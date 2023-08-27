@@ -1,0 +1,50 @@
+.planning-poker-body-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+}
+
+.planning-poker-gamers-zone {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.planning-poker-tasks-zone {
+    flex: 0 0 500px;
+}
+
+.planning-poker-card {
+    display: flex;
+    width: 120px;
+    height: 150px;
+    border-radius: 7px;
+    font-size: 70px;
+    align-items: center;
+    justify-content: center;
+}
+
+.planning-poker-card-active {
+    background-color: #68c35b;
+    color: white;
+}
+
+.planning-poker-card-hidden {
+    background-color: gray;
+    color: white;
+}
+
+.planning-poker-gamer-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.planning-poker-gamer-name {
+    width: 150px;
+    word-wrap: break-word;
+    text-align: center;
+}

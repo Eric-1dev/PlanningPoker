@@ -41,5 +41,14 @@
         "minify": {
             "enabled": true
         }
+    },
+    {
+        "outputFileName": "wwwroot/bundles/css/mainPage.bundle.css",
+        "inputFiles": [
+            "wwwroot/css/mainPage.css"
+        ],
+        "minify": {
+            "enabled": true
+        }
     }
 ]

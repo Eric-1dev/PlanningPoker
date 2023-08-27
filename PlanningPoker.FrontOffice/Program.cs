@@ -59,6 +59,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<ConnectHub>("/connect");
+app.MapHub<GameHub>("/game");
 
 app.Run();

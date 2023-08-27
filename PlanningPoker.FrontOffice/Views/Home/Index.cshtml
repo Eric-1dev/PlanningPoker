@@ -1,8 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Покер-планирование";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Styles {
+    <bundle name="wwwroot/bundles/css/mainPage.bundle.css" />
+}
+
+<div class="planning-poker-body-container">
+
+    <div class="planning-poker-gamers-zone">
+        @for (int i = 0; i < 20; i++)
+        {
+            <div class="planning-poker-gamer-score">
+
+                <div class="planning-poker-card planning-poker-card-active">
+                    @i
+                </div>
+
+                <div class="planning-poker-gamer-name">
+                    Another gamer
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <div class="planning-poker-tasks-zone">
+    </div>
 </div>
