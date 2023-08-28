@@ -28,19 +28,13 @@ header {
     left: 0;
     right: 0;
     height: 40px;
+    padding: 5px 20px;
 }
 
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 200px;
-}
-
-.planning-poker-body-wrapper {
-    position: fixed;
-    bottom: 200px;
-    top: 40px;
-    overflow-y: auto;
+.planning-poker-username-area {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: flex-end;
+    align-items: center;
 }

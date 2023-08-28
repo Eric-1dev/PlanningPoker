@@ -35,7 +35,7 @@
     {
         "outputFileName": "wwwroot/bundles/js/common.bundle.js",
         "inputFiles": [
-            "wwwroot/js/hubConnectorHelper.js",
+            "wwwroot/js/loginHelper.js.js",
             "wwwroot/js/modalWindowHelper.js"
         ],
         "minify": {
@@ -46,6 +46,16 @@
         "outputFileName": "wwwroot/bundles/css/mainPage.bundle.css",
         "inputFiles": [
             "wwwroot/css/mainPage.css"
+        ],
+        "minify": {
+            "enabled": true
+        }
+    },
+    {
+        "outputFileName": "wwwroot/bundles/js/gameProcess.bundle.js",
+        "inputFiles": [
+            "wwwroot/js/hubConnectorHelper.js",
+            "wwwroot/js/gameProcessHelper.js"
         ],
         "minify": {
             "enabled": true

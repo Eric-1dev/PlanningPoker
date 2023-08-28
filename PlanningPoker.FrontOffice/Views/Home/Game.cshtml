@@ -1,0 +1,74 @@
+@using PlanningPoker.Entities.Enums;
+
+@model GameProgressViewModel
+
+@{
+    ViewData["Title"] = "Покер-планирование";
+}
+
+@section Styles {
+    <bundle name="wwwroot/bundles/css/mainPage.bundle.css" />
+}
+
+@section Scripts {
+    <bundle name="wwwroot/bundles/js/gameProcess.bundle.js" />
+}
+
+<div class="planning-poker-gamers-zone-wrapper">
+    <div class="planning-poker-gamers-zone">
+        @for (int i = 0; i < 5; i++)
+        {
+            <div class="planning-poker-gamer-score">
+
+                <div class="planning-poker-card planning-poker-card-color-gray">
+                    @i
+                </div>
+
+                <div class="planning-poker-gamer-name">
+                    Another gamer
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+<div class="planning-poker-tasks-zone-wrapper">
+    <div class="planning-poker-tasks-zone">
+        tasks zone
+    </div>
+</div>
+
+<div class="footer">
+    @foreach (var card in Model.Cards)
+    {
+        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)">
+            @card.Score
+        </div>
+    }
+    @if (Model.NeedAddPassCard)
+    {
+        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(CardColorEnum.Gray)">
+            PASS
+        </div>
+    }
+</div>
+
+@{
+    string MapColorToClass(CardColorEnum color)
+    {
+        switch (color)
+        {
+            case CardColorEnum.Green:
+                return "planning-poker-card-color-green";
+            case CardColorEnum.Yellow:
+                return "planning-poker-card-color-yellow";
+            case CardColorEnum.Red:
+                return "planning-poker-card-color-red";
+            case CardColorEnum.Gray:
+                return "planning-poker-card-color-gray";
+            default:
+                return string.Empty;
+        }
+    }
+}

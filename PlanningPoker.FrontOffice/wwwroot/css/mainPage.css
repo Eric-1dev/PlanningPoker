@@ -1,9 +1,20 @@
-.planning-poker-body-container {
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 20px;
     gap: 20px;
+}
+
+.planning-poker-gamers-zone-wrapper {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 520px;
+    bottom: 200px;
+    overflow-y: auto;
 }
 
 .planning-poker-gamers-zone {
@@ -11,10 +22,25 @@
     flex-direction: row;
     flex-wrap: wrap;
     gap: 20px;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-content: center;
+    background: linear-gradient( #eee, transparent 1px), linear-gradient( 90deg, #eee, transparent 1px);
+    background-size: 15px 15px;
+    background-position: center center;
+}
+
+.planning-poker-tasks-zone-wrapper {
+    position: absolute;
+    width: 500px;
+    top: 40px;
+    right: 0;
+    bottom: 200px;
+    overflow-y: auto;
 }
 
 .planning-poker-tasks-zone {
-    flex: 0 0 500px;
 }
 
 .planning-poker-card {
@@ -25,16 +51,39 @@
     font-size: 70px;
     align-items: center;
     justify-content: center;
+    user-select: none;
 }
 
-.planning-poker-card-active {
+.planning-poker-card-color-green {
     background-color: #68c35b;
     color: white;
 }
 
-.planning-poker-card-hidden {
+.planning-poker-card-color-yellow {
+    background-color: #969a35;
+    color: white;
+}
+
+.planning-poker-card-color-red {
+    background-color: #c35b5b;
+    color: white;
+}
+
+.planning-poker-card-color-gray {
     background-color: gray;
     color: white;
+    font-size: 50px;
+}
+
+.planning-poker-card-clickable {
+    cursor: pointer;
+    transform: translateY(0) rotate(0);
+    transition-duration: 300ms;
+}
+
+.planning-poker-card-selected {
+    transform: translateY(-80px) rotate(-5deg);
+    transition-duration: 500ms;
 }
 
 .planning-poker-gamer-score {

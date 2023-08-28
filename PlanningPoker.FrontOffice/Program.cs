@@ -30,8 +30,9 @@ builder.Services
     .AddMvc()
     .AddControllersAsServices();
 
-builder.Services
-    .AddControllersWithViews();
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddBundles(options =>
 {
@@ -59,6 +60,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapHub<GameHub>("/game");
+app.MapHub<GameConnectHub>("/GameConnect");
 
 app.Run();
