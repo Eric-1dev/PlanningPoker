@@ -35,7 +35,6 @@
     {
         "outputFileName": "wwwroot/bundles/js/common.bundle.js",
         "inputFiles": [
-            "wwwroot/js/loginHelper.js.js",
             "wwwroot/js/modalWindowHelper.js"
         ],
         "minify": {
