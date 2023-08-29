@@ -59,5 +59,14 @@
         "minify": {
             "enabled": true
         }
+    },
+    {
+        "outputFileName": "wwwroot/bundles/css/login.bundle.css",
+        "inputFiles": [
+            "wwwroot/css/login.css"
+        ],
+        "minify": {
+            "enabled": true
+        }
     }
 ]

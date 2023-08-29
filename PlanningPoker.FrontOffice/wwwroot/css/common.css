@@ -38,3 +38,9 @@ header {
     justify-content: flex-end;
     align-items: center;
 }
+
+.planning-poker-backgroud-cell {
+    background: linear-gradient( #eee, transparent 1px), linear-gradient( 90deg, #eee, transparent 1px);
+    background-size: 15px 15px;
+    background-position: center center;
+}
