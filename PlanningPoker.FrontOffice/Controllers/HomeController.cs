@@ -5,8 +5,6 @@ namespace PlanningPoker.FrontOffice.Controllers
 {
     public class HomeController : Controller
     {
-        private const string _userNameCookieName = "UserName";
-
         public IActionResult Index()
         {
             return View();
@@ -15,11 +13,6 @@ namespace PlanningPoker.FrontOffice.Controllers
         [Route("/Game/{gameId:Guid}")]
         public IActionResult Game(Guid gameId)
         {
-            var userName = Request.Cookies[_userNameCookieName];
-
-            if (userName == null)
-                return RedirectToAction("Login", new { redirectUrl = Request.Path.Value });
-
             var model = new GameProgressViewModel
             {
                 Cards = new[]
@@ -40,31 +33,6 @@ namespace PlanningPoker.FrontOffice.Controllers
             };
 
             return View(model);
-        }
-
-        [Route("/Login")]
-        public IActionResult Login(string userName = null, string redirectUrl = null)
-        {
-            if (string.IsNullOrEmpty(userName))
-                return View("~/Views/Home/Login.cshtml", redirectUrl);
-
-            Response.Cookies.Append(_userNameCookieName, userName, new CookieOptions { Expires = DateTime.MaxValue });
-
-            if (redirectUrl != null)
-                return Redirect(redirectUrl);
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        [Route("/Logout")]
-        public IActionResult Logout(string redirectUrl)
-        {
-            if (Request.Cookies[_userNameCookieName] != null)
-            {
-                Response.Cookies.Append(_userNameCookieName, string.Empty, new CookieOptions { Expires = DateTime.Now.AddDays(-1) });
-            }
-
-            return Redirect(redirectUrl);
         }
     }
 }

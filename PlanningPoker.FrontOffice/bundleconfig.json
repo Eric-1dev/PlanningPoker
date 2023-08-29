@@ -42,9 +42,9 @@
         }
     },
     {
-        "outputFileName": "wwwroot/bundles/css/mainPage.bundle.css",
+        "outputFileName": "wwwroot/bundles/css/gamePage.bundle.css",
         "inputFiles": [
-            "wwwroot/css/mainPage.css"
+            "wwwroot/css/gamePage.css"
         ],
         "minify": {
             "enabled": true

@@ -3,8 +3,11 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using BundlerMinifier.TagHelpers;
 using ElectroPrognizer.Utils.Helpers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PlanningPoker.FrontOffice.Security;
 using PlanningPoker.IoC;
 using PlanningPoker.Services.Hubs;
 
@@ -41,6 +44,11 @@ builder.Services.AddBundles(options =>
     options.UseBundles = false;
 });
 
+builder.Services.AddAuthentication(PokerAuthenticationHandler.AuthSchemeName)
+    .AddScheme<AuthenticationSchemeOptions, PokerAuthenticationHandler>(PokerAuthenticationHandler.AuthSchemeName, null, options => { });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();
@@ -54,11 +62,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllers().RequireAuthorization();
 
 app.MapHub<GameConnectHub>("/GameConnect");
 

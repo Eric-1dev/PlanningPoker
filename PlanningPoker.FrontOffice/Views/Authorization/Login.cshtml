@@ -1,0 +1,22 @@
+@model string
+
+<div class="planning-poker-login-wrapper">
+    <form asp-action="Login">
+        <input type="hidden" name="redirectUrl" value="@Model" />
+        <input type="text" name="userName" placeholder="Имя пользователя" />
+        <input type="submit" class="btn btn-primary" value="Войти" />
+    </form>
+</div>
+
+<style>
+    .planning-poker-login-wrapper {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>

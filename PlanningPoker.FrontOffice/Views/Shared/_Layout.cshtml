@@ -16,8 +16,15 @@
 <body>
     <header>
         <div class="planning-poker-username-area">
-            @HttpContextAccessor.HttpContext.Request.Cookies["UserName"]
-            <a asp-action="Logout" asp-controller="Home" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Изменить имя</a>
+            @{
+                var userName = User.Identity.Name;
+
+                if (userName != null)
+                {
+                    <div>@userName</div>
+                    <a asp-action="Logout" asp-controller="Authorization" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Выход</a>
+                }
+            }
         </div>
     </header>
 
