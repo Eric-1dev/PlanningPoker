@@ -15,10 +15,9 @@ namespace PlanningPoker.FrontOffice.Controllers
 
             Response.Cookies.Append(PokerAuthenticationHandler.AuthCookieName, userName, new CookieOptions { Expires = DateTime.MaxValue });
 
-            if (redirectUrl != null)
-                return Redirect(redirectUrl);
-
-            return RedirectToAction("Index", "Home");
+            return redirectUrl == null
+                ? RedirectToAction("Index", "Home")
+                : Redirect(redirectUrl);
         }
 
         [Route("/Logout")]
