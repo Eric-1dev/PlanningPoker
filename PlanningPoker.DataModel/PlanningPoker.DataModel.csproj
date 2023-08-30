@@ -5,4 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PlanningPoker.Entities\PlanningPoker.Entities.csproj" />
+  </ItemGroup>
+
 </Project>

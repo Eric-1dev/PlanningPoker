@@ -14,8 +14,10 @@
     <bundle name="wwwroot/bundles/js/gameProcess.bundle.js" />
 }
 
+<input type="hidden" id="planning-poker-game-id" value="@Model.GameId" />
+
 <div class="planning-poker-gamers-zone-wrapper">
-    <div class="planning-poker-gamers-zone planning-poker-backgroud-cell">
+    <div class="planning-poker-gamers-zone">
         @for (int i = 0; i < 5; i++)
         {
             <div class="planning-poker-gamer-score">

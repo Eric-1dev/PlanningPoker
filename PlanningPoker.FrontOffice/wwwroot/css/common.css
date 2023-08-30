@@ -39,6 +39,14 @@ header {
     align-items: center;
 }
 
+.planning-poker-body-wrapper {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    left: 0;
+    bottom: 0;
+}
+
 .planning-poker-backgroud-cell {
     background: linear-gradient( #eee, transparent 1px), linear-gradient( 90deg, #eee, transparent 1px);
     background-size: 15px 15px;

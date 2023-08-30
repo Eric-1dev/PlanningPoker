@@ -1,12 +1,42 @@
+@{
+    ViewData["Title"] = "Создание игры";
+}
+
+
+@section Styles {
+    <bundle name="wwwroot/bundles/css/createGame.bundle.css" />
+}
+
+@section Scripts {
+    <bundle name="wwwroot/bundles/js/createGame.bundle.js" />
+}
+
 <div class="planning-poker-create-game-container">
-    <form asp-action="CreateGame" asp-controller="Home">
-        <div class="d-flex flex-column align-items-center">
-            <div class="mb-3">
-                <input type="text" />
-            </div>
+    <div class="planning-poker-create-game-form-wrapper" planning-poker-create-game-url="@Url.Action("CreateGame", "Home")">
+        <div class="planning-poker-create-game-form-container">
+            @RenderInputArea()
+
             <div>
-                <button type="submit" class="btn btn-success shadow-none">Создать игру</button>
+                <button type="button" class="btn btn-primary shadow-none mt-3" id="planning-poker-create-game-button">Создать игру</button>
             </div>
         </div>
-    </form>
+    </div>
 </div>
+
+<div id="planning-poker-create-game-task-name-template">
+    @RenderInputArea()
+</div>
+
+@{
+    object RenderInputArea()
+    {
+        <div class="mb-3 planning-poker-task-name-container">
+            <div class="planning-poker-task-block">
+                <textarea class="form-control shadow-none planning-poker-task-name" name="tasks" cols="60" rows="2" placeholder="Название задачи для оценки"></textarea>
+                <button type="button" class="btn btn-sm btn-warning mt-1 shadow-none planning-poker-delete-task-button">-</button>
+                <button type="button" class="btn btn-sm btn-success mt-1 shadow-none planning-poker-add-task-button">+</button>
+            </div>
+        </div>
+        return null;
+    }
+}

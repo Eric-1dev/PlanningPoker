@@ -1,38 +1,62 @@
 using Microsoft.AspNetCore.Mvc;
+using PlanningPoker.Entities.Enums;
 using PlanningPoker.FrontOffice.Models;
+using PlanningPoker.Services.Interfaces;
 
-namespace PlanningPoker.FrontOffice.Controllers
+namespace PlanningPoker.FrontOffice.Controllers;
+
+public class HomeController : BaseController
 {
-    public class HomeController : Controller
+    public IGameControlService GameControlService { get; set; }
+
+    public IActionResult Index()
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View();
+    }
 
-        [Route("/Game/{gameId:Guid}")]
-        public IActionResult Game(Guid gameId)
+    [Route("/Game/{gameId:Guid}")]
+    public IActionResult Game(Guid gameId)
+    {
+        var tasks = GameControlService.GetTasksByGameById(gameId);
+
+        var model = new GameProgressViewModel
         {
-            var model = new GameProgressViewModel
+            GameId = gameId,
+
+            Tasks = tasks.Select(x => new GameTaskViewModel
             {
-                Cards = new[]
-                {
-                    new CardViewModel(0, Entities.Enums.CardColorEnum.Green),
-                    new CardViewModel(0.5, Entities.Enums.CardColorEnum.Green),
-                    new CardViewModel(1, Entities.Enums.CardColorEnum.Green),
-                    new CardViewModel(2, Entities.Enums.CardColorEnum.Green),
-                    new CardViewModel(3, Entities.Enums.CardColorEnum.Green),
-                    new CardViewModel(5, Entities.Enums.CardColorEnum.Yellow),
-                    new CardViewModel(8, Entities.Enums.CardColorEnum.Yellow),
-                    new CardViewModel(13, Entities.Enums.CardColorEnum.Yellow),
-                    new CardViewModel(21, Entities.Enums.CardColorEnum.Red),
-                    new CardViewModel(34, Entities.Enums.CardColorEnum.Red),
-                    new CardViewModel(55, Entities.Enums.CardColorEnum.Red),
-                },
-                NeedAddPassCard = true
-            };
+                Id = x.Id,
+                Text = x.Text
+            }).ToArray(),
 
-            return View(model);
-        }
+            Cards = new[]
+            {
+                new CardViewModel(0,    CardColorEnum.Green),
+                new CardViewModel(0.5,  CardColorEnum.Green),
+                new CardViewModel(1,    CardColorEnum.Green),
+                new CardViewModel(2,    CardColorEnum.Green),
+                new CardViewModel(3,    CardColorEnum.Green),
+                new CardViewModel(5,    CardColorEnum.Yellow),
+                new CardViewModel(8,    CardColorEnum.Yellow),
+                new CardViewModel(13,   CardColorEnum.Yellow),
+                new CardViewModel(21,   CardColorEnum.Red),
+                new CardViewModel(34,   CardColorEnum.Red),
+                new CardViewModel(55,   CardColorEnum.Red),
+            },
+            NeedAddPassCard = true
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public JsonResult CreateGame(string[] tasks)
+    {
+        if (tasks.Length == 0)
+            return Fail("Не заполнена ни одна задача");
+
+        var gameId = GameControlService.CreateNewGame(tasks);
+
+        return Success(gameId);
     }
 }

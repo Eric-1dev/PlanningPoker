@@ -68,5 +68,23 @@
         "minify": {
             "enabled": true
         }
+    },
+    {
+        "outputFileName": "wwwroot/bundles/css/createGame.bundle.css",
+        "inputFiles": [
+            "wwwroot/css/createGame.css"
+        ],
+        "minify": {
+            "enabled": true
+        }
+    },
+    {
+        "outputFileName": "wwwroot/bundles/js/createGame.bundle.js",
+        "inputFiles": [
+            "wwwroot/js/createGameHelper.js"
+        ],
+        "minify": {
+            "enabled": true
+        }
     }
 ]

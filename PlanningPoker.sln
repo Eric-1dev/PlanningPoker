@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningPoker.DataLayer", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningPoker.Utils", "PlanningPoker.Utils\PlanningPoker.Utils.csproj", "{3A7B9DEC-45F6-4173-8287-DFF4D6012A7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningPoker.Entities", "PlanningPoker.Entities\PlanningPoker.Entities.csproj", "{4C468D58-131F-4FD3-86B4-2E07AEC8EE38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlanningPoker.Entities", "PlanningPoker.Entities\PlanningPoker.Entities.csproj", "{4C468D58-131F-4FD3-86B4-2E07AEC8EE38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanningPoker.DataModel", "PlanningPoker.DataModel\PlanningPoker.DataModel.csproj", "{C1774F7E-40DF-496F-8962-36E8EDD99D1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{4C468D58-131F-4FD3-86B4-2E07AEC8EE38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C468D58-131F-4FD3-86B4-2E07AEC8EE38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C468D58-131F-4FD3-86B4-2E07AEC8EE38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1774F7E-40DF-496F-8962-36E8EDD99D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1774F7E-40DF-496F-8962-36E8EDD99D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1774F7E-40DF-496F-8962-36E8EDD99D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1774F7E-40DF-496F-8962-36E8EDD99D1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
