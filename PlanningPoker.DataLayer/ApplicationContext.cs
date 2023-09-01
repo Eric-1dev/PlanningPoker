@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataModel;
 
@@ -6,7 +7,7 @@ namespace PlanningPoker.DataLayer;
 public class ApplicationContext : DbContext
 {
     public DbSet<Game> Games { get; set; }
-    public DbSet<GameTask> GameTasks { get; set; }
+    public DbSet<GameSubTask> GameSubTasks { get; set; }
 
     public ApplicationContext()
     {
@@ -25,7 +26,7 @@ public class ApplicationContext : DbContext
         //optionsBuilder.UseSqlite("Data Source=Database.db");
 
 #if DEBUG
-        //optionsBuilder.LogTo((message) => { Debug.WriteLine(message); });
+        optionsBuilder.LogTo((message) => { Debug.WriteLine(message); });
 #endif
     }
 }

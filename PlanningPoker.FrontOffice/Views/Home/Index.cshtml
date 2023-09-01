@@ -14,7 +14,9 @@
 <div class="planning-poker-create-game-container">
     <div class="planning-poker-create-game-form-wrapper" planning-poker-create-game-url="@Url.Action("CreateGame", "Home")">
         <div class="planning-poker-create-game-form-container">
-            @RenderInputArea()
+            @RenderInputArea(isSubtask: false)
+
+            @RenderInputArea(isSubtask: true)
 
             <div>
                 <button type="button" class="btn btn-primary shadow-none mt-3" id="planning-poker-create-game-button">Создать игру</button>
@@ -24,17 +26,24 @@
 </div>
 
 <div id="planning-poker-create-game-task-name-template">
-    @RenderInputArea()
+    @RenderInputArea(isSubtask: true)
 </div>
 
 @{
-    object RenderInputArea()
+    object RenderInputArea(bool isSubtask)
     {
+        var taskClass = isSubtask ? "planning-poker-subtask-name" : "planning-poker-task-name";
+        var placeholder = isSubtask ? "Название подзадачи" : "Название задачи";
+
         <div class="mb-3 planning-poker-task-name-container">
             <div class="planning-poker-task-block">
-                <textarea class="form-control shadow-none planning-poker-task-name" name="tasks" cols="60" rows="2" placeholder="Название задачи для оценки"></textarea>
-                <button type="button" class="btn btn-sm btn-warning mt-1 shadow-none planning-poker-delete-task-button">-</button>
-                <button type="button" class="btn btn-sm btn-success mt-1 shadow-none planning-poker-add-task-button">+</button>
+                <textarea class="form-control shadow-none @taskClass" name="tasks" cols="60" rows="2" placeholder="@placeholder"></textarea>
+
+                @if (isSubtask)
+                {
+                    <button type="button" class="btn btn-sm btn-warning mt-1 shadow-none planning-poker-delete-subtask-button">-</button>
+                    <button type="button" class="btn btn-sm btn-success mt-1 shadow-none planning-poker-add-subtask-button">+</button>
+                }
             </div>
         </div>
         return null;

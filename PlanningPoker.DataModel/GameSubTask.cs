@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PlanningPoker.DataModel;
 
-public class GameTask : BaseEntity
+public class GameSubTask : BaseEntity
 {
     [Required]
     public Guid GameId { get; set; }

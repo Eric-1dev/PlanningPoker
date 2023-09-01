@@ -10,7 +10,11 @@ public class Game
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
 
-    public virtual List<GameTask> Tasks { get; set; }
+    [StringLength(512)]
+    [Required]
+    public string TaskName { get; set; }
+
+    public virtual List<GameSubTask> SubTasks { get; set; }
 
     [Column("GameStateId")]
     [Required]

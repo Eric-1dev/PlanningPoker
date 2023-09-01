@@ -7,14 +7,15 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameControlService : IGameControlService
 {
-    public Guid CreateNewGame(string[] tasks)
+    public Guid CreateNewGame(string taskName, string[] subTasks)
     {
         using var dbContext = new ApplicationContext();
 
         var game = new Game
         {
             GameState = GameStateEnum.Paused,
-            Tasks = tasks.Select(x => new GameTask { Text = x}).ToList(),
+            TaskName = taskName,
+            SubTasks = subTasks.Select(x => new GameSubTask { Text = x}).ToList(),
         };
 
         dbContext.Games.Add(game);
@@ -24,7 +25,7 @@ public class GameControlService : IGameControlService
         return game.Id;
     }
 
-    public GameTask[] GetTasksByGameById(Guid gameId)
+    public GameSubTask[] GetTasksByGameById(Guid gameId)
     {
         using var dbContext = new ApplicationContext();
 
@@ -33,6 +34,6 @@ public class GameControlService : IGameControlService
         if (game == null)
             throw new Exception($"Игра с ID {gameId} не найдена");
 
-        return game.Tasks.ToArray();
+        return game.SubTasks.ToArray();
     }
 }

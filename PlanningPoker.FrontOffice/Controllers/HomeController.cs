@@ -50,12 +50,12 @@ public class HomeController : BaseController
     }
 
     [HttpPost]
-    public JsonResult CreateGame(string[] tasks)
+    public JsonResult CreateGame(string taskName, string[] subtasks)
     {
-        if (tasks.Length == 0)
+        if (string.IsNullOrEmpty(taskName))
             return Fail("Не заполнена ни одна задача");
 
-        var gameId = GameControlService.CreateNewGame(tasks);
+        var gameId = GameControlService.CreateNewGame(taskName, subtasks);
 
         return Success(gameId);
     }

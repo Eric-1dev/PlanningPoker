@@ -4,7 +4,7 @@ namespace PlanningPoker.Services.Interfaces;
 
 public interface IGameControlService
 {
-    Guid CreateNewGame(string[] tasks);
+    Guid CreateNewGame(string taskName, string[] subTasks);
 
-    GameTask[] GetTasksByGameById(Guid id);
+    GameSubTask[] GetTasksByGameById(Guid id);
 }

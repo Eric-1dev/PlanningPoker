@@ -36,18 +36,22 @@
 
 .planning-poker-task-name {
     resize: none;
-    border-radius: 5px 0 0 5px;
-
+    border-radius: 5px;
 }
 
-.planning-poker-delete-task-button {
+.planning-poker-subtask-name {
+    resize: none;
+    border-radius: 5px 0 0 5px;
+}
+
+.planning-poker-delete-subtask-button {
     border-radius: 0;
     margin: 0 !important;
     font-weight: bold;
     width: 2em;
 }
 
-.planning-poker-add-task-button {
+.planning-poker-add-subtask-button {
     border-radius: 0 5px 5px 0;
     margin: 0 !important;
     font-weight: bold;
