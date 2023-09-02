@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
@@ -7,7 +8,7 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameControlService : IGameControlService
 {
-    public Guid CreateNewGame(string taskName, string[] subTasks)
+    public Guid CreateNewGame(string taskName, string[] subTasks, Guid adminId)
     {
         using var dbContext = new ApplicationContext();
 
@@ -16,6 +17,7 @@ public class GameControlService : IGameControlService
             GameState = GameStateEnum.Paused,
             TaskName = taskName,
             SubTasks = subTasks.Select(x => new GameSubTask { Text = x}).ToList(),
+            AdminId = adminId
         };
 
         dbContext.Games.Add(game);
@@ -25,15 +27,18 @@ public class GameControlService : IGameControlService
         return game.Id;
     }
 
-    public GameSubTask[] GetTasksByGameById(Guid gameId)
+    public Game GetGameById(Guid gameId)
     {
         using var dbContext = new ApplicationContext();
 
-        var game = dbContext.Games.FirstOrDefault(x => x.Id == gameId);
+        var game = dbContext.Games
+            .Where(x => x.Id == gameId)
+            .Include(x => x.SubTasks)
+            .FirstOrDefault();
 
         if (game == null)
             throw new Exception($"Игра с ID {gameId} не найдена");
 
-        return game.SubTasks.ToArray();
+        return game;
     }
 }

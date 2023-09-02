@@ -13,7 +13,7 @@
     position: absolute;
     top: 40px;
     left: 0px;
-    right: 520px;
+    right: 720px;
     bottom: 210px;
     overflow-y: auto;
     padding: 10px;
@@ -33,15 +33,12 @@
 
 .planning-poker-tasks-zone-wrapper {
     position: absolute;
-    width: 500px;
+    width: 700px;
     top: 40px;
     right: 0;
     bottom: 200px;
     overflow-y: auto;
     padding: 10px;
-}
-
-.planning-poker-tasks-zone {
 }
 
 .planning-poker-card {
@@ -67,6 +64,11 @@
 
 .planning-poker-card-color-red {
     background-color: #c35b5b;
+    color: white;
+}
+
+.planning-poker-card-color-blue {
+    background-color: cadetblue;
     color: white;
 }
 
@@ -97,4 +99,39 @@
     width: 150px;
     word-wrap: break-word;
     text-align: center;
+}
+
+.planning-poker-tasks-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.planning-poker-tasks-zone-task {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 26px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+    .planning-poker-tasks-zone-task[selected] {
+        font-weight: bold;
+    }
+
+.planning-poker-tasks-zone-task-header {
+    
+}
+
+.planning-poker-tasks-zone-task-name {
+    color: blue;
+}
+
+.planning-poker-tasks-zone-task-score {
+    width: 4.5em;
+    border: 1px dotted;
 }

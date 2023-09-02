@@ -14,9 +14,13 @@ public class Game
     [Required]
     public string TaskName { get; set; }
 
+    public Guid AdminId { get; set; }
+
     public virtual List<GameSubTask> SubTasks { get; set; }
 
     [Column("GameStateId")]
     [Required]
     public GameStateEnum GameState { get; set; }
+
+    public double TotalScore { get; set; }
 }

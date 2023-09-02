@@ -1,4 +1,5 @@
 @using PlanningPoker.Entities.Enums;
+@using PlanningPoker.Utils.Extensions;
 
 @model GameProgressViewModel
 
@@ -18,7 +19,7 @@
 
 <div class="planning-poker-gamers-zone-wrapper">
     <div class="planning-poker-gamers-zone">
-        @for (int i = 0; i < 5; i++)
+        @for (int i = 0; i < 2; i++)
         {
             <div class="planning-poker-gamer-score">
 
@@ -37,7 +38,21 @@
 
 <div class="planning-poker-tasks-zone-wrapper">
     <div class="planning-poker-tasks-zone">
-        tasks zone
+        @if (Model.SubTasks.Any())
+        {
+            <div class="planning-poker-tasks-zone-task-header">
+                @Model.TaskName
+            </div>
+
+            @foreach (var subTask in Model.SubTasks)
+            {
+                RenderTask(subTask);
+            }
+        }
+        else
+        {
+            RenderTask(null);
+        }
     </div>
 </div>
 
@@ -69,8 +84,41 @@
                 return "planning-poker-card-color-red";
             case CardColorEnum.Gray:
                 return "planning-poker-card-color-gray";
+            case CardColorEnum.Blue:
+                return "planning-poker-card-color-blue";
             default:
                 return string.Empty;
         }
+    }
+
+    object RenderTask(GameTaskViewModel task)
+    {
+        <div class="planning-poker-tasks-zone-task" task-id="@task.Id">
+            <div class="planning-poker-tasks-zone-task-name">@task.Text</div>
+
+            @if (IsAdmin())
+            {
+                <select class="form-select shadow-none planning-poker-tasks-zone-task-score">
+                    <!option value=""></!option>
+                    @foreach (var score in Model.Cards.Select(x => x.Score))
+                    {
+                        var selectedAttr = task.Score == score ? "selected" : "";
+
+                        <!option @selectedAttr value="@score">@score</!option>
+                    }
+                </select>
+            }
+            else
+            {
+                <div>@task.Score</div>
+            }
+        </div>
+
+        return null;
+    }
+
+    bool IsAdmin()
+    {
+        return Model.AdminId == User.GetUserId();
     }
 }

@@ -14,4 +14,6 @@ public class GameSubTask : BaseEntity
     [StringLength(512)]
     [Required]
     public string Text { get; set; }
+
+    public double? Score { get; set; }
 }

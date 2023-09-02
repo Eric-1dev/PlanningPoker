@@ -53,8 +53,8 @@
     {
         "outputFileName": "wwwroot/bundles/js/gameProcess.bundle.js",
         "inputFiles": [
-            "wwwroot/js/hubConnectorHelper.js",
-            "wwwroot/js/gameProcessHelper.js"
+            "wwwroot/js/gameProcessHelper.js",
+            "wwwroot/js/hubConnectorHelper.js"
         ],
         "minify": {
             "enabled": true

@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using PlanningPoker.Entities.Enums;
 using PlanningPoker.FrontOffice.Models;
+using PlanningPoker.FrontOffice.Security;
 using PlanningPoker.Services.Interfaces;
+using PlanningPoker.Utils.Extensions;
 
 namespace PlanningPoker.FrontOffice.Controllers;
 
@@ -17,16 +20,18 @@ public class HomeController : BaseController
     [Route("/Game/{gameId:Guid}")]
     public IActionResult Game(Guid gameId)
     {
-        var tasks = GameControlService.GetTasksByGameById(gameId);
+        var game = GameControlService.GetGameById(gameId);
 
         var model = new GameProgressViewModel
         {
             GameId = gameId,
+            TaskName = game.TaskName,
 
-            Tasks = tasks.Select(x => new GameTaskViewModel
+            SubTasks = game.SubTasks?.Select(x => new GameTaskViewModel
             {
                 Id = x.Id,
-                Text = x.Text
+                Text = x.Text,
+                Score = x.Score
             }).ToArray(),
 
             Cards = new[]
@@ -43,7 +48,10 @@ public class HomeController : BaseController
                 new CardViewModel(34,   CardColorEnum.Red),
                 new CardViewModel(55,   CardColorEnum.Red),
             },
-            NeedAddPassCard = true
+
+            NeedAddPassCard = true,
+            AdminId = game.AdminId,
+            TotalScore = game.TotalScore,
         };
 
         return View(model);
@@ -55,7 +63,12 @@ public class HomeController : BaseController
         if (string.IsNullOrEmpty(taskName))
             return Fail("Не заполнена ни одна задача");
 
-        var gameId = GameControlService.CreateNewGame(taskName, subtasks);
+        var userId = User.GetUserId();
+
+        if (userId == null)
+            return Fail("Не удалось определить ваш Id. Попробуйте обновить страницу.");
+
+        var gameId = GameControlService.CreateNewGame(taskName, subtasks, userId.Value);
 
         return Success(gameId);
     }

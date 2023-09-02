@@ -6,4 +6,5 @@ public enum CardColorEnum
     Yellow = 2,
     Red = 3,
     Gray = 4,
+    Blue = 5,
 }

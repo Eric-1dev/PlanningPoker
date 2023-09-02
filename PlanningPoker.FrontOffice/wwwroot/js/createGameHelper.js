@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 $(document).ready(() => {
     createGameHelper.init();
 });
@@ -10,8 +12,15 @@ let createGameHelper = {
         createGameHelper._bindAddEvent($('.planning-poker-add-subtask-button'));
         createGameHelper._bindDeleteEvent($('.planning-poker-delete-subtask-button'));
 
+        $('#planning-poker-add-subtask').click(() => createGameHelper._insertNewInputAfter(null));
+
         $('#planning-poker-create-game-button').click(() => createGameHelper._createGame());
+
+        createGameHelper._createGameUrl = $('.planning-poker-create-game-form-wrapper').attr('planning-poker-create-game-url');
     },
+
+    _createGameUrl: '',
+    _gameUrl: 'Game/',
 
     _taskNameTemplate: {},
 
@@ -25,16 +34,17 @@ let createGameHelper = {
 
     _bindDeleteEvent: (target) => {
         $(target).click((event) => {
-            let allAreas = $('.planning-poker-task-name-container');
+            let allAreas = $('.planning-poker-subtask-container-wrapper .planning-poker-task-name-container');
 
-            if (allAreas.length <= 2) {
-                return;
+            if (allAreas.length === 1) {
+                $('#planning-poker-add-subtask').show();
             }
 
             let area = $(event.target).closest('.planning-poker-task-name-container');
 
             if (area.find('.planning-poker-subtask-name').val() !== '') {
-                modalWindowHelper.showConfirm('Вы действительно хотите удалить строку?', () => { area.remove(); return true; });
+                modalWindowHelper.showConfirmDialog('Вы действительно хотите удалить строку?', () => { area.remove(); return true; });
+                return;
             }
 
             area.remove();
@@ -47,14 +57,18 @@ let createGameHelper = {
         createGameHelper._bindAddEvent(newInput.find('.planning-poker-add-subtask-button'));
         createGameHelper._bindDeleteEvent(newInput.find('.planning-poker-delete-subtask-button'));
 
-        previousItem.after(newInput);
+        $('#planning-poker-add-subtask').hide();
+
+        if (previousItem) {
+            previousItem.after(newInput);
+        } else {
+            $('.planning-poker-subtask-container-wrapper').append(newInput);
+        }
 
         newInput.find('.planning-poker-subtask-name').focus();
     },
 
     _createGame: () => {
-        let url = $('.planning-poker-create-game-form-wrapper').attr('planning-poker-create-game-url');
-
         let taskName = $('.planning-poker-create-game-form-container .planning-poker-task-name').val();
 
         let subTasks = [];
@@ -72,12 +86,12 @@ let createGameHelper = {
         }
 
         $.ajax({
-            url: url,
+            url: createGameHelper._createGameUrl,
             type: 'POST',
             data: { taskName: taskName, subTasks: subTasks },
             success: (data) => {
                 if (data.isSuccess) {
-                    modalWindowHelper.showInfo(data.message);
+                    location.href = createGameHelper._gameUrl + data.entity;
                 } else {
                     modalWindowHelper.showError(data.message);
                 }

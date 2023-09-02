@@ -16,7 +16,12 @@
         <div class="planning-poker-create-game-form-container">
             @RenderInputArea(isSubtask: false)
 
-            @RenderInputArea(isSubtask: true)
+            <div class="planning-poker-subtask-container-wrapper">
+            </div>
+
+            <div>
+                <button type="button" class="btn btn-outline-success" id="planning-poker-add-subtask">Добавить подзадачу</button>
+            </div>
 
             <div>
                 <button type="button" class="btn btn-primary shadow-none mt-3" id="planning-poker-create-game-button">Создать игру</button>

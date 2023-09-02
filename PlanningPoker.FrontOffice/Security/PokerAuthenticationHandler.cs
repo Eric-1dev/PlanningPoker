@@ -11,12 +11,21 @@ public class PokerAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     public const string AuthSchemeName = "Basic";
 
     public const string AuthCookieName = "UserName";
+    public const string AuthCookieId = "UserId";
 
     public PokerAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
     { }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var userId = Context.Request.Cookies[AuthCookieId];
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            userId = Guid.NewGuid().ToString();
+            Context.Response.Cookies.Append(AuthCookieId, userId, new CookieOptions { Expires = DateTime.MaxValue });
+        }
+
         var userName = Context.Request.Cookies[AuthCookieName];
 
         if (string.IsNullOrEmpty(userName))
@@ -25,7 +34,8 @@ public class PokerAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         var claims = new Claim[]
         {
             new Claim(ClaimTypes.Role, "User"),
-            new Claim(ClaimTypes.Name, userName)
+            new Claim(ClaimTypes.Name, userName),
+            new Claim(ClaimTypes.NameIdentifier, userId)
         };
 
         var identity = new ClaimsIdentity(claims, AuthSchemeName);

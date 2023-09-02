@@ -4,10 +4,16 @@ namespace PlanningPoker.FrontOffice.Models
     {
         public Guid GameId { get; set; }
 
+        public string TaskName { get; set; }
+
         public CardViewModel[] Cards { get; set; }
 
         public bool NeedAddPassCard { get; set; }
 
-        public GameTaskViewModel[] Tasks { get; set; }
+        public GameTaskViewModel[] SubTasks { get; set; }
+
+        public Guid AdminId { get; set; }
+
+        public double TotalScore { get; set; }
     }
 }
