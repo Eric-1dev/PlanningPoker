@@ -25,7 +25,7 @@ let gameProcessHelper = {
 
     gameId: '',
 
-    renderUser: (userName, userId) => {
+    addUser: (userName, userId) => {
         let existingUser = $(`.planning-poker-gamer-score[id="${userId}"]`);
         if (existingUser.length > 0) {
             return;
@@ -41,5 +41,14 @@ let gameProcessHelper = {
         score.append(userNameBlock);
 
         $('.planning-poker-gamers-zone').append(score);
+    },
+
+    removeUser: (userId) => {
+        let existingUser = $(`.planning-poker-gamer-score[id="${userId}"]`);
+        if (existingUser.length < 1) {
+            return;
+        }
+
+        existingUser.remove();
     }
 };
