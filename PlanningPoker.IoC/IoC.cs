@@ -19,7 +19,7 @@ public static class IoC
             .SingleInstance()
             .PropertiesAutowired();
 
-        builder.RegisterType<GameGroupCacheInMemoryService>()
+        builder.RegisterType<GameGroupCacheInDataBaseService>()
             .As<IGameGroupCacheService>()
             .SingleInstance()
             .PropertiesAutowired();

@@ -58,17 +58,20 @@ public class HomeController : BaseController
     }
 
     [HttpPost]
-    public JsonResult CreateGame(string taskName, string[] subtasks)
+    public JsonResult CreateGame(string taskName, string[] subTasks)
     {
         if (string.IsNullOrEmpty(taskName))
-            return Fail("Не заполнена ни одна задача");
+            return Fail("Не заполнено название задачи");
 
         var userId = User.GetUserId();
 
         if (userId == null)
             return Fail("Не удалось определить ваш Id. Попробуйте обновить страницу.");
 
-        var gameId = GameControlService.CreateNewGame(taskName, subtasks, userId.Value);
+        if (!subTasks.Any())
+            subTasks = new[] { "Задача целиком" };
+
+        var gameId = GameControlService.CreateNewGame(taskName, subTasks, userId.Value);
 
         return Success(gameId);
     }

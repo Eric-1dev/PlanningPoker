@@ -19,40 +19,31 @@
 
 <div class="planning-poker-gamers-zone-wrapper">
     <div class="planning-poker-gamers-zone">
-        @for (int i = 0; i < 2; i++)
-        {
-            <div class="planning-poker-gamer-score">
+        <div class="planning-poker-gamer-score" mycard="true" user-id="@User.GetUserId()">
 
-                <div class="planning-poker-card planning-poker-card-color-gray">
-                    @i
-                </div>
-
-                <div class="planning-poker-gamer-name">
-                    Another gamer
-                </div>
-
+            <div class="planning-poker-card" card-state="unvoted">
             </div>
-        }
+
+            <div class="planning-poker-gamer-name">
+                @User.Identity.Name
+            </div>
+
+        </div>
     </div>
 </div>
 
 <div class="planning-poker-tasks-zone-wrapper">
     <div class="planning-poker-tasks-zone">
-        @if (Model.SubTasks.Any())
-        {
-            <div class="planning-poker-tasks-zone-task-header">
-                @Model.TaskName
-            </div>
 
-            @foreach (var subTask in Model.SubTasks)
-            {
-                RenderTask(subTask);
-            }
-        }
-        else
+        <div class="planning-poker-tasks-zone-task-header">
+            @Model.TaskName
+        </div>
+
+        @foreach (var subTask in Model.SubTasks)
         {
-            RenderTask(null);
+            RenderTask(subTask);
         }
+
     </div>
 </div>
 

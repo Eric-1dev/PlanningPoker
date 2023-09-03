@@ -8,6 +8,7 @@ public class ApplicationContext : DbContext
 {
     public DbSet<Game> Games { get; set; }
     public DbSet<GameSubTask> GameSubTasks { get; set; }
+    public DbSet<GamerConnection> GamerConnectionsCache { get; set; }
 
     public ApplicationContext()
     {
@@ -17,6 +18,9 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<GamerConnection>().HasIndex(x => x.GameId);
+        modelBuilder.Entity<GamerConnection>().HasIndex(x => x.Id);
+
         base.OnModelCreating(modelBuilder);
     }
 

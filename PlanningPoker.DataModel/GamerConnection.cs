@@ -3,19 +3,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PlanningPoker.DataModel;
 
-public class GameSubTask : BaseEntity
+public class GamerConnection
 {
-    [Required]
+    [Key]
+    public string ConnectionId { get; set; }
+
     public Guid GameId { get; set; }
 
     [ForeignKey(nameof(GameId))]
     public Game Game { get; set; }
 
-    [StringLength(512)]
-    [Required]
-    public string Text { get; set; }
+    public Guid Id { get; set; }
 
-    public double? Score { get; set; }
+    public string Name { get; set; }
 
-    public bool IsSelected { get; set; }
+    public bool HasVoted { get; set; }
+
+    public bool IsPlayer { get; set; }
 }

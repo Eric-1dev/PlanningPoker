@@ -67,16 +67,33 @@
     color: white;
 }
 
-.planning-poker-card-color-blue {
-    background-color: cadetblue;
-    color: white;
-}
-
 .planning-poker-card-color-gray {
     background-color: gray;
     color: white;
     font-size: 50px;
 }
+
+.planning-poker-card[card-state='voted-closed'] {
+    background-color: cadetblue;
+    color: white;
+}
+
+    .planning-poker-card[card-state='voted-closed']::after {
+        content: "\f26e";
+        font-family: "bootstrap-icons";
+    }
+
+.planning-poker-card[card-state='unvoted'] {
+    background-color: white;
+    color: black;
+    border: 1px solid lightgray;
+}
+
+    .planning-poker-card[card-state='unvoted']::after {
+        content: "\f293";
+        font-family: "bootstrap-icons";
+        color: gray;
+    }
 
 .planning-poker-card-clickable {
     cursor: pointer;
@@ -124,7 +141,6 @@
     }
 
 .planning-poker-tasks-zone-task-header {
-    
 }
 
 .planning-poker-tasks-zone-task-name {

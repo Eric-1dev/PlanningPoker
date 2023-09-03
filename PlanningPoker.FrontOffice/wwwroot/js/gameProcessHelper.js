@@ -13,11 +13,11 @@ let gameProcessHelper = {
 
             let wasSelected = selectedCard.hasClass('planning-poker-card-selected');
 
-            $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
+            let hasVote = !wasSelected;
 
-            if (!wasSelected) {
-                selectedCard.addClass('planning-poker-card-selected');
-            }
+            hubConnectorHelper.invokeTryChangeVote(hasVote);
+
+            gameProcessHelper._lastClickedCard = selectedCard;
         });
 
         hubConnectorHelper.init();
@@ -25,30 +25,66 @@ let gameProcessHelper = {
 
     gameId: '',
 
-    addUser: (userName, userId) => {
-        let existingUser = $(`.planning-poker-gamer-score[id="${userId}"]`);
-        if (existingUser.length > 0) {
+    addUser: (user) => {
+        let existingUserCard = gameProcessHelper._findUserCardByUserId(user.id);
+        if (existingUserCard.length > 0) {
             return;
         }
 
-        let score = $('<div class="planning-poker-gamer-score">');
-        score.prop('id', userId);
-        let card = $('<div class="planning-poker-card planning-poker-card-color-gray">');
+        let scoreBlock = $('<div class="planning-poker-gamer-score">');
+        scoreBlock.attr('user-id', user.id);
+
+        let cardState;
+        if (user.hasVoted) {
+            cardState = 'voted-closed';
+        } else {
+            cardState = 'unvoted';
+        }
+
+        let card = $(`<div class="planning-poker-card" card-state="${cardState}">`);
         let userNameBlock = $('<div class="planning-poker-gamer-name">');
-        userNameBlock.html(userName);
+        userNameBlock.html(user.name);
 
-        score.append(card);
-        score.append(userNameBlock);
+        scoreBlock.append(card);
+        scoreBlock.append(userNameBlock);
 
-        $('.planning-poker-gamers-zone').append(score);
+        $('.planning-poker-gamers-zone').append(scoreBlock);
     },
 
     removeUser: (userId) => {
-        let existingUser = $(`.planning-poker-gamer-score[id="${userId}"]`);
-        if (existingUser.length < 1) {
+        let existingUserCard = gameProcessHelper._findUserCardByUserId(userId);
+        if (existingUserCard.length < 1) {
             return;
         }
 
-        existingUser.remove();
+        existingUserCard.remove();
+    },
+
+    updateUserVote: (user) => {
+        let userCard = gameProcessHelper._findUserCardByUserId(user.id);
+        if (userCard.length === 0) {
+            return;
+        }
+
+        if (user.hasVoted) {
+            userCard.find('.planning-poker-card').attr('card-state', 'voted-closed');
+        } else {
+            userCard.find('.planning-poker-card').attr('card-state', 'unvoted');
+        }
+
+        if (userCard.attr('mycard')) {
+            $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
+
+            if (user.hasVoted) {
+                gameProcessHelper._lastClickedCard.addClass('planning-poker-card-selected');
+            }
+        }
+    },
+
+    _lastClickedCard: {},
+
+    _findUserCardByUserId: (userId) => {
+        return $(`.planning-poker-gamer-score[user-id="${userId}"]`);
     }
+
 };

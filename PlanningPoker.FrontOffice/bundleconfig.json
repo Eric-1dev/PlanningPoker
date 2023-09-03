@@ -15,7 +15,8 @@
     {
         "outputFileName": "wwwroot/bundles/css/libraries.bundle.css",
         "inputFiles": [
-            "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css"
+            "wwwroot/lib/bootstrap/dist/css/bootstrap.min.css",
+            "wwwroot/lib/bootstrap-icons/bootstrap-icons.min.css"
         ],
         "minify": {
             "enabled": false
