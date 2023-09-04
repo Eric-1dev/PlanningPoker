@@ -1,9 +1,11 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using PlanningPoker.Entities.Enums;
+using PlanningPoker.Entities.Models;
 using PlanningPoker.FrontOffice.Models;
 using PlanningPoker.FrontOffice.Security;
 using PlanningPoker.Services.Interfaces;
+using PlanningPoker.Utils.Constants;
 using PlanningPoker.Utils.Extensions;
 
 namespace PlanningPoker.FrontOffice.Controllers;
@@ -25,33 +27,7 @@ public class HomeController : BaseController
         var model = new GameProgressViewModel
         {
             GameId = gameId,
-            TaskName = game.TaskName,
-
-            SubTasks = game.SubTasks?.Select(x => new GameTaskViewModel
-            {
-                Id = x.Id,
-                Text = x.Text,
-                Score = x.Score
-            }).ToArray(),
-
-            Cards = new[]
-            {
-                new CardViewModel(0,    CardColorEnum.Green),
-                new CardViewModel(0.5,  CardColorEnum.Green),
-                new CardViewModel(1,    CardColorEnum.Green),
-                new CardViewModel(2,    CardColorEnum.Green),
-                new CardViewModel(3,    CardColorEnum.Green),
-                new CardViewModel(5,    CardColorEnum.Yellow),
-                new CardViewModel(8,    CardColorEnum.Yellow),
-                new CardViewModel(13,   CardColorEnum.Yellow),
-                new CardViewModel(21,   CardColorEnum.Red),
-                new CardViewModel(34,   CardColorEnum.Red),
-                new CardViewModel(55,   CardColorEnum.Red),
-            },
-
-            NeedAddPassCard = true,
-            AdminId = game.AdminId,
-            TotalScore = game.TotalScore,
+            TaskName = game.TaskName
         };
 
         return View(model);
@@ -71,7 +47,7 @@ public class HomeController : BaseController
         if (!subTasks.Any())
             subTasks = new[] { "Задача целиком" };
 
-        var gameId = GameControlService.CreateNewGame(taskName, subTasks, userId.Value);
+        var gameId = GameControlService.CreateNewGame(taskName, subTasks, userId.Value, CardSetTypeEnum.Classic);
 
         return Success(gameId);
     }

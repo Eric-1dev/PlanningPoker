@@ -38,7 +38,7 @@ public class GameConnectHub : Hub
             await Clients.OthersInGroup(groupName).SendAsync("UserJoin", gamerConnection);
         }
 
-        var gameInfo = new GameInfoModel(game, otherUsers);
+        var gameInfo = new GameInfoModel(game, userId.Value, otherUsers);
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
     }

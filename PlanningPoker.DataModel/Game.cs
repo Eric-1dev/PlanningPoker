@@ -22,6 +22,9 @@ public class Game
 
     public double TotalScore { get; set; }
 
+    [Column("CardSetTypeId")]
+    public CardSetTypeEnum CardSetType { get; set; }
+
     public virtual List<GameSubTask> SubTasks { get; set; }
 
     public virtual List<GamerConnection> Gamers { get; set; }

@@ -81,10 +81,69 @@ let gameProcessHelper = {
         }
     },
 
+    handleGameInfoMessage: (gameInfo) => {
+        if (gameInfo.cards && gameInfo.cards.length > 0) {
+            gameProcessHelper.handleCardsInfo(gameInfo.cards);
+
+            if (gameInfo.subTasks) {
+                gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks, gameInfo.cards, gameInfo.isAdmin);
+            }
+        }
+
+        if (gameInfo.otherUsers) {
+            gameInfo.otherUsers.forEach((user) => {
+                gameProcessHelper.addUser(user);
+            });
+        }
+    },
+
+    handleCardsInfo: (cards) => {
+        let cardZone = $('#planning-poker-gamer-card-zone')
+
+        cardZone.html('');
+
+        cards.forEach((card) => {
+            let cardBlock = $(`<div class="planning-poker-card planning-poker-card-clickable ${gameProcessHelper._mapCardColorToClass(card.color)}" score="${card.score}">`)
+            cardBlock.html(card.text);
+
+            cardZone.append(cardBlock);
+        });
+    },
+
+    handleSubTasksInfo: (subTasks, cards, isAdmin) => {
+        let subTaskZone = $('#planning-poker-tasks-zone');
+
+        subTasks.sort((a, b) => a.order - b.order).forEach((subTask) => {
+            let taskBlock = $(`<div class="planning-poker-tasks-zone-task" task-id="${subTask.id}">`);
+            let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
+
+            //todo заполнение задач
+
+            taskBlock.append(taskNameBlock);
+            subTaskZone.append(taskBlock);
+        });
+    },
+
     _lastClickedCard: {},
 
     _findUserCardByUserId: (userId) => {
         return $(`.planning-poker-gamer-score[user-id="${userId}"]`);
-    }
+    },
 
+    _mapCardColorToClass: (color) => {
+        switch (color) {
+            case 'Green':
+                return 'planning-poker-card-color-green';
+            case 'Yellow':
+                return 'planning-poker-card-color-yellow';
+            case 'Red':
+                return 'planning-poker-card-color-red';
+            case 'Gray':
+                return 'planning-poker-card-color-gray';
+            case 'Blue':
+                return 'planning-poker-card-color-blue';
+            default:
+                return '';
+        }
+    }
 };

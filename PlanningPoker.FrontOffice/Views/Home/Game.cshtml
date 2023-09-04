@@ -33,83 +33,55 @@
 </div>
 
 <div class="planning-poker-tasks-zone-wrapper">
-    <div class="planning-poker-tasks-zone">
 
-        <div class="planning-poker-tasks-zone-task-header">
-            @Model.TaskName
-        </div>
+    <div id="planning-poker-tasks-zone-task-header">
+        @Model.TaskName
+    </div>
 
-        @foreach (var subTask in Model.SubTasks)
+    <div id="planning-poker-tasks-zone">
+
+        @* @foreach (var subTask in Model.SubTasks)
         {
-            RenderTask(subTask);
-        }
+        RenderTask(subTask);
+        } *@
 
     </div>
 </div>
 
-<div class="footer">
+<div id="planning-poker-gamer-card-zone">
     @foreach (var card in Model.Cards)
     {
-        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)">
-            @card.Score
-        </div>
-    }
-    @if (Model.NeedAddPassCard)
-    {
-        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(CardColorEnum.Gray)">
-            PASS
+        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)" score="@card.Score">
+            @card.Text
         </div>
     }
 </div>
 
 @{
-    string MapColorToClass(CardColorEnum color)
-    {
-        switch (color)
-        {
-            case CardColorEnum.Green:
-                return "planning-poker-card-color-green";
-            case CardColorEnum.Yellow:
-                return "planning-poker-card-color-yellow";
-            case CardColorEnum.Red:
-                return "planning-poker-card-color-red";
-            case CardColorEnum.Gray:
-                return "planning-poker-card-color-gray";
-            case CardColorEnum.Blue:
-                return "planning-poker-card-color-blue";
-            default:
-                return string.Empty;
-        }
-    }
 
-    object RenderTask(GameTaskViewModel task)
-    {
-        <div class="planning-poker-tasks-zone-task" task-id="@task.Id">
-            <div class="planning-poker-tasks-zone-task-name">@task.Text</div>
+    // object RenderTask(GameTaskViewModel task)
+    // {
+    //     <div class="planning-poker-tasks-zone-task" task-id="@task.Id">
+    //         <div class="planning-poker-tasks-zone-task-name">@task.Text</div>
 
-            @if (IsAdmin())
-            {
-                <select class="form-select shadow-none planning-poker-tasks-zone-task-score">
-                    <!option value=""></!option>
-                    @foreach (var score in Model.Cards.Select(x => x.Score))
-                    {
-                        var selectedAttr = task.Score == score ? "selected" : "";
+    //         @if (Model.IsAdmin)
+    //         {
+    //             <select class="form-select shadow-none planning-poker-tasks-zone-task-score" readonly>
+    //                 <!option value=""></!option>
+    //                 @foreach (var score in Model.Cards.Select(x => x.Score))
+    //                 {
+    //                     var selectedAttr = task.Score == score ? "selected" : "";
 
-                        <!option @selectedAttr value="@score">@score</!option>
-                    }
-                </select>
-            }
-            else
-            {
-                <div>@task.Score</div>
-            }
-        </div>
+    //                     <!option @selectedAttr value="@score">@score</!option>
+    //                 }
+    //             </select>
+    //         }
+    //         else
+    //         {
+    //             <div>@task.Score</div>
+    //         }
+    //     </div>
 
-        return null;
-    }
-
-    bool IsAdmin()
-    {
-        return Model.AdminId == User.GetUserId();
-    }
+    //     return null;
+    // }
 }

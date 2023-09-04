@@ -17,16 +17,30 @@ public class GameControlService : IGameControlService
         return game?.GameState == GameStateEnum.Running;
     }
 
-    public Guid CreateNewGame(string taskName, string[] subTasks, Guid adminId)
+    public Guid CreateNewGame(string taskName, string[] subTasks, Guid adminId, CardSetTypeEnum cardSetType)
     {
+        var subTaskList = new List<GameSubTask>();
+
+        for (int i = 0; i < subTasks.Length; i++)
+        {
+            subTaskList.Add(new GameSubTask
+            {
+                Order = i,
+                IsSelected = false,
+                Text = subTasks[i],
+                Score = null
+            });
+        }
+
         using var dbContext = new ApplicationContext();
 
         var game = new Game
         {
             GameState = GameStateEnum.Paused,
             TaskName = taskName,
-            SubTasks = subTasks.Select(x => new GameSubTask { Text = x}).ToList(),
-            AdminId = adminId
+            SubTasks = subTaskList,
+            AdminId = adminId,
+            CardSetType = cardSetType
         };
 
         dbContext.Games.Add(game);

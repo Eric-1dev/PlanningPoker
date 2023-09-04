@@ -18,4 +18,6 @@ public class GameSubTask : BaseEntity
     public double? Score { get; set; }
 
     public bool IsSelected { get; set; }
+
+    public int Order { get; set; }
 }

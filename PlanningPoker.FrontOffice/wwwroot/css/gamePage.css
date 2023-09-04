@@ -1,4 +1,4 @@
-.footer {
+#planning-poker-gamer-card-zone {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -118,7 +118,7 @@
     text-align: center;
 }
 
-.planning-poker-tasks-zone {
+#planning-poker-tasks-zone {
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -140,7 +140,8 @@
         font-weight: bold;
     }
 
-.planning-poker-tasks-zone-task-header {
+#planning-poker-tasks-zone-task-header {
+    margin-bottom: 20px;
 }
 
 .planning-poker-tasks-zone-task-name {

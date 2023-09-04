@@ -19,9 +19,7 @@ let hubConnectorHelper = {
         });
 
         hubConnection.on('ReceiveGameInfo', (gameInfo) => {
-            gameInfo.otherUsers.forEach((user) => {
-                gameProcessHelper.addUser(user);
-            });
+            gameProcessHelper.handleGameInfoMessage(gameInfo);
         });
 
         hubConnection.on("UserVoted", (user) => {
