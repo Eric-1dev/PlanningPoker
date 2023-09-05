@@ -131,14 +131,14 @@
     justify-content: space-between;
     font-size: 18px;
     border-bottom: 1px solid lightgray;
-    border-right: 1px solid lightgray;
     padding: 5px;
+    cursor: pointer;
 }
 
-    .planning-poker-tasks-zone-task[active] {
+    .planning-poker-tasks-zone-task[active="true"] {
         font-weight: bold;
         color: blue;
-        cursor: pointer;
+        cursor: default;
     }
 
 #planning-poker-tasks-zone-task-header {

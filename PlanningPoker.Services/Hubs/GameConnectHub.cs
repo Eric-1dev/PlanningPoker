@@ -30,7 +30,7 @@ public class GameConnectHub : Hub
 
         GameGroupCacheService.AddUserToGame(gameId, gamerConnection);
 
-        var otherUsers = GameGroupCacheService.GetOtherUsersInGame(gameId, Context.ConnectionId);
+        var otherUsers = GameGroupCacheService.GetAllUsersInGame(gameId, Context.ConnectionId).Where(x => x.Id != userId).ToArray();
         var game = GameControlService.GetGameById(gameId);
 
         if (otherUsers.Length > 0)

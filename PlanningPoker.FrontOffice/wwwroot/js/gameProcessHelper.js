@@ -17,7 +17,7 @@ let gameProcessHelper = {
 
     gameId: '',
 
-    addUser: (user) => {
+    addPlayer: (user) => {
         let existingUserCard = gameProcessHelper._findUserCardByUserId(user.id);
         if (existingUserCard.length > 0) {
             return;
@@ -88,7 +88,9 @@ let gameProcessHelper = {
 
         if (gameInfo.otherUsers) {
             gameInfo.otherUsers.forEach((user) => {
-                gameProcessHelper.addUser(user);
+                if (user.isPlayer) {
+                    gameProcessHelper.addPlayer(user);
+                }
             });
         }
     },
@@ -115,15 +117,15 @@ let gameProcessHelper = {
     },
 
     handleSubTaskInfo: (subTask, isAdmin, scoreValues) => {
-        let activeAttr;
+        let isActive;
 
         if (subTask.isSelected) {
-            activeAttr = "active";
+            isActive = "true";
         } else {
-            activeAttr = null;
+            isActive = "false";
         }
 
-        let taskBlock = $(`<div class="planning-poker-tasks-zone-task" ${activeAttr} task-id="${subTask.id}">`);
+        let taskBlock = $(`<div class="planning-poker-tasks-zone-task" active="${isActive}" task-id="${subTask.id}">`);
         let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
 
         let scoreBlock;

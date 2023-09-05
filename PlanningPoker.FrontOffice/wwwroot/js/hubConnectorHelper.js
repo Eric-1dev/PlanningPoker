@@ -7,7 +7,7 @@ let hubConnectorHelper = {
             .build();
 
         hubConnection.on('UserJoin', (user) => {
-            gameProcessHelper.addUser(user);
+            gameProcessHelper.addPlayer(user);
         });
 
         hubConnection.on('UserQuit', (userId) => {

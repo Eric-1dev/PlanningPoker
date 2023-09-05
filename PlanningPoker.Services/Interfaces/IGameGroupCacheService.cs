@@ -8,7 +8,7 @@ public interface IGameGroupCacheService
 
     Guid? RemoveUserFromGame(string connectionId);
 
-    GamerConnectionModel[] GetOtherUsersInGame(Guid gameId, string connectionId);
+    GamerConnectionModel[] GetAllUsersInGame(Guid gameId, string connectionId);
 
     GamerConnectionModel ChangeUserVote(string connectionId, double? score);
 }

@@ -55,11 +55,11 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         return gameId;
     }
 
-    public GamerConnectionModel[] GetOtherUsersInGame(Guid gameId, string connectionId)
+    public GamerConnectionModel[] GetAllUsersInGame(Guid gameId, string connectionId)
     {
         using var dbContext = new ApplicationContext();
 
-        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId && x.IsPlayer && x.ConnectionId != connectionId);
+        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId && x.ConnectionId != connectionId);
 
         return gameConnections.Select(x => new GamerConnectionModel(x)).ToArray();
     }
