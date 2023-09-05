@@ -87,7 +87,7 @@ public class GameConnectHub : Hub
 
         var groupName = GetGroupName(gameId);
 
-        await Clients.Group(groupName).SendAsync("ReceiveChangeSubTaskScore", result);
+        await Clients.OthersInGroup(groupName).SendAsync("ReceiveChangeSubTaskScore", result);
     }
 
     private static string GetGroupName(Guid? gameId)

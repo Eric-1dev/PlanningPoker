@@ -123,8 +123,8 @@ let gameProcessHelper = {
             activeAttr = null;
         }
 
-        let taskBlock = $(`<div class="planning-poker-tasks-zone-task" task-id="${subTask.id}">`);
-        let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name" ${activeAttr}>${subTask.text}</div>`);
+        let taskBlock = $(`<div class="planning-poker-tasks-zone-task" ${activeAttr} task-id="${subTask.id}">`);
+        let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
 
         let scoreBlock;
 

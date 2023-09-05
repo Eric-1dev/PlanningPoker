@@ -130,14 +130,15 @@
     align-items: center;
     justify-content: space-between;
     font-size: 18px;
-    border: 1px solid lightgray;
-    border-radius: 5px;
-    cursor: pointer;
+    border-bottom: 1px solid lightgray;
+    border-right: 1px solid lightgray;
     padding: 5px;
 }
 
-    .planning-poker-tasks-zone-task[selected] {
+    .planning-poker-tasks-zone-task[active] {
         font-weight: bold;
+        color: blue;
+        cursor: pointer;
     }
 
 #planning-poker-tasks-zone-task-header {
@@ -150,11 +151,6 @@
     margin-right: 10px;
 }
 
-    .planning-poker-tasks-zone-task-name[active] {
-        color: blue;
-    }
-
 .planning-poker-tasks-zone-task-score {
-    width: 4.5em;
-    border: 1px dotted;
+    width: auto;
 }
