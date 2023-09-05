@@ -1,4 +1,3 @@
-using PlanningPoker.Services.Models;
 using PlanningPoker.Services.Models.GameInfoModel;
 
 namespace PlanningPoker.Services.Interfaces;
@@ -10,5 +9,6 @@ public interface IGameGroupCacheService
     Guid? RemoveUserFromGame(string connectionId);
 
     GamerConnectionModel[] GetOtherUsersInGame(Guid gameId, string connectionId);
-    GamerConnectionModel ChangeUserVote(string connectionId, bool hasVote);
+
+    GamerConnectionModel ChangeUserVote(string connectionId, double? score);
 }

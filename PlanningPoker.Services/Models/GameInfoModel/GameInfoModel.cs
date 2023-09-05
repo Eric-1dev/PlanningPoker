@@ -15,6 +15,8 @@ public class GameInfoModel
 
     public GameStateEnum GameState { get; }
 
+    public double[] AvailableScores { get; }
+
     public Card[] Cards { get; }
 
     public bool IsAdmin { get; }
@@ -24,6 +26,7 @@ public class GameInfoModel
         OtherUsers = otherUsers;
         TaskName = game.TaskName;
         GameState = game.GameState;
+        AvailableScores = CardSetConstants.Cards(game.CardSetType).Where(x => x.Score >= 0).Select(x => x.Score).ToArray();
         Cards = CardSetConstants.Cards(game.CardSetType);
         IsAdmin = game.AdminId == userId;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel

@@ -4,12 +4,8 @@ using PlanningPoker.Entities.Enums;
 
 namespace PlanningPoker.DataModel;
 
-public class Game
+public class Game : BaseEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; }
-
     [StringLength(512)]
     [Required]
     public string TaskName { get; set; }

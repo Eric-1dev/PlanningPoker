@@ -22,7 +22,7 @@ public class GamerConnectionModel
         ConnectionId = gamerConnection.ConnectionId;
         Id = gamerConnection.Id;
         Name = gamerConnection.Name;
-        HasVoted = gamerConnection.HasVoted;
+        HasVoted = gamerConnection.Score != null;
         IsPlayer = gamerConnection.IsPlayer;
     }
 }

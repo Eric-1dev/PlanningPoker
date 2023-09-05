@@ -17,7 +17,7 @@ public class GamerConnection
 
     public string Name { get; set; }
 
-    public bool HasVoted { get; set; }
+    public double? Score { get; set; }
 
     public bool IsPlayer { get; set; }
 }

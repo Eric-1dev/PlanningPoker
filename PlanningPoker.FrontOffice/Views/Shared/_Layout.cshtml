@@ -17,14 +17,14 @@
     <header>
         <div class="planning-poker-username-area">
             @{
-                var userName = User.Identity.Name;
+            var userName = User.Identity.Name;
 
-                if (userName != null)
-                {
-                    <div>@userName</div>
-                    <a asp-action="Logout" asp-controller="Authorization" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Выход</a>
-                }
+            if (userName != null)
+            {
+                <div>@userName</div>
+                <a asp-action="Logout" asp-controller="Authorization" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Выход</a>
             }
+        }
         </div>
     </header>
 

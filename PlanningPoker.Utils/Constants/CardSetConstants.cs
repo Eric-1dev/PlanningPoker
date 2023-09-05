@@ -26,7 +26,7 @@ public static class CardSetConstants
                     new Card(21,    CardColorEnum.Red),
                     new Card(34,    CardColorEnum.Red),
                     new Card(55,    CardColorEnum.Red),
-                    new Card(null,  CardColorEnum.Gray, "Pass")
+                    new Card(-1,  CardColorEnum.Gray, "Pass")
                 }
             }
         };

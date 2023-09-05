@@ -24,13 +24,14 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
             ConnectionId = gamerConnection.ConnectionId,
             Id = gamerConnection.Id,
             Name = gamerConnection.Name,
-            HasVoted = false,
+            Score = null,
             IsPlayer = true,
         };
 
         using var dbContext = new ApplicationContext();
 
         var existingUser = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.Id == gamerConnection.Id);
+
         if (existingUser != null)
             dbContext.GamerConnectionsCache.Remove(existingUser);
 
@@ -63,13 +64,13 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         return gameConnections.Select(x => new GamerConnectionModel(x)).ToArray();
     }
 
-    public GamerConnectionModel ChangeUserVote(string connectionId, bool hasVote)
+    public GamerConnectionModel ChangeUserVote(string connectionId, double? score)
     {
         using var dbContext = new ApplicationContext();
 
         var user = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId);
 
-        user.HasVoted = hasVote;
+        user.Score = score;
 
         dbContext.SaveChanges();
 

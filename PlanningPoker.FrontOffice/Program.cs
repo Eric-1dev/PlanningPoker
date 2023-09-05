@@ -4,7 +4,6 @@ using Autofac.Extensions.DependencyInjection;
 using BundlerMinifier.TagHelpers;
 using ElectroPrognizer.Utils.Helpers;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlanningPoker.FrontOffice.Security;

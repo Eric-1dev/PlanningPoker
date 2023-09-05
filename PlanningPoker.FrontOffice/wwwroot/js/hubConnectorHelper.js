@@ -26,13 +26,21 @@ let hubConnectorHelper = {
             gameProcessHelper.updateUserVote(user);
         });
 
+        hubConnection.on("ReceiveChangeSubTaskScore", (result) => {
+            gameProcessHelper.handleSubTaskChangeScore(result.subTaskId, result.score);
+        });
+
         hubConnection.start();
 
         hubConnectorHelper._hubConnection = hubConnection;
     },
 
-    invokeTryChangeVote: (hasVote) => {
-        hubConnectorHelper._hubConnection.invoke('TryChangeVote', gameProcessHelper.gameId, hasVote);
+    invokeTryChangeVote: (score) => {
+        hubConnectorHelper._hubConnection.invoke('TryChangeVote', gameProcessHelper.gameId, score);
+    },
+
+    invokeChangeSubTaskScore: (subTaskId, score) => {
+        hubConnectorHelper._hubConnection.invoke('SendChangeSubTaskScore', gameProcessHelper.gameId, subTaskId, score);
     },
 
     _hubConnection: {}

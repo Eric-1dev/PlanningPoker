@@ -8,17 +8,9 @@ let gameProcessHelper = {
     init: () => {
         gameProcessHelper.gameId = $('#planning-poker-game-id').val();
 
-        $('.planning-poker-card-clickable').click((event) => {
-            let selectedCard = $(event.target);
+        gameProcessHelper._addClickEventToCards();
 
-            let wasSelected = selectedCard.hasClass('planning-poker-card-selected');
-
-            let hasVote = !wasSelected;
-
-            hubConnectorHelper.invokeTryChangeVote(hasVote);
-
-            gameProcessHelper._lastClickedCard = selectedCard;
-        });
+        gameProcessHelper._subTaskZone = $('#planning-poker-tasks-zone');
 
         hubConnectorHelper.init();
     },
@@ -82,12 +74,16 @@ let gameProcessHelper = {
     },
 
     handleGameInfoMessage: (gameInfo) => {
+        if (gameInfo.taskName) {
+            gameProcessHelper.handleTaskName(gameInfo.taskName);
+        }
+
         if (gameInfo.cards && gameInfo.cards.length > 0) {
             gameProcessHelper.handleCardsInfo(gameInfo.cards);
+        }
 
-            if (gameInfo.subTasks) {
-                gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks, gameInfo.cards, gameInfo.isAdmin);
-            }
+        if (gameInfo.subTasks) {
+            gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks, gameInfo.isAdmin, gameInfo.availableScores);
         }
 
         if (gameInfo.otherUsers) {
@@ -98,36 +94,135 @@ let gameProcessHelper = {
     },
 
     handleCardsInfo: (cards) => {
-        let cardZone = $('#planning-poker-gamer-card-zone')
+        let cardZone = $('#planning-poker-gamer-card-zone');
 
         cardZone.html('');
 
         cards.forEach((card) => {
-            let cardBlock = $(`<div class="planning-poker-card planning-poker-card-clickable ${gameProcessHelper._mapCardColorToClass(card.color)}" score="${card.score}">`)
+            let cardBlock = $(`<div class="planning-poker-card planning-poker-card-clickable ${gameProcessHelper._mapCardColorToClass(card.color)}" score="${card.score}">`);
             cardBlock.html(card.text);
 
             cardZone.append(cardBlock);
         });
+
+        gameProcessHelper._addClickEventToCards();
     },
 
-    handleSubTasksInfo: (subTasks, cards, isAdmin) => {
-        let subTaskZone = $('#planning-poker-tasks-zone');
-
+    handleSubTasksInfo: (subTasks, isAdmin, scoreValues) => {
         subTasks.sort((a, b) => a.order - b.order).forEach((subTask) => {
-            let taskBlock = $(`<div class="planning-poker-tasks-zone-task" task-id="${subTask.id}">`);
-            let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
-
-            //todo заполнение задач
-
-            taskBlock.append(taskNameBlock);
-            subTaskZone.append(taskBlock);
+            gameProcessHelper.handleSubTaskInfo(subTask, isAdmin, scoreValues);
         });
     },
 
+    handleSubTaskInfo: (subTask, isAdmin, scoreValues) => {
+        let activeAttr;
+
+        if (subTask.isSelected) {
+            activeAttr = "active";
+        } else {
+            activeAttr = null;
+        }
+
+        let taskBlock = $(`<div class="planning-poker-tasks-zone-task" task-id="${subTask.id}">`);
+        let taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name" ${activeAttr}>${subTask.text}</div>`);
+
+        let scoreBlock;
+
+        if (isAdmin && subTask.isSelected) {
+            scoreBlock = $('<select class="form-select shadow-none planning-poker-tasks-zone-task-score">');
+
+            scoreBlock.append($('<option value="">'));
+
+            scoreValues.forEach((scoreValue) => {
+
+                let selectedAttr;
+                if (scoreValue === subTask.score) {
+                    selectedAttr = 'selected';
+                }
+
+                let option = $(`<option ${selectedAttr} value="${scoreValue}">`);
+                option.html(scoreValue);
+
+                scoreBlock.append(option);
+            });
+
+        } else {
+            scoreBlock = $('<div class="planning-poker-tasks-zone-task-score">');
+            scoreBlock.html(subTask.score);
+        }
+
+        scoreBlock.change((event) => gameProcessHelper.onSubTaskScoreChanged(event.target));
+
+        taskBlock.append(taskNameBlock);
+        taskBlock.append(scoreBlock);
+
+        let existingTask = gameProcessHelper._findSubTaskById(subTask.id);
+
+        if (existingTask.length === 1) {
+            existingTask.after(taskBlock);
+            existingTask.remove();
+        } else {
+            gameProcessHelper._subTaskZone.append(taskBlock);
+        }
+    },
+
+    handleTaskName: (taskName) => {
+        $('#planning-poker-tasks-zone-task-header').html(taskName);
+    },
+
+    handleSubTaskChangeScore: (subTaskId, score) => {
+        let subTask = gameProcessHelper._findSubTaskById(subTaskId);
+
+        let scoreBlock = subTask.find('.planning-poker-tasks-zone-task-score');
+
+        scoreBlock.html(score);
+    },
+
+    onSubTaskScoreChanged: (target) => {
+        let subTaskId = $(target).closest('.planning-poker-tasks-zone-task').attr('task-id');
+        let scoreStr = $(target).val();
+
+        let score;
+
+        if (scoreStr) {
+            score = parseFloat(scoreStr);
+        } else {
+            score = null;
+        }
+
+        hubConnectorHelper.invokeChangeSubTaskScore(subTaskId, score);
+    },
+
+    _subTaskZone: {},
     _lastClickedCard: {},
 
     _findUserCardByUserId: (userId) => {
         return $(`.planning-poker-gamer-score[user-id="${userId}"]`);
+    },
+
+    _findSubTaskById: (subTaskId) => {
+        return gameProcessHelper._subTaskZone.find(`.planning-poker-tasks-zone-task[task-id="${subTaskId}"]`);
+    },
+
+    _addClickEventToCards: () => {
+        $('.planning-poker-card-clickable').click((event) => {
+            let selectedCard = $(event.target);
+
+            let wasSelected = selectedCard.hasClass('planning-poker-card-selected');
+
+            let score;
+
+            if (wasSelected) {
+                score = null;
+            } else {
+                let scoreStr = selectedCard.attr('score');
+                score = parseFloat(scoreStr);
+            }
+
+            hubConnectorHelper.invokeTryChangeVote(score);
+
+            gameProcessHelper._lastClickedCard = selectedCard;
+        });
     },
 
     _mapCardColorToClass: (color) => {

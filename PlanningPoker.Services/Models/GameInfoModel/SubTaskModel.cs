@@ -2,7 +2,7 @@ namespace PlanningPoker.Services.Models.GameInfoModel;
 
 public class SubTaskModel
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public string Text { get; set; }
 

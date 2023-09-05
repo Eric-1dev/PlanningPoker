@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
+using PlanningPoker.Services.Dto;
 using PlanningPoker.Services.Interfaces;
 
 namespace PlanningPoker.Services.Implementation;
@@ -59,9 +60,22 @@ public class GameControlService : IGameControlService
             .Include(x => x.SubTasks)
             .FirstOrDefault();
 
-        if (game == null)
-            throw new Exception($"Игра с ID {gameId} не найдена");
+        return game ?? throw new Exception($"Игра с ID {gameId} не найдена");
+    }
 
-        return game;
+    public ChangeSubTaskScoreDto TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var subTask = dbContext.GameSubTasks.FirstOrDefault(x => x.Id == subTaskId && x.Game.Id == gameId && x.Game.AdminId == userId);
+
+        if (subTask == null)
+            return null;
+
+        subTask.Score = score;
+
+        dbContext.SaveChanges();
+
+        return new ChangeSubTaskScoreDto { SubTaskId = subTask.Id, Score = score };
     }
 }

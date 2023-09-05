@@ -14,7 +14,7 @@ public class GameConnectHub : Hub
 
     public async Task UserConnected(Guid gameId)
     {
-        var groupName = gameId.ToString();
+        var groupName = GetGroupName(gameId);
         var userName = Context.User.Identity.Name;
         var userId = Context.User.GetUserId();
 
@@ -57,7 +57,7 @@ public class GameConnectHub : Hub
 
         if (gameId.HasValue)
         {
-            var groupName = gameId.ToString();
+            var groupName = GetGroupName(gameId);
 
             await Clients.OthersInGroup(groupName).SendAsync("UserQuit", userId);
         }
@@ -65,17 +65,33 @@ public class GameConnectHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    public async Task TryChangeVote(Guid gameId, bool hasVote)
+    public async Task TryChangeVote(Guid gameId, double? score)
     {
         var canVote = GameControlService.CanUserVote(gameId);
 
         if (!canVote)
             return;
 
-        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, hasVote);
+        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score);
 
-        var groupName = gameId.ToString();
+        var groupName = GetGroupName(gameId);
 
         await Clients.Group(groupName).SendAsync("UserVoted", user);
+    }
+
+    public async Task SendChangeSubTaskScore(Guid gameId, Guid subTaskId, double? score)
+    {
+        var userId = Context.User.GetUserId();
+
+        var result = GameControlService.TryChangeSubTaskScore(userId.Value, gameId, subTaskId, score);
+
+        var groupName = GetGroupName(gameId);
+
+        await Clients.Group(groupName).SendAsync("ReceiveChangeSubTaskScore", result);
+    }
+
+    private static string GetGroupName(Guid? gameId)
+    {
+        return gameId?.ToString() ?? throw new Exception("GameId должен иметь значение");
     }
 }

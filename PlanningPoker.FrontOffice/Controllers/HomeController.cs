@@ -1,9 +1,6 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using PlanningPoker.Entities.Enums;
-using PlanningPoker.Entities.Models;
 using PlanningPoker.FrontOffice.Models;
-using PlanningPoker.FrontOffice.Security;
 using PlanningPoker.Services.Interfaces;
 using PlanningPoker.Utils.Constants;
 using PlanningPoker.Utils.Extensions;
@@ -27,7 +24,8 @@ public class HomeController : BaseController
         var model = new GameProgressViewModel
         {
             GameId = gameId,
-            TaskName = game.TaskName
+            TaskName = game.TaskName,
+            Cards = CardSetConstants.Cards(game.CardSetType)
         };
 
         return View(model);
