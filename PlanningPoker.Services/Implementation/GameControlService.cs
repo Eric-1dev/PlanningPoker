@@ -9,7 +9,7 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameControlService : IGameControlService
 {
-    public bool CanUserVote(Guid gameId)
+    public bool IsGameRunning(Guid gameId)
     {
         using var dbContext = new ApplicationContext();
 

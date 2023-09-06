@@ -2,7 +2,7 @@ using PlanningPoker.DataModel;
 
 namespace PlanningPoker.Services.Models.GameInfoModel;
 
-public class GamerConnectionModel
+public class UserInfoModel
 {
     public string ConnectionId { get; set; }
 
@@ -14,10 +14,10 @@ public class GamerConnectionModel
 
     public bool IsPlayer { get; set; }
 
-    public GamerConnectionModel()
+    public UserInfoModel()
     { }
 
-    public GamerConnectionModel(GamerConnection gamerConnection)
+    public UserInfoModel(GamerConnection gamerConnection)
     {
         ConnectionId = gamerConnection.ConnectionId;
         Id = gamerConnection.Id;

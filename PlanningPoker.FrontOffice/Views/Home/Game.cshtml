@@ -17,9 +17,16 @@
 
 <input type="hidden" id="planning-poker-game-id" value="@Model.GameId" />
 
+<div class="planning-poker-buttons-zone-wrapper">
+    <div class="planning-poker-buttons-zone">
+        <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-spectate-button">Стать набдюдателем</button>
+        <button class="btn btn-sm btn-success planning-poker-button" id="planning-poker-join-game-button">Вступить в игру</button>
+    </div>
+</div>
+
 <div class="planning-poker-gamers-zone-wrapper">
     <div class="planning-poker-gamers-zone">
-        <div class="planning-poker-gamer-score" mycard="true" user-id="@User.GetUserId()">
+        <div class="planning-poker-gamer-score" my-card="true" user-id="@User.GetUserId()">
 
             <div class="planning-poker-card" card-state="unvoted">
             </div>
@@ -43,11 +50,11 @@
 
 <div id="planning-poker-gamer-card-zone">
     @foreach (var card in Model.Cards)
-{
-    <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)" score="@card.Score">
+    {
+        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)" score="@card.Score">
             @card.Text
         </div>
-}
+    }
 </div>
 
 @{

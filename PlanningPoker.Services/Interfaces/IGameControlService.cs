@@ -10,7 +10,7 @@ public interface IGameControlService
 
     Game GetGameById(Guid id);
 
-    bool CanUserVote(Guid gameId);
+    bool IsGameRunning(Guid gameId);
 
     ChangeSubTaskScoreDto TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score);
 }

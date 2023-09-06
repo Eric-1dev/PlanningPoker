@@ -7,11 +7,11 @@ let hubConnectorHelper = {
             .build();
 
         hubConnection.on('UserJoin', (user) => {
-            gameProcessHelper.addPlayer(user);
+            gameProcessHelper.handleUserInfo(user);
         });
 
         hubConnection.on('UserQuit', (userId) => {
-            gameProcessHelper.removeUser(userId);
+            gameProcessHelper.removeUserCard(userId);
         });
 
         hubConnection.on('ConnectionEstablished', () => {
@@ -30,6 +30,10 @@ let hubConnectorHelper = {
             gameProcessHelper.handleSubTaskChangeScore(result.subTaskId, result.score);
         });
 
+        hubConnection.on("ChangeUserInfo", (user) => {
+            gameProcessHelper.handleUserInfo(user);
+        });
+
         hubConnection.start();
 
         hubConnectorHelper._hubConnection = hubConnection;
@@ -41,6 +45,18 @@ let hubConnectorHelper = {
 
     invokeChangeSubTaskScore: (subTaskId, score) => {
         hubConnectorHelper._hubConnection.invoke('SendChangeSubTaskScore', gameProcessHelper.gameId, subTaskId, score);
+    },
+
+    invokeSpectate: () => {
+        hubConnectorHelper._hubConnection
+            .invoke('MakeMeSpectator', gameProcessHelper.gameId)
+            .then(gameProcessHelper.changeMyStatus(false));
+    },
+
+    invokeJoinGame: () => {
+        hubConnectorHelper._hubConnection
+            .invoke('MakeMePlayer', gameProcessHelper.gameId)
+            .then(gameProcessHelper.changeMyStatus(true));
     },
 
     _hubConnection: {}

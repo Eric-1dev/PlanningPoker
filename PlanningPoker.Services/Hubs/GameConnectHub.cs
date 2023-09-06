@@ -20,17 +20,20 @@ public class GameConnectHub : Hub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-        var gamerConnection = new GamerConnectionModel
+        var isPlayer = true;
+
+        var gamerConnection = new UserInfoModel
         {
             ConnectionId = Context.ConnectionId,
             Name = userName,
             Id = userId.Value,
-            IsPlayer = true,
+            IsPlayer = isPlayer,
         };
 
         GameGroupCacheService.AddUserToGame(gameId, gamerConnection);
 
         var otherUsers = GameGroupCacheService.GetAllUsersInGame(gameId, Context.ConnectionId).Where(x => x.Id != userId).ToArray();
+
         var game = GameControlService.GetGameById(gameId);
 
         if (otherUsers.Length > 0)
@@ -38,7 +41,7 @@ public class GameConnectHub : Hub
             await Clients.OthersInGroup(groupName).SendAsync("UserJoin", gamerConnection);
         }
 
-        var gameInfo = new GameInfoModel(game, userId.Value, otherUsers);
+        var gameInfo = new GameInfoModel(game, userId.Value, otherUsers, isPlayer);
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
     }
@@ -67,9 +70,11 @@ public class GameConnectHub : Hub
 
     public async Task TryChangeVote(Guid gameId, double? score)
     {
-        var canVote = GameControlService.CanUserVote(gameId);
+        var isGameRunning = GameControlService.IsGameRunning(gameId);
 
-        if (!canVote)
+        var isUserIsPlayer = GameGroupCacheService.IsUserIsPlayer(gameId, Context.ConnectionId);
+
+        if (!isGameRunning || !isUserIsPlayer)
             return;
 
         var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score);
@@ -88,6 +93,27 @@ public class GameConnectHub : Hub
         var groupName = GetGroupName(gameId);
 
         await Clients.OthersInGroup(groupName).SendAsync("ReceiveChangeSubTaskScore", result);
+    }
+
+    public async Task MakeMeSpectator(Guid gameId)
+    {
+        await ChangeUserStatus(gameId, isPlayer: false);
+    }
+
+    public async Task MakeMePlayer(Guid gameId)
+    {
+        await ChangeUserStatus(gameId, isPlayer: true);
+    }
+
+    private async Task ChangeUserStatus(Guid gameId, bool isPlayer)
+    {
+        GameGroupCacheService.ChangeUserStatus(Context.ConnectionId, gameId, isPlayer);
+
+        var groupName = GetGroupName(gameId);
+
+        var myInfo = GameGroupCacheService.GetMyInfo(gameId, Context.ConnectionId);
+
+        await Clients.OthersInGroup(groupName).SendAsync("ChangeUserInfo", myInfo);
     }
 
     private static string GetGroupName(Guid? gameId)

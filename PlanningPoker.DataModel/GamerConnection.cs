@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PlanningPoker.DataModel;
 
@@ -9,9 +8,6 @@ public class GamerConnection
     public string ConnectionId { get; set; }
 
     public Guid GameId { get; set; }
-
-    [ForeignKey(nameof(GameId))]
-    public Game Game { get; set; }
 
     public Guid Id { get; set; }
 

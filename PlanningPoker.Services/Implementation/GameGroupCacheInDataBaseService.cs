@@ -16,7 +16,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         dbContext.SaveChanges();
     }
 
-    public void AddUserToGame(Guid gameId, GamerConnectionModel gamerConnection)
+    public void AddUserToGame(Guid gameId, UserInfoModel gamerConnection)
     {
         var gamerConnectionEntity = new GamerConnection
         {
@@ -55,25 +55,60 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         return gameId;
     }
 
-    public GamerConnectionModel[] GetAllUsersInGame(Guid gameId, string connectionId)
+    public UserInfoModel[] GetAllUsersInGame(Guid gameId, string connectionId)
     {
         using var dbContext = new ApplicationContext();
 
-        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId && x.ConnectionId != connectionId);
+        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId);
 
-        return gameConnections.Select(x => new GamerConnectionModel(x)).ToArray();
+        return gameConnections.Select(x => new UserInfoModel(x)).ToArray();
     }
 
-    public GamerConnectionModel ChangeUserVote(string connectionId, double? score)
+    public UserInfoModel GetMyInfo(Guid gameId, string connectionId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var myConnection = dbContext.GamerConnectionsCache.First(x => x.GameId == gameId && x.ConnectionId == connectionId);
+
+        return new UserInfoModel(myConnection);
+    }
+
+    public UserInfoModel ChangeUserVote(string connectionId, double? score)
     {
         using var dbContext = new ApplicationContext();
 
         var user = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId);
 
+        if (!user.IsPlayer)
+            throw new Exception("Наблюдатель не может голосовать");
+
         user.Score = score;
 
         dbContext.SaveChanges();
 
-        return new GamerConnectionModel(user);
+        return new UserInfoModel(user);
+    }
+
+    public void ChangeUserStatus(string connectionId, Guid gameId, bool isPlayer)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var user = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId);
+
+        user.IsPlayer = isPlayer;
+
+        if (!isPlayer)
+            user.Score = null;
+
+        dbContext.SaveChanges();
+    }
+
+    public bool IsUserIsPlayer(Guid gameId, string connectionId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var isPlayer = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId).IsPlayer;
+
+        return isPlayer;
     }
 }

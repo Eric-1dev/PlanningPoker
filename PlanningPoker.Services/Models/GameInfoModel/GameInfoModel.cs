@@ -7,7 +7,7 @@ namespace PlanningPoker.Services.Models.GameInfoModel;
 
 public class GameInfoModel
 {
-    public GamerConnectionModel[] OtherUsers { get; }
+    public UserInfoModel[] OtherUsers { get; }
 
     public string TaskName { get; }
 
@@ -19,9 +19,11 @@ public class GameInfoModel
 
     public Card[] Cards { get; }
 
-    public bool IsAdmin { get; }
+    public bool? IsAdmin { get; }
 
-    public GameInfoModel(Game game, Guid userId, GamerConnectionModel[] otherUsers)
+    public bool? IsPlayer { get; }
+
+    public GameInfoModel(Game game, Guid userId, UserInfoModel[] otherUsers, bool isPlayer)
     {
         OtherUsers = otherUsers;
         TaskName = game.TaskName;
@@ -29,6 +31,7 @@ public class GameInfoModel
         AvailableScores = CardSetConstants.Cards(game.CardSetType).Where(x => x.Score >= 0).Select(x => x.Score).ToArray();
         //Cards = CardSetConstants.Cards(game.CardSetType);
         IsAdmin = game.AdminId == userId;
+        IsPlayer = isPlayer;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel
         {
             Score = x.Score,

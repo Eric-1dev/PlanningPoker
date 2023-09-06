@@ -12,14 +12,24 @@ let gameProcessHelper = {
 
         gameProcessHelper._subTaskZone = $('#planning-poker-tasks-zone');
 
+        $('#planning-poker-spectate-button').click(() => {
+            hubConnectorHelper.invokeSpectate();
+        });
+
+        $('#planning-poker-join-game-button').click(() => {
+            hubConnectorHelper.invokeJoinGame();
+        });
+
         hubConnectorHelper.init();
     },
 
     gameId: '',
 
-    addPlayer: (user) => {
+    handleUserInfo: (user) => {
         let existingUserCard = gameProcessHelper._findUserCardByUserId(user.id);
-        if (existingUserCard.length > 0) {
+
+        if (!user.isPlayer) {
+            existingUserCard.remove();
             return;
         }
 
@@ -27,6 +37,7 @@ let gameProcessHelper = {
         scoreBlock.attr('user-id', user.id);
 
         let cardState;
+
         if (user.hasVoted) {
             cardState = 'voted-closed';
         } else {
@@ -40,10 +51,15 @@ let gameProcessHelper = {
         scoreBlock.append(card);
         scoreBlock.append(userNameBlock);
 
-        $('.planning-poker-gamers-zone').append(scoreBlock);
+        if (existingUserCard.length > 0) {
+            existingUserCard.after(scoreBlock);
+            existingUserCard.remove();
+        } else {
+            $('.planning-poker-gamers-zone').append(scoreBlock);
+        }
     },
 
-    removeUser: (userId) => {
+    removeUserCard: (userId) => {
         let existingUserCard = gameProcessHelper._findUserCardByUserId(userId);
         if (existingUserCard.length < 1) {
             return;
@@ -54,6 +70,7 @@ let gameProcessHelper = {
 
     updateUserVote: (user) => {
         let userCard = gameProcessHelper._findUserCardByUserId(user.id);
+
         if (userCard.length === 0) {
             return;
         }
@@ -64,7 +81,7 @@ let gameProcessHelper = {
             userCard.find('.planning-poker-card').attr('card-state', 'unvoted');
         }
 
-        if (userCard.attr('mycard')) {
+        if (userCard.attr('my-card')) {
             $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
 
             if (user.hasVoted) {
@@ -88,10 +105,12 @@ let gameProcessHelper = {
 
         if (gameInfo.otherUsers) {
             gameInfo.otherUsers.forEach((user) => {
-                if (user.isPlayer) {
-                    gameProcessHelper.addPlayer(user);
-                }
+                gameProcessHelper.handleUserInfo(user);
             });
+        }
+
+        if (gameInfo.isPlayer != null) {
+            gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
         }
     },
 
@@ -193,6 +212,20 @@ let gameProcessHelper = {
         }
 
         hubConnectorHelper.invokeChangeSubTaskScore(subTaskId, score);
+    },
+
+    changeMyStatus: (isPlayer) => {
+        if (isPlayer) {
+            $('#planning-poker-spectate-button').show();
+            $('#planning-poker-join-game-button').hide();
+            $('#planning-poker-gamer-card-zone').show();
+            $('.planning-poker-gamer-score[my-card="true"]').show();
+        } else {
+            $('#planning-poker-spectate-button').hide();
+            $('#planning-poker-join-game-button').show();
+            $('#planning-poker-gamer-card-zone').hide();
+            $('.planning-poker-gamer-score[my-card="true"]').hide();
+        }
     },
 
     _subTaskZone: {},
