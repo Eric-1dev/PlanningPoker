@@ -39,6 +39,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
                 UserId = gamerConnection.Id,
                 Name = gamerConnection.Name,
                 Score = null,
+                ScoreText = null,
                 IsPlayer = gamerConnection.IsPlayer,
                 IsActive = true,
             };

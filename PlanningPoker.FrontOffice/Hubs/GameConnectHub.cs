@@ -55,14 +55,16 @@ public class GameConnectHub : Hub
 
         var game = GameControlService.GetGameById(gameId);
 
-        if (otherUsers.Length > 0)
-        {
-            await Clients.OthersInGroup(GroupName).SendAsync("UserJoin", gamerInfoModel);
-        }
-
         var gameInfo = new GameInfoModel(game, myUserInfoModel, otherUsers);
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
+
+        UserInfoModel.ClearScore(myUserInfoModel);
+
+        if (otherUsers.Length > 0)
+        {
+            await Clients.OthersInGroup(GroupName).SendAsync("UserJoin", myUserInfoModel);
+        }
     }
 
     public override async Task OnConnectedAsync()
@@ -107,6 +109,8 @@ public class GameConnectHub : Hub
             return;
 
         var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score, scoreText);
+
+        UserInfoModel.ClearScore(user);
 
         await Clients.Group(GroupName).SendAsync("UserVoted", user);
     }

@@ -76,24 +76,10 @@ let gameProcessHelper = {
         let scoreBlock = $('<div class="planning-poker-gamer-score">');
         scoreBlock.attr('user-id', user.id);
 
-        let cardState;
-        let score;
+        let cardInfo = gameProcessHelper._generateCardState(user);
 
-        if (user.score != null) {
-            score = user.score;
-            cardState = 'openned';
-        } else {
-            score = '';
-
-            if (user.hasVoted) {
-                cardState = 'voted';
-            } else {
-                cardState = 'unvoted';
-            }
-        }
-
-        let card = $(`<div class="planning-poker-card" card-state="${cardState}">`);
-        card.html(score);
+        let card = $(`<div class="planning-poker-card" card-state="${cardInfo.cardState}">`);
+        card.html(cardInfo.scoreText);
 
         let userNameBlock = $('<div class="planning-poker-gamer-name">');
         userNameBlock.html(user.name);
@@ -126,11 +112,10 @@ let gameProcessHelper = {
             return;
         }
 
-        if (user.hasVoted) {
-            userCard.find('.planning-poker-card').attr('card-state', 'voted');
-        } else {
-            userCard.find('.planning-poker-card').attr('card-state', 'unvoted');
-        }
+        let cardInfo = gameProcessHelper._generateCardState(user);
+
+        userCard.find('.planning-poker-card').attr('card-state', cardInfo.cardState);
+        userCard.find('.planning-poker-card').html(cardInfo.scoreText);
 
         if (userCard.attr('my-card')) {
             $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
@@ -150,7 +135,7 @@ let gameProcessHelper = {
     },
 
     handleGameInfoMessage: (gameInfo) => {
-        gameProcessHelper._isAdmin = gameInfo.myInfo.Id === gameInfo.AdminId;
+        gameProcessHelper._isAdmin = gameInfo.myInfo.id === gameInfo.adminId;
 
         gameProcessHelper.handleMyInfo(gameInfo.myInfo);
 
@@ -328,7 +313,7 @@ let gameProcessHelper = {
         let score;
 
         if (scoreStr) {
-            score = parseFloat(scoreStr);
+            score = parseFloat(scoreStr.replace(',', '.'));
         } else {
             score = null;
         }
@@ -348,6 +333,30 @@ let gameProcessHelper = {
             $('#planning-poker-gamer-card-zone').hide();
             $('.planning-poker-gamer-score[my-card="true"]').hide();
         }
+    },
+
+    _generateCardState: (userInfo) => {
+        let cardState;
+        let scoreText;
+
+        if (userInfo.score != null && gameProcessHelper._gameState === 'CardsOpenned') {
+            scoreText = userInfo.scoreText;
+            cardState = 'openned';
+        } else {
+            scoreText = '';
+            if (userInfo.hasVoted) {
+                cardState = 'voted';
+            } else {
+                cardState = 'unvoted';
+            }
+        }
+
+        let cardInfo = {
+            cardState: cardState,
+            scoreText: scoreText
+        };
+
+        return cardInfo;
     },
 
     _findUserCardByUserId: (userId) => {
@@ -377,7 +386,7 @@ let gameProcessHelper = {
                 score = null;
             } else {
                 let scoreStr = selectedCard.attr('score');
-                score = parseFloat(scoreStr);
+                score = parseFloat(scoreStr.replace(',', '.'));
             }
 
             hubConnectorHelper.invokeTryChangeVote(score);

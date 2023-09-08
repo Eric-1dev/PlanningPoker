@@ -14,6 +14,8 @@ public class UserInfoModel
 
     public double? Score { get; set; }
 
+    public string ScoreText { get; set; }
+
     public bool IsPlayer { get; set; }
 
     public UserInfoModel()
@@ -26,6 +28,7 @@ public class UserInfoModel
         Name = gamerConnection.Name;
         HasVoted = gamerConnection.Score != null;
         Score = gamerConnection.Score;
+        ScoreText = gamerConnection.ScoreText;
         IsPlayer = gamerConnection.IsPlayer;
     }
 
@@ -33,7 +36,13 @@ public class UserInfoModel
     {
         foreach (var userInfo in userInfos)
         {
-            userInfo.Score = null;
+            ClearScore(userInfo);
         }
+    }
+
+    public static void ClearScore(UserInfoModel userInfo)
+    {
+        userInfo.Score = null;
+        userInfo.ScoreText = null;
     }
 }
