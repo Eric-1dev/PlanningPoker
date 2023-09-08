@@ -1,7 +1,8 @@
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
+using PlanningPoker.Entities.Exceptions;
 using PlanningPoker.Services.Interfaces;
-using PlanningPoker.Services.Models.GameInfoModel;
+using PlanningPoker.Services.Models;
 
 namespace PlanningPoker.Services.Implementation;
 
@@ -30,6 +31,8 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 
         using var dbContext = new ApplicationContext();
 
+        dbContext.Database.BeginTransaction();
+
         var existingUser = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.Id == gamerConnection.Id);
 
         if (existingUser != null)
@@ -38,6 +41,8 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         dbContext.GamerConnectionsCache.Add(gamerConnectionEntity);
 
         dbContext.SaveChanges();
+
+        dbContext.Database.CommitTransaction();
     }
 
     public Guid? RemoveUserFromGame(string connectionId)
@@ -45,6 +50,9 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         using var dbContext = new ApplicationContext();
 
         var gamerConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId);
+
+        if (gamerConnection == null)
+            return null;
 
         var gameId = gamerConnection?.GameId;
 
@@ -80,7 +88,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         var user = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId);
 
         if (!user.IsPlayer)
-            throw new Exception("Наблюдатель не может голосовать");
+            throw new WorkflowException("Наблюдатель не может голосовать");
 
         user.Score = score;
 

@@ -20,10 +20,40 @@ let gameProcessHelper = {
             hubConnectorHelper.invokeJoinGame();
         });
 
+        $('#planning-poker-start-game-button').click(() => {
+            hubConnectorHelper.invokeStartGame();
+        });
+
+        $('#planning-poker-open-cards-button').click(() => {
+            hubConnectorHelper.invokeTryOpenCards();
+        });
+
         hubConnectorHelper.init();
     },
 
     gameId: '',
+
+    onDisconnected: () => {
+        $('#planning-poker-connection-lost-locker').fadeIn('fast');
+    },
+
+    onConnected: () => {
+        $('#planning-poker-connection-lost-locker').fadeOut('fast');
+    },
+
+    handleNewMessage: (messageInfo) => {
+        switch (messageInfo.messageType) {
+            case 'Info':
+                modalWindowHelper.showInfo(messageInfo.message);
+                break;
+            case 'Error':
+                modalWindowHelper.showError(messageInfo.message);
+                break;
+            default:
+                modalWindowHelper.showInfo(messageInfo.message);
+                break;
+        }
+    },
 
     handleUserInfo: (user) => {
         let existingUserCard = gameProcessHelper._findUserCardByUserId(user.id);
@@ -61,6 +91,7 @@ let gameProcessHelper = {
 
     removeUserCard: (userId) => {
         let existingUserCard = gameProcessHelper._findUserCardByUserId(userId);
+
         if (existingUserCard.length < 1) {
             return;
         }
@@ -91,27 +122,25 @@ let gameProcessHelper = {
     },
 
     handleGameInfoMessage: (gameInfo) => {
-        if (gameInfo.taskName) {
-            gameProcessHelper.handleTaskName(gameInfo.taskName);
-        }
+        gameProcessHelper.handleTaskName(gameInfo.taskName);
 
         if (gameInfo.cards && gameInfo.cards.length > 0) {
             gameProcessHelper.handleCardsInfo(gameInfo.cards);
         }
 
-        if (gameInfo.subTasks) {
-            gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks, gameInfo.isAdmin, gameInfo.availableScores);
-        }
+        gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks, gameInfo.availableScores);
 
-        if (gameInfo.otherUsers) {
+        if (gameInfo.otherUsers != null) {
             gameInfo.otherUsers.forEach((user) => {
                 gameProcessHelper.handleUserInfo(user);
             });
         }
 
-        if (gameInfo.isPlayer != null) {
-            gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
-        }
+        gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
+
+        gameProcessHelper._isAdmin = gameInfo.isAdmin;
+
+        gameProcessHelper.handleGameState(gameInfo.gameState);
     },
 
     handleCardsInfo: (cards) => {
@@ -121,6 +150,7 @@ let gameProcessHelper = {
 
         cards.forEach((card) => {
             let cardBlock = $(`<div class="planning-poker-card planning-poker-card-clickable ${gameProcessHelper._mapCardColorToClass(card.color)}" score="${card.score}">`);
+
             cardBlock.html(card.text);
 
             cardZone.append(cardBlock);
@@ -129,13 +159,13 @@ let gameProcessHelper = {
         gameProcessHelper._addClickEventToCards();
     },
 
-    handleSubTasksInfo: (subTasks, isAdmin, scoreValues) => {
+    handleSubTasksInfo: (subTasks, scoreValues) => {
         subTasks.sort((a, b) => a.order - b.order).forEach((subTask) => {
-            gameProcessHelper.handleSubTaskInfo(subTask, isAdmin, scoreValues);
+            gameProcessHelper.handleSubTaskInfo(subTask, scoreValues);
         });
     },
 
-    handleSubTaskInfo: (subTask, isAdmin, scoreValues) => {
+    handleSubTaskInfo: (subTask, scoreValues) => {
         let isActive;
 
         if (subTask.isSelected) {
@@ -149,7 +179,7 @@ let gameProcessHelper = {
 
         let scoreBlock;
 
-        if (isAdmin && subTask.isSelected) {
+        if (gameProcessHelper._isAdmin && subTask.isSelected) {
             scoreBlock = $('<select class="form-select shadow-none planning-poker-tasks-zone-task-score">');
 
             scoreBlock.append($('<option value="">'));
@@ -199,6 +229,41 @@ let gameProcessHelper = {
         scoreBlock.html(score);
     },
 
+    handleGameState: (gameState) => {
+        gameProcessHelper._gameState = gameState;
+
+        if (gameProcessHelper._isAdmin) {
+            switch (gameState) {
+                case 'Created':
+                    $('#planning-poker-start-game-button').show();
+                    $('#planning-poker-score-next-button').hide();
+                    $('#planning-poker-rescore-button').hide();
+                    $('#planning-poker-open-cards-button').hide();
+                    break;
+                case 'Scoring':
+                    $('#planning-poker-start-game-button').hide();
+                    $('#planning-poker-score-next-button').hide();
+                    $('#planning-poker-rescore-button').hide();
+                    $('#planning-poker-open-cards-button').show();
+                    break;
+                case 'CardsOpenned':
+                    $('#planning-poker-start-game-button').hide();
+                    $('#planning-poker-score-next-button').show();
+                    $('#planning-poker-rescore-button').show();
+                    $('#planning-poker-open-cards-button').hide();
+                    break;
+                case 'Finished':
+                    $('#planning-poker-start-game-button').show();
+                    $('#planning-poker-score-next-button').hide();
+                    $('#planning-poker-rescore-button').hide();
+                    $('#planning-poker-open-cards-button').hide();
+                    break;
+                default:
+                    break;
+            }
+        }
+    },
+
     onSubTaskScoreChanged: (target) => {
         let subTaskId = $(target).closest('.planning-poker-tasks-zone-task').attr('task-id');
         let scoreStr = $(target).val();
@@ -229,6 +294,9 @@ let gameProcessHelper = {
     },
 
     _subTaskZone: {},
+
+    _isAdmin: false,
+    _gameState: '',
     _lastClickedCard: {},
 
     _findUserCardByUserId: (userId) => {
@@ -241,6 +309,9 @@ let gameProcessHelper = {
 
     _addClickEventToCards: () => {
         $('.planning-poker-card-clickable').click((event) => {
+            if (gameProcessHelper._gameState !== 'Running')
+                return;
+
             let selectedCard = $(event.target);
 
             let wasSelected = selectedCard.hasClass('planning-poker-card-selected');

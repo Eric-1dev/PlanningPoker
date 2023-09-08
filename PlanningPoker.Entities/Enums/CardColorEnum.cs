@@ -1,8 +1,5 @@
-using System.Text.Json.Serialization;
-
 namespace PlanningPoker.Entities.Enums;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum CardColorEnum
 {
     Green = 1,

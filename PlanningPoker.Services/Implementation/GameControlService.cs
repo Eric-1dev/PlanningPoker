@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
+using PlanningPoker.Entities.Exceptions;
 using PlanningPoker.Services.Dto;
 using PlanningPoker.Services.Interfaces;
 
@@ -15,7 +16,7 @@ public class GameControlService : IGameControlService
 
         var game = dbContext.Games.FirstOrDefault(x => x.Id == gameId);
 
-        return game?.GameState == GameStateEnum.Running;
+        return game?.GameState == GameStateEnum.Scoring;
     }
 
     public Guid CreateNewGame(string taskName, string[] subTasks, Guid adminId, CardSetTypeEnum cardSetType)
@@ -37,7 +38,7 @@ public class GameControlService : IGameControlService
 
         var game = new Game
         {
-            GameState = GameStateEnum.Paused,
+            GameState = GameStateEnum.Created,
             TaskName = taskName,
             SubTasks = subTaskList,
             AdminId = adminId,
@@ -60,7 +61,7 @@ public class GameControlService : IGameControlService
             .Include(x => x.SubTasks)
             .FirstOrDefault();
 
-        return game ?? throw new Exception($"Игра с ID {gameId} не найдена");
+        return game ?? throw new WorkflowException($"Игра с ID {gameId} не найдена");
     }
 
     public ChangeSubTaskScoreDto TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score)
@@ -77,5 +78,34 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return new ChangeSubTaskScoreDto { SubTaskId = subTask.Id, Score = score };
+    }
+
+    public Game StartGame(Guid gameId, Guid userId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        dbContext.Attach(game);
+
+        if (game.AdminId != userId)
+            throw new WorkflowException("Только администратор может управлять игрой");
+
+        if (game.GameState != GameStateEnum.Created && game.GameState != GameStateEnum.Finished)
+            throw new WorkflowException($"Нельзя начать оценку, когда игра находится в статусе {game.GameState}");
+
+        game.GameState = GameStateEnum.Scoring;
+
+        foreach (var subTask in game.SubTasks)
+        {
+            subTask.IsSelected = false;
+        }
+
+        var firstSubTask = game.SubTasks.OrderBy(x => x.Order).First();
+        firstSubTask.IsSelected = true;
+
+        dbContext.SaveChanges();
+
+        return game;
     }
 }

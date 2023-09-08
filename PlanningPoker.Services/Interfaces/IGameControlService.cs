@@ -11,6 +11,7 @@ public interface IGameControlService
     Game GetGameById(Guid id);
 
     bool IsGameRunning(Guid gameId);
-
     ChangeSubTaskScoreDto TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score);
+
+    Game StartGame(Guid gameId, Guid userId);
 }

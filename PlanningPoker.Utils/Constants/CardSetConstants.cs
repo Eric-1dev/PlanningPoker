@@ -36,4 +36,9 @@ public static class CardSetConstants
     {
         return _cardSets.First(x => x.CardSetType == cardSetType).Cards;
     }
+
+    public static double[] GetAvailableScores(CardSetTypeEnum cardSetType)
+    {
+        return Cards(cardSetType).Where(x => x.Score >= 0).Select(x => x.Score).ToArray();
+    }
 }

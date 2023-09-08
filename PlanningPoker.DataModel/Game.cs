@@ -16,7 +16,7 @@ public class Game : BaseEntity
     [Required]
     public GameStateEnum GameState { get; set; }
 
-    public double TotalScore { get; set; }
+    public double? TotalScore { get; set; }
 
     [Column("CardSetTypeId")]
     public CardSetTypeEnum CardSetType { get; set; }

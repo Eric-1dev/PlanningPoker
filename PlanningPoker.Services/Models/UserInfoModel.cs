@@ -1,6 +1,6 @@
 using PlanningPoker.DataModel;
 
-namespace PlanningPoker.Services.Models.GameInfoModel;
+namespace PlanningPoker.Services.Models;
 
 public class UserInfoModel
 {

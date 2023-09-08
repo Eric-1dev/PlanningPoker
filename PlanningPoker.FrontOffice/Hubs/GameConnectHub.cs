@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using PlanningPoker.FrontOffice.HubModels;
 using PlanningPoker.Services.Interfaces;
-using PlanningPoker.Services.Models.GameInfoModel;
+using PlanningPoker.Services.Models;
 using PlanningPoker.Utils.Extensions;
 
 namespace PlanningPoker.Services.Hubs;
@@ -26,7 +27,7 @@ public class GameConnectHub : Hub
         {
             ConnectionId = Context.ConnectionId,
             Name = userName,
-            Id = userId.Value,
+            Id = userId,
             IsPlayer = isPlayer,
         };
 
@@ -41,7 +42,7 @@ public class GameConnectHub : Hub
             await Clients.OthersInGroup(groupName).SendAsync("UserJoin", gamerConnection);
         }
 
-        var gameInfo = new GameInfoModel(game, userId.Value, otherUsers, isPlayer);
+        var gameInfo = new GameInfoModel(game, userId, otherUsers, isPlayer);
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
     }
@@ -88,7 +89,7 @@ public class GameConnectHub : Hub
     {
         var userId = Context.User.GetUserId();
 
-        var result = GameControlService.TryChangeSubTaskScore(userId.Value, gameId, subTaskId, score);
+        var result = GameControlService.TryChangeSubTaskScore(userId, gameId, subTaskId, score);
 
         var groupName = GetGroupName(gameId);
 
@@ -103,6 +104,19 @@ public class GameConnectHub : Hub
     public async Task MakeMePlayer(Guid gameId)
     {
         await ChangeUserStatus(gameId, isPlayer: true);
+    }
+
+    public async Task StartGame(Guid gameId)
+    {
+        var userId = Context.User.GetUserId();
+
+        var game = GameControlService.StartGame(gameId, userId);
+
+        var groupName = GetGroupName(gameId);
+
+        var gameState = new GameStateChangedModel(game);
+
+        await Clients.Group(groupName).SendAsync("GameStateChanged", gameState);
     }
 
     private async Task ChangeUserStatus(Guid gameId, bool isPlayer)

@@ -19,8 +19,16 @@
 
 <div class="planning-poker-buttons-zone-wrapper">
     <div class="planning-poker-buttons-zone">
-        <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-spectate-button">Стать набдюдателем</button>
-        <button class="btn btn-sm btn-success planning-poker-button" id="planning-poker-join-game-button">Вступить в игру</button>
+        <div class="planning-poker-button-group">
+            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-spectate-button">Стать набдюдателем</button>
+            <button class="btn btn-sm btn-success planning-poker-button" id="planning-poker-join-game-button">Вступить в игру</button>
+        </div>
+        <div class="planning-poker-button-group">
+            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-start-game-button">Начать оценку</button>
+            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-open-cards-button">Показать карты</button>
+            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-score-next-button">Перейти к следующей задаче</button>
+            <button class="btn btn-sm btn-warning planning-poker-button" id="planning-poker-rescore-button">Оценить заново</button>
+        </div>
     </div>
 </div>
 
@@ -55,6 +63,16 @@
             @card.Text
         </div>
     }
+</div>
+
+
+<div id="planning-poker-connection-lost-locker">
+    <div id="planning-poker-connection-lost-banner-wrapper">
+        <div id="planning-poker-connection-lost-banner">
+            <span class="mb-5">Потеряно соединение с сервером. Восстанавливаю...</span>
+            <img src="~/Content/images/loader.svg" />
+        </div>
+    </div>
 </div>
 
 @{

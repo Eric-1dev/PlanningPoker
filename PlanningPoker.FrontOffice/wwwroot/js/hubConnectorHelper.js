@@ -1,10 +1,22 @@
 /*jshint esversion: 6 */
 
 let hubConnectorHelper = {
+    _hubConnection: {},
+
     init: () => {
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/GameConnect")
             .build();
+
+        hubConnection.onclose(async () => {
+            gameProcessHelper.onDisconnected();
+
+            await hubConnectorHelper._start();
+        });
+
+        hubConnection.on('OnSystemMessageReceived', (messageInfo) => {
+            gameProcessHelper.handleNewMessage(messageInfo);
+        });
 
         hubConnection.on('UserJoin', (user) => {
             gameProcessHelper.handleUserInfo(user);
@@ -34,9 +46,14 @@ let hubConnectorHelper = {
             gameProcessHelper.handleUserInfo(user);
         });
 
-        hubConnection.start();
+        hubConnection.on("GameStateChanged", (gameState) => {
+            gameProcessHelper.handleGameState(gameState.gameState);
+            gameProcessHelper.handleSubTasksInfo(gameState.subTasks, gameInfo.availableScores);
+        });
 
         hubConnectorHelper._hubConnection = hubConnection;
+
+        hubConnectorHelper._start();
     },
 
     invokeTryChangeVote: (score) => {
@@ -59,5 +76,25 @@ let hubConnectorHelper = {
             .then(gameProcessHelper.changeMyStatus(true));
     },
 
-    _hubConnection: {}
+    invokeStartGame: () => {
+        hubConnectorHelper._hubConnection
+            .invoke('StartGame', gameProcessHelper.gameId);
+    },
+
+    invokeTryOpenCards: () => {
+
+    },
+
+    _start: async () => {
+        try {
+            await hubConnectorHelper._hubConnection.start()
+                .then(() => {
+                    gameProcessHelper.onConnected();
+                });
+            console.log("SignalR Connected.");
+        } catch {
+            console.log("SignalR Connection error.");
+            setTimeout(async () => await hubConnectorHelper._start(), 3000);
+        }
+    }
 };

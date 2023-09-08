@@ -39,13 +39,10 @@ public class HomeController : BaseController
 
         var userId = User.GetUserId();
 
-        if (userId == null)
-            return Fail("Не удалось определить ваш Id. Попробуйте обновить страницу.");
-
         if (!subTasks.Any())
             subTasks = new[] { "Задача целиком" };
 
-        var gameId = GameControlService.CreateNewGame(taskName, subTasks, userId.Value, CardSetTypeEnum.Classic);
+        var gameId = GameControlService.CreateNewGame(taskName, subTasks, userId, CardSetTypeEnum.Classic);
 
         return Success(gameId);
     }

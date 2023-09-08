@@ -1,4 +1,4 @@
-using PlanningPoker.Services.Models.GameInfoModel;
+using PlanningPoker.Services.Models;
 
 namespace PlanningPoker.Services.Interfaces;
 

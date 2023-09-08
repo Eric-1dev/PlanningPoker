@@ -1,13 +1,17 @@
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using BundlerMinifier.TagHelpers;
 using ElectroPrognizer.Utils.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using PlanningPoker.FrontOffice.Security;
 using PlanningPoker.IoC;
+using PlanningPoker.Services.HubFilters;
 using PlanningPoker.Services.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +27,9 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder
     }
 
     builder.RegisterLocalServices();
+
+    builder.RegisterType<GameConnectHub>().SingleInstance().PropertiesAutowired();
+    builder.RegisterType<ErrorHandleHubFilter>().As<IHubFilter>().PropertiesAutowired();
 }));
 
 var connectionString = builder.Configuration.GetConnectionString("PlanningPoker");
@@ -32,7 +39,12 @@ builder.Services
     .AddMvc()
     .AddControllersAsServices();
 
-builder.Services.AddControllersWithViews();
+builder.Services
+    .AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddHttpContextAccessor();
 
@@ -48,7 +60,12 @@ builder.Services.AddAuthentication(PokerAuthenticationHandler.AuthSchemeName)
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSignalR();
+builder.Services
+    .AddSignalR(options =>
+    {
+        options.AddFilter<ErrorHandleHubFilter>();
+    })
+    .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 

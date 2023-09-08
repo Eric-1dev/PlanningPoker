@@ -1,5 +1,4 @@
 using Autofac;
-using PlanningPoker.Services.Hubs;
 using PlanningPoker.Services.Implementation;
 using PlanningPoker.Services.Interfaces;
 
@@ -11,11 +10,6 @@ public static class IoC
     {
         builder.RegisterType<GameControlService>()
             .As<IGameControlService>()
-            .SingleInstance()
-            .PropertiesAutowired();
-
-        builder.RegisterType<GameConnectHub>()
-            .As<GameConnectHub>()
             .SingleInstance()
             .PropertiesAutowired();
 
