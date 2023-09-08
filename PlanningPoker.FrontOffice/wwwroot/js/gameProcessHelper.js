@@ -128,6 +128,10 @@ let gameProcessHelper = {
     },
 
     handleGameInfoMessage: (gameInfo) => {
+        gameProcessHelper._isAdmin = gameInfo.isAdmin;
+
+        gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
+
         gameProcessHelper.handleTaskName(gameInfo.taskName);
 
         if (gameInfo.cards && gameInfo.cards.length > 0) {
@@ -141,10 +145,6 @@ let gameProcessHelper = {
                 gameProcessHelper.handleUserInfo(user);
             });
         }
-
-        gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
-
-        gameProcessHelper._isAdmin = gameInfo.isAdmin;
 
         gameProcessHelper.handleGameState(gameInfo.gameState);
     },
