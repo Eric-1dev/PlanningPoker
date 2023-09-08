@@ -57,32 +57,31 @@ let hubConnectorHelper = {
     },
 
     invokeTryChangeVote: (score) => {
-        hubConnectorHelper._hubConnection.invoke('TryChangeVote', gameProcessHelper.gameId, score);
+        hubConnectorHelper._hubConnection.invoke('TryChangeVote', score);
     },
 
     invokeChangeSubTaskScore: (subTaskId, score) => {
-        hubConnectorHelper._hubConnection.invoke('SendChangeSubTaskScore', gameProcessHelper.gameId, subTaskId, score);
+        hubConnectorHelper._hubConnection.invoke('SendChangeSubTaskScore', subTaskId, score);
     },
 
     invokeSpectate: () => {
         hubConnectorHelper._hubConnection
-            .invoke('MakeMeSpectator', gameProcessHelper.gameId)
+            .invoke('MakeMeSpectator')
             .then(gameProcessHelper.changeMyStatus(false));
     },
 
     invokeJoinGame: () => {
         hubConnectorHelper._hubConnection
-            .invoke('MakeMePlayer', gameProcessHelper.gameId)
+            .invoke('MakeMePlayer')
             .then(gameProcessHelper.changeMyStatus(true));
     },
 
     invokeStartGame: () => {
-        hubConnectorHelper._hubConnection
-            .invoke('StartGame', gameProcessHelper.gameId);
+        hubConnectorHelper._hubConnection.invoke('StartGame');
     },
 
     invokeTryOpenCards: () => {
-
+        hubConnectorHelper._hubConnection.invoke('TryOpenCards');
     },
 
     _start: async () => {

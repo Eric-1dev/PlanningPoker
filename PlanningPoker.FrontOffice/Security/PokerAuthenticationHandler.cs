@@ -9,7 +9,6 @@ namespace PlanningPoker.FrontOffice.Security;
 public class PokerAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>, IAuthenticationHandler
 {
     public const string AuthSchemeName = "Basic";
-
     public const string AuthCookieName = "UserName";
     public const string AuthCookieId = "UserId";
 

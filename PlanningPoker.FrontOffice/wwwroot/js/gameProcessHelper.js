@@ -5,6 +5,14 @@ $(document).ready(() => {
 });
 
 let gameProcessHelper = {
+    _subTaskZone: {},
+
+    _isAdmin: false,
+    _gameState: '',
+    _lastClickedCard: {},
+
+    gameId: '',
+
     init: () => {
         gameProcessHelper.gameId = $('#planning-poker-game-id').val();
 
@@ -30,8 +38,6 @@ let gameProcessHelper = {
 
         hubConnectorHelper.init();
     },
-
-    gameId: '',
 
     onDisconnected: () => {
         $('#planning-poker-connection-lost-locker').fadeIn('fast');
@@ -293,12 +299,6 @@ let gameProcessHelper = {
         }
     },
 
-    _subTaskZone: {},
-
-    _isAdmin: false,
-    _gameState: '',
-    _lastClickedCard: {},
-
     _findUserCardByUserId: (userId) => {
         return $(`.planning-poker-gamer-score[user-id="${userId}"]`);
     },
@@ -309,7 +309,7 @@ let gameProcessHelper = {
 
     _addClickEventToCards: () => {
         $('.planning-poker-card-clickable').click((event) => {
-            if (gameProcessHelper._gameState !== 'Running')
+            if (gameProcessHelper._gameState !== 'Scoring')
                 return;
 
             let selectedCard = $(event.target);
