@@ -19,7 +19,7 @@ public class ApplicationContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<GamerConnection>().HasIndex(x => x.GameId);
-        modelBuilder.Entity<GamerConnection>().HasIndex(x => x.Id);
+        modelBuilder.Entity<GamerConnection>().HasIndex(x => x.UserId);
 
         base.OnModelCreating(modelBuilder);
     }

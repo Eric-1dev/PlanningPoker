@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using PlanningPoker.Entities.Exceptions;
 using PlanningPoker.FrontOffice.HubModels;
 using PlanningPoker.Services.Interfaces;
 using PlanningPoker.Services.Models;
+using PlanningPoker.Utils.Constants;
 using PlanningPoker.Utils.Extensions;
 
 namespace PlanningPoker.Services.Hubs;
@@ -10,9 +12,6 @@ namespace PlanningPoker.Services.Hubs;
 [Authorize]
 public class GameConnectHub : Hub
 {
-    public IGameGroupCacheService GameGroupCacheService { get; set; }
-    public IGameControlService GameControlService { get; set; }
-
     private Guid GameId
     {
         get
@@ -20,15 +19,16 @@ public class GameConnectHub : Hub
             var result = Context.Items.TryGetValue("GameId", out var gameId);
 
             if (result)
-            {
                 return (Guid)gameId;
-            }
 
             throw new Exception($"Не найден {nameof(GameId)} в контексте соединения");
         }
     }
 
     private string GroupName => GameId.ToString();
+
+    public IGameGroupCacheService GameGroupCacheService { get; set; }
+    public IGameControlService GameControlService { get; set; }
 
     public async Task UserConnected(Guid gameId)
     {
@@ -41,15 +41,15 @@ public class GameConnectHub : Hub
 
         var isPlayer = true;
 
-        var gamerConnection = new UserInfoModel
+        var gamerInfoModel = new UserInfoModel
         {
             ConnectionId = Context.ConnectionId,
             Name = userName,
             Id = userId,
-            IsPlayer = isPlayer,
+            IsPlayer = isPlayer
         };
 
-        GameGroupCacheService.AddUserToGame(gameId, gamerConnection);
+        var myUserInfoModel = GameGroupCacheService.AddOrUpdateUserToGame(gameId, gamerInfoModel);
 
         var otherUsers = GameGroupCacheService.GetAllUsersInGame(gameId, Context.ConnectionId).Where(x => x.Id != userId).ToArray();
 
@@ -57,10 +57,10 @@ public class GameConnectHub : Hub
 
         if (otherUsers.Length > 0)
         {
-            await Clients.OthersInGroup(GroupName).SendAsync("UserJoin", gamerConnection);
+            await Clients.OthersInGroup(GroupName).SendAsync("UserJoin", gamerInfoModel);
         }
 
-        var gameInfo = new GameInfoModel(game, userId, otherUsers, isPlayer);
+        var gameInfo = new GameInfoModel(game, myUserInfoModel, otherUsers);
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
     }
@@ -85,6 +85,20 @@ public class GameConnectHub : Hub
 
     public async Task TryChangeVote(double? score)
     {
+        var cardSetType = GameControlService.GetCardSetType(GameId);
+
+        string scoreText = null;
+
+        if (score.HasValue)
+        {
+            scoreText = CardSetConstants.GetScoreText(cardSetType, score.Value);
+
+            if (scoreText == null)
+            {
+                throw new WorkflowException("Выбранная карта не найдена в используемом наборе");
+            }
+        }
+
         var isGameRunning = GameControlService.IsGameRunning(GameId);
 
         var isUserIsPlayer = GameGroupCacheService.IsUserIsPlayer(GameId, Context.ConnectionId);
@@ -92,7 +106,7 @@ public class GameConnectHub : Hub
         if (!isGameRunning || !isUserIsPlayer)
             return;
 
-        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score);
+        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score, scoreText);
 
         await Clients.Group(GroupName).SendAsync("UserVoted", user);
     }
@@ -129,7 +143,18 @@ public class GameConnectHub : Hub
 
     public async Task TryOpenCards()
     {
-        await Clients.Group(GroupName).SendAsync("");
+        var userId = Context.User.GetUserId();
+
+        var playerScores = GameGroupCacheService.CheckAllVotedAndGetScores(GameId);
+
+        if (playerScores == null)
+            throw new WorkflowException("Открыть карты можно только когда все участники проголосовали");
+
+        var game = GameControlService.OpenCards(GameId, userId);
+
+        var playerScoresModel = new ShowPlayerScoresModel(playerScores, game.GameState);
+
+        await Clients.Group(GroupName).SendAsync("ShowPlayerScores", playerScoresModel);
     }
 
     private async Task ChangeUserStatus(bool isPlayer)

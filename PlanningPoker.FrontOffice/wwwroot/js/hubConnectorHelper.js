@@ -48,7 +48,11 @@ let hubConnectorHelper = {
 
         hubConnection.on("GameStateChanged", (gameState) => {
             gameProcessHelper.handleGameState(gameState.gameState);
-            gameProcessHelper.handleSubTasksInfo(gameState.subTasks, gameInfo.availableScores);
+            gameProcessHelper.handleSubTasksInfo(gameState.subTasks, gameState.availableScores);
+        });
+
+        hubConnection.on("ShowPlayerScores", (showPlayerScoresModel) => {
+            gameProcessHelper.handleShowPlayerScores(showPlayerScoresModel);
         });
 
         hubConnectorHelper._hubConnection = hubConnection;

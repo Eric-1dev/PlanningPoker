@@ -8,6 +8,8 @@ namespace PlanningPoker.FrontOffice.HubModels;
 
 public class GameInfoModel
 {
+    public UserInfoModel MyInfo { get; }
+
     public UserInfoModel[] OtherUsers { get; }
 
     public string TaskName { get; }
@@ -20,22 +22,23 @@ public class GameInfoModel
 
     public Card[] Cards { get; }
 
-    public bool IsAdmin { get; }
-
-    public bool IsPlayer { get; }
+    public Guid AdminId { get; }
 
     public GameInfoModel()
     { }
 
-    public GameInfoModel(Game game, Guid userId, UserInfoModel[] otherUsers, bool isPlayer)
+    public GameInfoModel(Game game, UserInfoModel myInfo, UserInfoModel[] otherUsers)
     {
+        if (game.GameState != GameStateEnum.CardsOpenned)
+            UserInfoModel.ClearScores(otherUsers);
+
         OtherUsers = otherUsers;
         TaskName = game.TaskName;
         GameState = game.GameState;
         AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
         //Cards = CardSetConstants.Cards(game.CardSetType);
-        IsAdmin = game.AdminId == userId;
-        IsPlayer = isPlayer;
+        MyInfo = myInfo;
+        AdminId = game.AdminId;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel(x)).ToArray();
     }
 }

@@ -9,7 +9,7 @@ let gameProcessHelper = {
 
     _isAdmin: false,
     _gameState: '',
-    _lastClickedCard: {},
+    _lastClickedCard: null,
 
     gameId: '',
 
@@ -33,6 +33,10 @@ let gameProcessHelper = {
         });
 
         $('#planning-poker-open-cards-button').click(() => {
+            if (gameProcessHelper._gameState !== 'Scoring') {
+                return;
+            }
+
             hubConnectorHelper.invokeTryOpenCards();
         });
 
@@ -73,14 +77,24 @@ let gameProcessHelper = {
         scoreBlock.attr('user-id', user.id);
 
         let cardState;
+        let score;
 
-        if (user.hasVoted) {
-            cardState = 'voted-closed';
+        if (user.score != null) {
+            score = user.score;
+            cardState = 'openned';
         } else {
-            cardState = 'unvoted';
+            score = '';
+
+            if (user.hasVoted) {
+                cardState = 'voted';
+            } else {
+                cardState = 'unvoted';
+            }
         }
 
         let card = $(`<div class="planning-poker-card" card-state="${cardState}">`);
+        card.html(score);
+
         let userNameBlock = $('<div class="planning-poker-gamer-name">');
         userNameBlock.html(user.name);
 
@@ -113,7 +127,7 @@ let gameProcessHelper = {
         }
 
         if (user.hasVoted) {
-            userCard.find('.planning-poker-card').attr('card-state', 'voted-closed');
+            userCard.find('.planning-poker-card').attr('card-state', 'voted');
         } else {
             userCard.find('.planning-poker-card').attr('card-state', 'unvoted');
         }
@@ -122,15 +136,23 @@ let gameProcessHelper = {
             $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
 
             if (user.hasVoted) {
-                gameProcessHelper._lastClickedCard.addClass('planning-poker-card-selected');
+                if (gameProcessHelper._lastClickedCard != null) {
+                    gameProcessHelper._lastClickedCard.addClass('planning-poker-card-selected');
+                    return;
+                }
+
+                if (user.score != null) {
+                    $(`.planning-poker-card-clickable[score="${user.score}"]`).addClass('planning-poker-card-selected');
+                    return;
+                }
             }
         }
     },
 
     handleGameInfoMessage: (gameInfo) => {
-        gameProcessHelper._isAdmin = gameInfo.isAdmin;
+        gameProcessHelper._isAdmin = gameInfo.myInfo.Id === gameInfo.AdminId;
 
-        gameProcessHelper.changeMyStatus(gameInfo.isPlayer);
+        gameProcessHelper.handleMyInfo(gameInfo.myInfo);
 
         gameProcessHelper.handleTaskName(gameInfo.taskName);
 
@@ -147,6 +169,12 @@ let gameProcessHelper = {
         }
 
         gameProcessHelper.handleGameState(gameInfo.gameState);
+    },
+
+    handleMyInfo: (myInfo) => {
+        gameProcessHelper.changeMyStatus(myInfo.isPlayer);
+        
+        gameProcessHelper.updateUserVote(myInfo);
     },
 
     handleCardsInfo: (cards) => {
@@ -185,7 +213,7 @@ let gameProcessHelper = {
 
         let scoreBlock;
 
-        if (gameProcessHelper._isAdmin && subTask.isSelected) {
+        if (gameProcessHelper._isAdmin) {
             scoreBlock = $('<select class="form-select shadow-none planning-poker-tasks-zone-task-score">');
 
             scoreBlock.append($('<option value="">'));
@@ -202,6 +230,10 @@ let gameProcessHelper = {
 
                 scoreBlock.append(option);
             });
+
+            if (!subTask.isSelected || gameProcessHelper._gameState !== 'CardsOpenned') {
+                scoreBlock.prop('disabled', true);
+            }
 
         } else {
             scoreBlock = $('<div class="planning-poker-tasks-zone-task-score">');
@@ -238,27 +270,33 @@ let gameProcessHelper = {
     handleGameState: (gameState) => {
         gameProcessHelper._gameState = gameState;
 
+        let subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
+
         if (gameProcessHelper._isAdmin) {
             switch (gameState) {
                 case 'Created':
+                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();
                     $('#planning-poker-open-cards-button').hide();
                     break;
                 case 'Scoring':
+                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-start-game-button').hide();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();
                     $('#planning-poker-open-cards-button').show();
                     break;
                 case 'CardsOpenned':
+                    subTaskScoreBlock.prop('disabled', false);
                     $('#planning-poker-start-game-button').hide();
                     $('#planning-poker-score-next-button').show();
                     $('#planning-poker-rescore-button').show();
                     $('#planning-poker-open-cards-button').hide();
                     break;
                 case 'Finished':
+                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();
@@ -268,6 +306,19 @@ let gameProcessHelper = {
                     break;
             }
         }
+    },
+
+    handleShowPlayerScores: (showPlayerScoresModel) => {
+        showPlayerScoresModel.playerScores.forEach((playerScore) => {
+            let userCard = gameProcessHelper._findUserCardByUserId(playerScore.userId);
+
+            if (userCard) {
+                userCard.find('.planning-poker-card').attr('card-state', 'openned');
+                userCard.find('.planning-poker-card').html(playerScore.score);
+            }
+        });
+
+        gameProcessHelper.handleGameState(showPlayerScoresModel.gameState);
     },
 
     onSubTaskScoreChanged: (target) => {
@@ -305,6 +356,10 @@ let gameProcessHelper = {
 
     _findSubTaskById: (subTaskId) => {
         return gameProcessHelper._subTaskZone.find(`.planning-poker-tasks-zone-task[task-id="${subTaskId}"]`);
+    },
+
+    _findSelectedSubTaskScoreBlock: () => {
+        return $('.planning-poker-tasks-zone-task[active="true"] .planning-poker-tasks-zone-task-score');
     },
 
     _addClickEventToCards: () => {

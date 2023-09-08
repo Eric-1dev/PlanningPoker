@@ -71,7 +71,10 @@ public class GameControlService : IGameControlService
         var subTask = dbContext.GameSubTasks.FirstOrDefault(x => x.Id == subTaskId && x.Game.Id == gameId && x.Game.AdminId == userId);
 
         if (subTask == null)
-            return null;
+            throw new WorkflowException("Подзадача с указанным ID не найдена");
+
+        if (!subTask.IsSelected)
+            throw new WorkflowException("Можно изменить оценку только выбранной задачи");
 
         subTask.Score = score;
 
@@ -107,5 +110,35 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return game;
+    }
+
+    public Game OpenCards(Guid gameId, Guid userId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        dbContext.Attach(game);
+
+        if (game.AdminId != userId)
+            throw new WorkflowException("Только администратор может управлять игрой");
+
+        if (game.GameState != GameStateEnum.Scoring)
+            throw new WorkflowException($"Нельзя начать оценку, когда игра находится в статусе {game.GameState}");
+
+        game.GameState = GameStateEnum.CardsOpenned;
+
+        dbContext.SaveChanges();
+
+        return game;
+    }
+
+    public CardSetTypeEnum GetCardSetType(Guid gameId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        return game.CardSetType;
     }
 }

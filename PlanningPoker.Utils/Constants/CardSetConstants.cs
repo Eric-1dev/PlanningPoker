@@ -41,4 +41,9 @@ public static class CardSetConstants
     {
         return Cards(cardSetType).Where(x => x.Score >= 0).Select(x => x.Score).ToArray();
     }
+
+    public static string GetScoreText(CardSetTypeEnum cardSetType, double score)
+    {
+        return Cards(cardSetType).FirstOrDefault(x => x.Score == score)?.Text ?? null;
+    }
 }

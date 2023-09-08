@@ -17,32 +17,40 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         dbContext.SaveChanges();
     }
 
-    public void AddUserToGame(Guid gameId, UserInfoModel gamerConnection)
+    public UserInfoModel AddOrUpdateUserToGame(Guid gameId, UserInfoModel gamerConnection)
     {
-        var gamerConnectionEntity = new GamerConnection
-        {
-            GameId = gameId,
-            ConnectionId = gamerConnection.ConnectionId,
-            Id = gamerConnection.Id,
-            Name = gamerConnection.Name,
-            Score = null,
-            IsPlayer = true,
-        };
-
         using var dbContext = new ApplicationContext();
 
         dbContext.Database.BeginTransaction();
 
-        var existingUser = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.Id == gamerConnection.Id);
+        var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.Id);
 
-        if (existingUser != null)
-            dbContext.GamerConnectionsCache.Remove(existingUser);
+        if (userConnection != null)
+        {
+            userConnection.ConnectionId = gamerConnection.ConnectionId;
+            userConnection.IsActive = true;
+        }
+        else
+        {
+            userConnection = new GamerConnection
+            {
+                GameId = gameId,
+                ConnectionId = gamerConnection.ConnectionId,
+                UserId = gamerConnection.Id,
+                Name = gamerConnection.Name,
+                Score = null,
+                IsPlayer = gamerConnection.IsPlayer,
+                IsActive = true,
+            };
 
-        dbContext.GamerConnectionsCache.Add(gamerConnectionEntity);
+            dbContext.GamerConnectionsCache.Add(userConnection);
+        }
 
         dbContext.SaveChanges();
 
         dbContext.Database.CommitTransaction();
+
+        return new UserInfoModel(userConnection);
     }
 
     public Guid? RemoveUserFromGame(string connectionId)
@@ -56,7 +64,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 
         var gameId = gamerConnection?.GameId;
 
-        dbContext.GamerConnectionsCache.Remove(gamerConnection);
+        gamerConnection.IsActive = false;
 
         dbContext.SaveChanges();
 
@@ -67,7 +75,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
     {
         using var dbContext = new ApplicationContext();
 
-        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId);
+        var gameConnections = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId && x.IsActive);
 
         return gameConnections.Select(x => new UserInfoModel(x)).ToArray();
     }
@@ -81,7 +89,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         return new UserInfoModel(myConnection);
     }
 
-    public UserInfoModel ChangeUserVote(string connectionId, double? score)
+    public UserInfoModel ChangeUserVote(string connectionId, double? score, string scoreText)
     {
         using var dbContext = new ApplicationContext();
 
@@ -91,6 +99,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
             throw new WorkflowException("Наблюдатель не может голосовать");
 
         user.Score = score;
+        user.ScoreText = scoreText;
 
         dbContext.SaveChanges();
 
@@ -118,5 +127,26 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         var isPlayer = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.ConnectionId == connectionId).IsPlayer;
 
         return isPlayer;
+    }
+
+    public UserScoreModel[] CheckAllVotedAndGetScores(Guid gameId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var allScores = dbContext.GamerConnectionsCache
+            .Where(x => x.GameId == gameId && x.IsPlayer)
+            .Select(x => new
+            {
+                UserId = x.UserId,
+                Score = x.Score,
+                ScoreText = x.ScoreText
+            }).ToArray();
+
+        if (allScores.Any(x => x.Score == null))
+            return null;
+
+        return allScores
+            .Select(x => new UserScoreModel(x.UserId, x.Score.Value, x.ScoreText))
+            .ToArray();
     }
 }
