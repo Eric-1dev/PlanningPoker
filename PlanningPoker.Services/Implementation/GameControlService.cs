@@ -189,6 +189,9 @@ public class GameControlService : IGameControlService
         if (selectedSubTask == null)
             throw new WorkflowException("Некорректное состояние. Должна быть выбрана предыдущая задача");
 
+        if (selectedSubTask.Score == null)
+            throw new WorkflowException("Укажите оценку");
+
         var nextSubTask = game.SubTasks.OrderBy(x => x.Order).Where(x => x.Order > selectedSubTask.Order).FirstOrDefault();
 
         if (nextSubTask == null)

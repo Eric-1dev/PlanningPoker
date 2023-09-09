@@ -199,13 +199,11 @@ let gameProcessHelper = {
             gameProcessHelper.handleUserInfo(user);
         });
 
-        gameProcessHelper.handleGameState();
+        gameProcessHelper.actualizeButtons();
     },
 
     gameStateChanged: (gameState) => {
         gameProcessHelper._gameState = gameState;
-
-        gameProcessHelper.handleGameState();
     },
 
     redrawCards: () => {
@@ -240,7 +238,7 @@ let gameProcessHelper = {
             isActive = false;
         }
 
-        const taskBlock = $(`<div class="planning-poker-tasks-zone-task" active="${isActive}" task-id="${subTask.id}">`);
+        const taskBlock = $(`<div class="planning-poker-tasks-zone-task" order="${subTask.order}" active="${isActive}" task-id="${subTask.id}">`);
         const taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
 
         let scoreBlock;
@@ -262,7 +260,9 @@ let gameProcessHelper = {
                 scoreBlock.append(option);
             });
 
-            if (!subTask.isSelected || gameProcessHelper._gameState !== 'CardsOpenned') {
+            if (gameProcessHelper._gameState === 'CardsOpenned' && subTask.isSelected) {
+                scoreBlock.prop('disabled', false);
+            } else {
                 scoreBlock.prop('disabled', true);
             }
 
@@ -290,13 +290,10 @@ let gameProcessHelper = {
         $('#planning-poker-tasks-zone-task-header').html(taskName);
     },
 
-    handleGameState: () => {
-        let subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
-
+    actualizeButtons: () => {
         if (gameProcessHelper._isAdmin) {
             switch (gameProcessHelper._gameState) {
                 case 'Created':
-                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
@@ -304,7 +301,6 @@ let gameProcessHelper = {
                     $('#planning-poker-open-cards-button').hide();
                     break;
                 case 'Scoring':
-                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').hide();
                     $('#planning-poker-score-next-button').hide();
@@ -312,15 +308,17 @@ let gameProcessHelper = {
                     $('#planning-poker-open-cards-button').show();
                     break;
                 case 'CardsOpenned':
-                    subTaskScoreBlock.prop('disabled', false);
-                    $('#planning-poker-finish-game-button').hide();
+                    if (gameProcessHelper._isFinalSubTask()) {
+                        $('#planning-poker-score-next-button').show();
+                    } else {
+                        $('#planning-poker-finish-game-button').show();
+                    }
+
                     $('#planning-poker-start-game-button').hide();
-                    $('#planning-poker-score-next-button').show();
                     $('#planning-poker-rescore-button').show();
                     $('#planning-poker-open-cards-button').hide();
                     break;
                 case 'Finished':
-                    subTaskScoreBlock.prop('disabled', true);
                     $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
@@ -333,11 +331,9 @@ let gameProcessHelper = {
         }
     },
 
-    handleShowPlayerScores: (showPlayerScoresModel) => {
-        gameProcessHelper.gameStateChanged(showPlayerScoresModel.gameState);
-
-        showPlayerScoresModel.playerScores.forEach((playerScore) => {
-            let userCard = gameProcessHelper._findUserCardByUserId(playerScore.userId);
+    handleShowPlayerScores: (playerScores) => {
+        playerScores.forEach((playerScore) => {
+            const userCard = gameProcessHelper._findUserCardByUserId(playerScore.userId);
 
             if (userCard) {
                 const scoreText = gameProcessHelper._getScoreTextByScore(playerScore.score);
@@ -347,6 +343,9 @@ let gameProcessHelper = {
                 cardContentBlock.html(scoreText);
             }
         });
+
+        const subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
+        subTaskScoreBlock.prop('disabled', false);
     },
 
     handleFlushPlayerScores: (playerScores) => {
@@ -356,8 +355,8 @@ let gameProcessHelper = {
     },
 
     onSubTaskScoreChanged: (target) => {
-        let subTaskId = $(target).closest('.planning-poker-tasks-zone-task').attr('task-id');
-        let scoreStr = $(target).val();
+        const subTaskId = $(target).closest('.planning-poker-tasks-zone-task').attr('task-id');
+        const scoreStr = $(target).val();
 
         let score;
 
@@ -418,8 +417,12 @@ let gameProcessHelper = {
         return gameProcessHelper._subTaskZone.find(`.planning-poker-tasks-zone-task[task-id="${subTaskId}"]`);
     },
 
+    _findSelectedSubTaskBlock: () => {
+        return $('.planning-poker-tasks-zone-task[active="true"]');
+    },
+
     _findSelectedSubTaskScoreBlock: () => {
-        return $('.planning-poker-tasks-zone-task[active="true"] .planning-poker-tasks-zone-task-score');
+        return gameProcessHelper._findSelectedSubTaskBlock().find('.planning-poker-tasks-zone-task-score');
     },
 
     _addClickEventToCards: () => {
@@ -507,6 +510,22 @@ let gameProcessHelper = {
         }
 
         gameProcessHelper._actualizeOpenCardsButtonState();
+    },
+
+    _isFinalSubTask: () => {
+        const selectedSubTaskBlock = gameProcessHelper._findSelectedSubTaskBlock();
+
+        const selectedOrder = selectedSubTaskBlock.attr('order');
+
+        const orders = $('.planning-poker-tasks-zone-task').map((_, item) => {
+            const order = $(item).attr('order');
+
+            return parseInt(order);
+        });
+
+        const maxOrder = Math.max(orders);
+
+        return maxOrder == selectedOrder;
     },
 
     _mapCardColorToClass: (color) => {
