@@ -102,6 +102,10 @@ class HubConnector {
         this.#hubConnection.invoke('ScoreNextSubTask');
     }
 
+    invokeFinishGame() {
+        this.#hubConnection.invoke('FinishGame');
+    }
+
     async #startConnection() {
         try {
             await this.#hubConnection.start()

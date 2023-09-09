@@ -24,4 +24,6 @@ public interface IGameControlService
     GameSubTask RescoreCurrentSubTask(Guid gameId, Guid userId);
 
     GameSubTask ScoreNextSubTask(Guid gameId, Guid userId);
+
+    Game FinishGame(Guid gameId, Guid userId);
 }

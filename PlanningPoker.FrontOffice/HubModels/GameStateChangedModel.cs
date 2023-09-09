@@ -6,6 +6,7 @@ namespace PlanningPoker.FrontOffice.HubModels;
 public class GameStateChangedModel
 {
     public GameStateEnum GameState { get; set; }
+
     public SubTaskModel[] SubTasks { get; set; }
 
     public GameStateChangedModel(Game game)

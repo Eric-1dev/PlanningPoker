@@ -39,7 +39,7 @@ let gameProcessHelper = {
         });
 
         $('#planning-poker-start-game-button').click(() => {
-            if (gameProcessHelper._gameState !== 'Created') {
+            if (gameProcessHelper._gameState !== 'Created' && gameProcessHelper._gameState !== 'Finished') {
                 return;
             }
 
@@ -68,6 +68,14 @@ let gameProcessHelper = {
             }
 
             gameProcessHelper._hubConnector.invokeScoreNextSubTask();
+        });
+
+        $('#planning-poker-finish-game-button').click(() => {
+            if (gameProcessHelper._gameState !== 'CardsOpenned') {
+                return;
+            }
+
+            gameProcessHelper._hubConnector.invokeFinishGame();
         });
 
         gameProcessHelper._hubConnector.init();
@@ -308,10 +316,11 @@ let gameProcessHelper = {
                     $('#planning-poker-open-cards-button').show();
                     break;
                 case 'CardsOpenned':
-                    if (gameProcessHelper._isFinalSubTask()) {
-                        $('#planning-poker-score-next-button').show();
-                    } else {
+                    const isFinalSubTask = gameProcessHelper._isFinalSubTask();
+                    if (isFinalSubTask) {
                         $('#planning-poker-finish-game-button').show();
+                    } else {
+                        $('#planning-poker-score-next-button').show();
                     }
 
                     $('#planning-poker-start-game-button').hide();
@@ -515,17 +524,19 @@ let gameProcessHelper = {
     _isFinalSubTask: () => {
         const selectedSubTaskBlock = gameProcessHelper._findSelectedSubTaskBlock();
 
-        const selectedOrder = selectedSubTaskBlock.attr('order');
+        const selectedOrder = parseInt(selectedSubTaskBlock.attr('order'));
 
-        const orders = $('.planning-poker-tasks-zone-task').map((_, item) => {
-            const order = $(item).attr('order');
+        let maxOrder = 0;
 
-            return parseInt(order);
+        $('.planning-poker-tasks-zone-task').each((_, item) => {
+            const orderStr = $(item).attr('order');
+            const order = parseInt(orderStr);
+            if (order > maxOrder) {
+                maxOrder = order;
+            }
         });
 
-        const maxOrder = Math.max(orders);
-
-        return maxOrder == selectedOrder;
+        return maxOrder === selectedOrder;
     },
 
     _mapCardColorToClass: (color) => {

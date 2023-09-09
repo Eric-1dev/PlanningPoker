@@ -207,6 +207,39 @@ public class GameControlService : IGameControlService
         return nextSubTask;
     }
 
+    public Game FinishGame(Guid gameId, Guid userId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        ThrowIfIncorrectState(game.GameState, GameStateEnum.CardsOpenned);
+
+        dbContext.Attach(game);
+
+        var selectedSubTask = game.SubTasks.FirstOrDefault(x => x.IsSelected);
+
+        if (selectedSubTask == null)
+            throw new WorkflowException("Некорректное состояние. Должна быть выбрана последняя задача");
+
+        if (selectedSubTask.Score == null)
+            throw new WorkflowException("Укажите оценку");
+
+        foreach (var subTask in game.SubTasks)
+        {
+            subTask.IsSelected = false;
+        }
+
+        game.GameState = GameStateEnum.Finished;
+
+        dbContext.SaveChanges();
+
+        return game;
+
+    }
+
     private static void ThrowIfNotAdmin(Guid adminId, Guid userId)
     {
         if (adminId != userId)

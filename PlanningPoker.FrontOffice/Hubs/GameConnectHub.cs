@@ -169,6 +169,15 @@ public class GameConnectHub : Hub
         await Clients.Group(GroupName).SendAsync("ReceiveScoreNextSubTask", model);
     }
 
+    public async Task FinishGame()
+    {
+        var game = GameControlService.FinishGame(GameId, CurrentUserId);
+
+        var gameState = new GameStateChangedModel(game);
+
+        await Clients.Group(GroupName).SendAsync("GameStateChanged", gameState);
+    }
+
     private async Task ChangeUserStatus(bool isPlayer)
     {
         GameGroupCacheService.ChangeUserStatus(Context.ConnectionId, GameId, isPlayer);
