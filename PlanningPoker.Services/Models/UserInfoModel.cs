@@ -12,6 +12,8 @@ public class UserInfoModel : UserScoreModel
 
     public bool IsPlayer { get; set; }
 
+    public bool IsActive { get; set; }
+
     public UserInfoModel(string connectionId, Guid userId, string userName, bool isPlayer) : base(userId, null)
     {
         ConnectionId = connectionId;
@@ -26,6 +28,7 @@ public class UserInfoModel : UserScoreModel
         Name = gamerConnection.Name;
         HasVoted = gamerConnection.Score != null;
         IsPlayer = gamerConnection.IsPlayer;
+        IsActive = gamerConnection.IsActive;
     }
 
     public static void ClearScores(UserInfoModel[] userInfos)

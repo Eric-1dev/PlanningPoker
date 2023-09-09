@@ -16,6 +16,7 @@
 }
 
 <input type="hidden" id="planning-poker-game-id" value="@Model.GameId" />
+<input type="hidden" id="planning-poker-user-id" value="@Model.UserId" />
 
 <div class="planning-poker-buttons-zone-wrapper">
     <div class="planning-poker-buttons-zone">
@@ -25,7 +26,7 @@
         </div>
         <div class="planning-poker-button-group">
             <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-start-game-button">Начать оценку</button>
-            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-open-cards-button">Показать карты</button>
+            <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-open-cards-button" disabled>Показать карты</button>
             <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-score-next-button">Перейти к следующей задаче</button>
             <button class="btn btn-sm btn-warning planning-poker-button" id="planning-poker-rescore-button">Оценить заново</button>
         </div>
@@ -34,7 +35,7 @@
 
 <div class="planning-poker-gamers-zone-wrapper">
     <div class="planning-poker-gamers-zone">
-        <div class="planning-poker-gamer-score" my-card="true" user-id="@User.GetUserId()">
+@*         <div class="planning-poker-gamer-score" my-card="true" user-id="@User.GetUserId()">
 
             <div class="planning-poker-card" card-state="unvoted">
             </div>
@@ -43,7 +44,7 @@
                 @User.Identity.Name
             </div>
 
-        </div>
+        </div> *@
     </div>
 </div>
 

@@ -6,7 +6,5 @@ public class GameProgressViewModel
 {
     public Guid GameId { get; set; }
 
-    public string TaskName { get; set; }
-
-    public Card[] Cards { get; set; }
+    public Guid UserId { get; set; }
 }

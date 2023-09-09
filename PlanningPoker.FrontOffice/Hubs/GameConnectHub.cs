@@ -162,7 +162,9 @@ public class GameConnectHub : Hub
 
         var myInfo = GameGroupCacheService.GetMyInfo(GameId, Context.ConnectionId);
 
-        await Clients.OthersInGroup(GroupName).SendAsync("ChangeUserInfo", myInfo);
+        UserInfoModel.ClearScore(myInfo);
+
+        await Clients.Group(GroupName).SendAsync("ChangeUserInfo", myInfo);
     }
 
     private static string GetGroupName(Guid groupId) => groupId.ToString();

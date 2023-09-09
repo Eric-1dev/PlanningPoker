@@ -1,9 +1,9 @@
 /*jshint esversion: 6 */
 
-let hubConnectorHelper = {
-    _hubConnection: {},
+class HubConnector {
+    #hubConnection;
 
-    init: () => {
+    init() {
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/GameConnect")
             .build();
@@ -11,7 +11,7 @@ let hubConnectorHelper = {
         hubConnection.onclose(async () => {
             gameProcessHelper.onDisconnected();
 
-            await hubConnectorHelper._start();
+            await this.#startConnection();
         });
 
         hubConnection.on('OnSystemMessageReceived', (messageInfo) => {
@@ -23,7 +23,7 @@ let hubConnectorHelper = {
         });
 
         hubConnection.on('UserQuit', (userId) => {
-            gameProcessHelper.removeUserCard(userId);
+            gameProcessHelper.removeUser(userId);
         });
 
         hubConnection.on('ReceiveGameInfo', (gameInfo) => {
@@ -57,58 +57,58 @@ let hubConnectorHelper = {
             gameProcessHelper.handleSubTaskInfo(model.subTask);
         });
 
-        hubConnectorHelper._hubConnection = hubConnection;
+        this.#hubConnection = hubConnection;
 
-        hubConnectorHelper._start();
-    },
+        this.#startConnection();
+    }
 
-    invokeTryChangeVote: (score) => {
-        hubConnectorHelper._hubConnection.invoke('TryChangeVote', score);
-    },
+    invokeTryChangeVote(score) {
+        this.#hubConnection.invoke('TryChangeVote', score);
+    }
 
-    invokeChangeSubTaskScore: (subTaskId, score) => {
-        hubConnectorHelper._hubConnection.invoke('SendChangeSubTaskScore', subTaskId, score);
-    },
+    invokeChangeSubTaskScore(subTaskId, score) {
+        this.#hubConnection.invoke('SendChangeSubTaskScore', subTaskId, score);
+    }
 
-    invokeSpectate: () => {
-        hubConnectorHelper._hubConnection
+    invokeSpectate() {
+        this.#hubConnection
             .invoke('MakeMeSpectator')
             .then(gameProcessHelper.changeMyStatus(false));
-    },
+    }
 
-    invokeJoinGame: () => {
-        hubConnectorHelper._hubConnection
+    invokeJoinGame() {
+        this.#hubConnection
             .invoke('MakeMePlayer')
             .then(gameProcessHelper.changeMyStatus(true));
-    },
+    }
 
-    invokeStartGame: () => {
-        hubConnectorHelper._hubConnection.invoke('StartGame');
-    },
+    invokeStartGame() {
+        this.#hubConnection.invoke('StartGame');
+    }
 
-    invokeTryOpenCards: () => {
-        hubConnectorHelper._hubConnection.invoke('TryOpenCards');
-    },
+    invokeTryOpenCards() {
+        this.#hubConnection.invoke('TryOpenCards');
+    }
 
-    invokeRescoreSubTask: () => {
-        hubConnectorHelper._hubConnection.invoke('RescoreSubTask');
-    },
+    invokeRescoreSubTask() {
+        this.#hubConnection.invoke('RescoreSubTask');
+    }
 
-    invokeScoreNextSubTask: () => {
-        hubConnectorHelper._hubConnection.invoke('ScoreNextSubTask');
-    },
+    invokeScoreNextSubTask() {
+        this.#hubConnection.invoke('ScoreNextSubTask');
+    }
 
-    _start: async () => {
+    async #startConnection() {
         try {
-            await hubConnectorHelper._hubConnection.start()
+            await this.#hubConnection.start()
                 .then(() => {
                     gameProcessHelper.onConnected();
-                    hubConnectorHelper._hubConnection.invoke('UserConnected', gameProcessHelper.gameId);
+                    this.#hubConnection.invoke('UserConnected', gameProcessHelper.gameId);
                 });
             console.log("SignalR Connected.");
-        } catch {
+        } catch (e) {
             console.log("SignalR Connection error.");
-            setTimeout(async () => await hubConnectorHelper._start(), 3000);
+            setTimeout(async () => await this.#startConnection(), 3000);
         }
     }
-};
+}
