@@ -19,4 +19,6 @@ public interface IGameGroupCacheService
     bool IsUserIsPlayer(Guid gameId, string connectionId);
 
     UserScoreModel[] CheckAllVotedAndGetScores(Guid gameId);
+
+    UserScoreModel[] FlushPlayerScores(Guid gameId);
 }

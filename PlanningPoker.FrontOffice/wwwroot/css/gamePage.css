@@ -78,6 +78,7 @@
     display: flex;
     width: 120px;
     height: 150px;
+    border: 1px solid lightgray;
     border-radius: 7px;
     font-size: 70px;
     align-items: center;
@@ -119,7 +120,6 @@
 .planning-poker-card[card-state='unvoted'] {
     background-color: white;
     color: black;
-    border: 1px solid lightgray;
 }
 
     .planning-poker-card[card-state='unvoted']::after {
@@ -130,7 +130,6 @@
 
 .planning-poker-card[card-state='openned'] {
     background-color: cadetblue;
-    border: 1px solid black;
     color: white;
 }
 

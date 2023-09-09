@@ -26,10 +26,6 @@ let hubConnectorHelper = {
             gameProcessHelper.removeUserCard(userId);
         });
 
-        hubConnection.on('ConnectionEstablished', () => {
-            hubConnection.invoke('UserConnected', gameProcessHelper.gameId);
-        });
-
         hubConnection.on('ReceiveGameInfo', (gameInfo) => {
             gameProcessHelper.handleGameInfoMessage(gameInfo);
         });
@@ -38,8 +34,8 @@ let hubConnectorHelper = {
             gameProcessHelper.updateUserVote(user);
         });
 
-        hubConnection.on("ReceiveChangeSubTaskScore", (result) => {
-            gameProcessHelper.handleSubTaskChangeScore(result.subTaskId, result.score);
+        hubConnection.on("ReceiveChangeSubTaskScore", (subTask) => {
+            gameProcessHelper.handleSubTaskInfo(subTask);
         });
 
         hubConnection.on("ChangeUserInfo", (user) => {
@@ -47,12 +43,18 @@ let hubConnectorHelper = {
         });
 
         hubConnection.on("GameStateChanged", (gameState) => {
-            gameProcessHelper.handleGameState(gameState.gameState);
+            gameProcessHelper.gameStateChanged(gameState.gameState);
             gameProcessHelper.handleSubTasksInfo(gameState.subTasks, gameState.availableScores);
         });
 
         hubConnection.on("ShowPlayerScores", (showPlayerScoresModel) => {
             gameProcessHelper.handleShowPlayerScores(showPlayerScoresModel);
+        });
+
+        hubConnection.on("FlushPlayerScores", (model) => {
+            gameProcessHelper.handleFlushPlayerScores(model.playerScores);
+            gameProcessHelper.gameStateChanged(model.gameState);
+            gameProcessHelper.handleSubTaskInfo(model.subTask);
         });
 
         hubConnectorHelper._hubConnection = hubConnection;
@@ -88,11 +90,20 @@ let hubConnectorHelper = {
         hubConnectorHelper._hubConnection.invoke('TryOpenCards');
     },
 
+    invokeRescoreSubTask: () => {
+        hubConnectorHelper._hubConnection.invoke('RescoreSubTask');
+    },
+
+    invokeScoreNextSubTask: () => {
+        hubConnectorHelper._hubConnection.invoke('ScoreNextSubTask');
+    },
+
     _start: async () => {
         try {
             await hubConnectorHelper._hubConnection.start()
                 .then(() => {
                     gameProcessHelper.onConnected();
+                    hubConnectorHelper._hubConnection.invoke('UserConnected', gameProcessHelper.gameId);
                 });
             console.log("SignalR Connected.");
         } catch {

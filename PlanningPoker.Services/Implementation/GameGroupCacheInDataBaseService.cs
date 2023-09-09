@@ -23,7 +23,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 
         dbContext.Database.BeginTransaction();
 
-        var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.Id);
+        var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.UserId);
 
         if (userConnection != null)
         {
@@ -36,10 +36,9 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
             {
                 GameId = gameId,
                 ConnectionId = gamerConnection.ConnectionId,
-                UserId = gamerConnection.Id,
+                UserId = gamerConnection.UserId,
                 Name = gamerConnection.Name,
                 Score = null,
-                ScoreText = null,
                 IsPlayer = gamerConnection.IsPlayer,
                 IsActive = true,
             };
@@ -100,7 +99,6 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
             throw new WorkflowException("Наблюдатель не может голосовать");
 
         user.Score = score;
-        user.ScoreText = scoreText;
 
         dbContext.SaveChanges();
 
@@ -135,19 +133,36 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         using var dbContext = new ApplicationContext();
 
         var allScores = dbContext.GamerConnectionsCache
-            .Where(x => x.GameId == gameId && x.IsPlayer)
+            .Where(x => x.GameId == gameId && x.IsPlayer && x.IsActive)
             .Select(x => new
             {
                 UserId = x.UserId,
-                Score = x.Score,
-                ScoreText = x.ScoreText
+                Score = x.Score
             }).ToArray();
 
         if (allScores.Any(x => x.Score == null))
             return null;
 
         return allScores
-            .Select(x => new UserScoreModel(x.UserId, x.Score.Value, x.ScoreText))
+            .Select(x => new UserScoreModel(x.UserId, x.Score.Value))
+            .ToArray();
+    }
+
+    public UserScoreModel[] FlushPlayerScores(Guid gameId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var allPlayers = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId);
+
+        foreach ( var player in allPlayers)
+        {
+            player.Score = null;
+        }
+
+        dbContext.SaveChanges();
+
+        return allPlayers
+            .Select(x => new UserScoreModel(x.UserId, null))
             .ToArray();
     }
 }

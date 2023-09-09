@@ -2,33 +2,29 @@ using PlanningPoker.DataModel;
 
 namespace PlanningPoker.Services.Models;
 
-public class UserInfoModel
+public class UserInfoModel : UserScoreModel
 {
     public string ConnectionId { get; set; }
-
-    public Guid Id { get; set; }
 
     public string Name { get; set; }
 
     public bool HasVoted { get; set; }
 
-    public double? Score { get; set; }
-
-    public string ScoreText { get; set; }
-
     public bool IsPlayer { get; set; }
 
-    public UserInfoModel()
-    { }
+    public UserInfoModel(string connectionId, Guid userId, string userName, bool isPlayer) : base(userId, null)
+    {
+        ConnectionId = connectionId;
+        UserId = userId;
+        Name = userName;
+        IsPlayer = isPlayer;
+    }
 
-    public UserInfoModel(GamerConnection gamerConnection)
+    public UserInfoModel(GamerConnection gamerConnection) : base(gamerConnection.UserId, gamerConnection.Score)
     {
         ConnectionId = gamerConnection.ConnectionId;
-        Id = gamerConnection.UserId;
         Name = gamerConnection.Name;
         HasVoted = gamerConnection.Score != null;
-        Score = gamerConnection.Score;
-        ScoreText = gamerConnection.ScoreText;
         IsPlayer = gamerConnection.IsPlayer;
     }
 
@@ -43,6 +39,5 @@ public class UserInfoModel
     public static void ClearScore(UserInfoModel userInfo)
     {
         userInfo.Score = null;
-        userInfo.ScoreText = null;
     }
 }

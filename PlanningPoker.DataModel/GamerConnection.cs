@@ -14,8 +14,6 @@ public class GamerConnection : BaseEntity
 
     public double? Score { get; set; }
 
-    public string ScoreText { get; set; }
-
     public bool IsPlayer { get; set; }
 
     public bool IsActive { get; set; }

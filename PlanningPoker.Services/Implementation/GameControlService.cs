@@ -3,7 +3,6 @@ using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
 using PlanningPoker.Entities.Exceptions;
-using PlanningPoker.Services.Dto;
 using PlanningPoker.Services.Interfaces;
 
 namespace PlanningPoker.Services.Implementation;
@@ -64,7 +63,7 @@ public class GameControlService : IGameControlService
         return game ?? throw new WorkflowException($"Игра с ID {gameId} не найдена");
     }
 
-    public ChangeSubTaskScoreDto TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score)
+    public GameSubTask TryChangeSubTaskScore(Guid userId, Guid gameId, Guid subTaskId, double? score)
     {
         using var dbContext = new ApplicationContext();
 
@@ -80,7 +79,7 @@ public class GameControlService : IGameControlService
 
         dbContext.SaveChanges();
 
-        return new ChangeSubTaskScoreDto { SubTaskId = subTask.Id, Score = score };
+        return subTask;
     }
 
     public Game StartGame(Guid gameId, Guid userId)
@@ -89,13 +88,11 @@ public class GameControlService : IGameControlService
 
         var game = GetGameById(gameId);
 
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        ThrowIfIncorrectState(game.GameState, GameStateEnum.Created, GameStateEnum.Finished);
+
         dbContext.Attach(game);
-
-        if (game.AdminId != userId)
-            throw new WorkflowException("Только администратор может управлять игрой");
-
-        if (game.GameState != GameStateEnum.Created && game.GameState != GameStateEnum.Finished)
-            throw new WorkflowException($"Нельзя начать оценку, когда игра находится в статусе {game.GameState}");
 
         game.GameState = GameStateEnum.Scoring;
 
@@ -118,13 +115,11 @@ public class GameControlService : IGameControlService
 
         var game = GetGameById(gameId);
 
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        ThrowIfIncorrectState(game.GameState, GameStateEnum.Scoring);
+
         dbContext.Attach(game);
-
-        if (game.AdminId != userId)
-            throw new WorkflowException("Только администратор может управлять игрой");
-
-        if (game.GameState != GameStateEnum.Scoring)
-            throw new WorkflowException($"Нельзя начать оценку, когда игра находится в статусе {game.GameState}");
 
         game.GameState = GameStateEnum.CardsOpenned;
 
@@ -140,5 +135,43 @@ public class GameControlService : IGameControlService
         var game = GetGameById(gameId);
 
         return game.CardSetType;
+    }
+
+    public GameSubTask RescoreCurrentSubTask(Guid gameId, Guid userId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        ThrowIfIncorrectState(game.GameState, GameStateEnum.CardsOpenned);
+
+        dbContext.Attach(game);
+
+        game.GameState = GameStateEnum.Scoring;
+
+        var selectedSubTask = game.SubTasks.FirstOrDefault(x => x.IsSelected);
+
+        if (selectedSubTask == null)
+            throw new WorkflowException("Не выбрана подзадача для переоценки");
+
+        selectedSubTask.Score = null;
+
+        dbContext.SaveChanges();
+
+        return selectedSubTask;
+    }
+
+    private static void ThrowIfNotAdmin(Guid adminId, Guid userId)
+    {
+        if (adminId != userId)
+            throw new WorkflowException("Только администратор может управлять игрой");
+    }
+
+    private static void ThrowIfIncorrectState(GameStateEnum currentGameState, params GameStateEnum[] requiredGameStates)
+    {
+        if (!requiredGameStates.Contains(currentGameState))
+            throw new WorkflowException($"Недоспустимое действие. Игра находится в статусе {currentGameState}");
     }
 }

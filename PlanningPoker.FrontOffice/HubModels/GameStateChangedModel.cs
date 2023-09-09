@@ -14,6 +14,6 @@ public class GameStateChangedModel
     {
         GameState = game.GameState;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel(x)).ToArray();
-        AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
+        //AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
     }
 }

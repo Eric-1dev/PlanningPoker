@@ -57,12 +57,6 @@
 </div>
 
 <div id="planning-poker-gamer-card-zone">
-    @foreach (var card in Model.Cards)
-    {
-        <div class="planning-poker-card planning-poker-card-clickable @MapColorToClass(card.Color)" score="@card.Score">
-            @card.Text
-        </div>
-    }
 </div>
 
 
@@ -74,22 +68,3 @@
         </div>
     </div>
 </div>
-
-@{
-    string MapColorToClass(CardColorEnum color)
-    {
-        switch (color)
-        {
-            case CardColorEnum.Green:
-                return "planning-poker-card-color-green";
-            case CardColorEnum.Yellow:
-                return "planning-poker-card-color-yellow";
-            case CardColorEnum.Red:
-                return "planning-poker-card-color-red";
-            case CardColorEnum.Gray:
-                return "planning-poker-card-color-gray";
-            default:
-                return string.Empty;
-        }
-    }
-}

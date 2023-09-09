@@ -16,9 +16,7 @@ public class GameInfoModel
 
     public SubTaskModel[] SubTasks { get; }
 
-    public GameStateEnum? GameState { get; }
-
-    public double[] AvailableScores { get; }
+    public GameStateEnum GameState { get; }
 
     public Card[] Cards { get; }
 
@@ -35,8 +33,8 @@ public class GameInfoModel
         OtherUsers = otherUsers;
         TaskName = game.TaskName;
         GameState = game.GameState;
-        AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
-        //Cards = CardSetConstants.Cards(game.CardSetType);
+        //AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
+        Cards = CardSetConstants.Cards(game.CardSetType);
         MyInfo = myInfo;
         AdminId = game.AdminId;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel(x)).ToArray();

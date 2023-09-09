@@ -25,7 +25,8 @@ public class GameConnectHub : Hub
         }
     }
 
-    private string GroupName => GameId.ToString();
+    private string GroupName => GetGroupName(GameId);
+    private Guid CurrentUserId => Context.User.GetUserId();
 
     public IGameGroupCacheService GameGroupCacheService { get; set; }
     public IGameControlService GameControlService { get; set; }
@@ -35,23 +36,16 @@ public class GameConnectHub : Hub
         Context.Items.TryAdd("GameId", gameId);
 
         var userName = Context.User.Identity.Name;
-        var userId = Context.User.GetUserId();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName);
 
         var isPlayer = true;
 
-        var gamerInfoModel = new UserInfoModel
-        {
-            ConnectionId = Context.ConnectionId,
-            Name = userName,
-            Id = userId,
-            IsPlayer = isPlayer
-        };
+        var gamerInfoModel = new UserInfoModel(Context.ConnectionId, CurrentUserId, userName, isPlayer);
 
         var myUserInfoModel = GameGroupCacheService.AddOrUpdateUserToGame(gameId, gamerInfoModel);
 
-        var otherUsers = GameGroupCacheService.GetAllUsersInGame(gameId, Context.ConnectionId).Where(x => x.Id != userId).ToArray();
+        var otherUsers = GameGroupCacheService.GetAllUsersInGame(gameId, Context.ConnectionId).Where(x => x.UserId != CurrentUserId).ToArray();
 
         var game = GameControlService.GetGameById(gameId);
 
@@ -67,20 +61,12 @@ public class GameConnectHub : Hub
         }
     }
 
-    public override async Task OnConnectedAsync()
-    {
-        await Clients.Caller.SendAsync("ConnectionEstablished");
-        await base.OnConnectedAsync();
-    }
-
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        var userId = Context.User.GetUserId();
-
         var gameId = GameGroupCacheService.RemoveUserFromGame(Context.ConnectionId);
 
         if (gameId.HasValue)
-            await Clients.OthersInGroup(GroupName).SendAsync("UserQuit", userId);
+            await Clients.OthersInGroup(GetGroupName(gameId.Value)).SendAsync("UserQuit", CurrentUserId);
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -117,11 +103,11 @@ public class GameConnectHub : Hub
 
     public async Task SendChangeSubTaskScore(Guid subTaskId, double? score)
     {
-        var userId = Context.User.GetUserId();
+        var subTask = GameControlService.TryChangeSubTaskScore(CurrentUserId, GameId, subTaskId, score);
 
-        var result = GameControlService.TryChangeSubTaskScore(userId, GameId, subTaskId, score);
+        var subTaskModel = new SubTaskModel(subTask);
 
-        await Clients.OthersInGroup(GroupName).SendAsync("ReceiveChangeSubTaskScore", result);
+        await Clients.Group(GroupName).SendAsync("ReceiveChangeSubTaskScore", subTaskModel);
     }
 
     public async Task MakeMeSpectator()
@@ -136,9 +122,7 @@ public class GameConnectHub : Hub
 
     public async Task StartGame()
     {
-        var userId = Context.User.GetUserId();
-
-        var game = GameControlService.StartGame(GameId, userId);
+        var game = GameControlService.StartGame(GameId, CurrentUserId);
 
         var gameState = new GameStateChangedModel(game);
 
@@ -147,18 +131,29 @@ public class GameConnectHub : Hub
 
     public async Task TryOpenCards()
     {
-        var userId = Context.User.GetUserId();
-
         var playerScores = GameGroupCacheService.CheckAllVotedAndGetScores(GameId);
 
         if (playerScores == null)
             throw new WorkflowException("Открыть карты можно только когда все участники проголосовали");
 
-        var game = GameControlService.OpenCards(GameId, userId);
+        var game = GameControlService.OpenCards(GameId, CurrentUserId);
 
         var playerScoresModel = new ShowPlayerScoresModel(playerScores, game.GameState);
 
         await Clients.Group(GroupName).SendAsync("ShowPlayerScores", playerScoresModel);
+    }
+
+    public async Task RescoreSubTask()
+    {
+        var subTask = GameControlService.RescoreCurrentSubTask(GameId, CurrentUserId);
+
+        var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
+
+        var subTaskModel = new SubTaskModel(subTask);
+
+        var model = new RescoreCurrentSubTaskModel(playerScores, subTaskModel);
+
+        await Clients.Group(GroupName).SendAsync("FlushPlayerScores", model);
     }
 
     private async Task ChangeUserStatus(bool isPlayer)
@@ -169,4 +164,6 @@ public class GameConnectHub : Hub
 
         await Clients.OthersInGroup(GroupName).SendAsync("ChangeUserInfo", myInfo);
     }
+
+    private static string GetGroupName(Guid groupId) => groupId.ToString();
 }
