@@ -5,6 +5,8 @@ namespace PlanningPoker.Services.Interfaces;
 
 public interface IGameControlService
 {
+    bool IsGameExists(Guid gameId);
+
     Guid CreateNewGame(string taskName, string[] subTasks, Guid adminId, CardSetTypeEnum cardSetType);
 
     Game GetGameById(Guid id);
@@ -19,5 +21,7 @@ public interface IGameControlService
 
     CardSetTypeEnum GetCardSetType(Guid gameId);
 
-    GameSubTask RescoreCurrentSubTask(Guid gameId, Guid currentUserId);
+    GameSubTask RescoreCurrentSubTask(Guid gameId, Guid userId);
+
+    GameSubTask ScoreNextSubTask(Guid gameId, Guid userId);
 }

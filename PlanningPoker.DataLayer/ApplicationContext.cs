@@ -20,6 +20,7 @@ public class ApplicationContext : DbContext
     {
         modelBuilder.Entity<GamerConnection>().HasIndex(x => x.GameId);
         modelBuilder.Entity<GamerConnection>().HasIndex(x => x.UserId);
+        modelBuilder.Entity<GamerConnection>().HasIndex(x => new { x.UserId, x.GameId }).IsUnique(true);
 
         base.OnModelCreating(modelBuilder);
     }

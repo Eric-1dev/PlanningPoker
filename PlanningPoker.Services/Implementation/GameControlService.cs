@@ -9,6 +9,15 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameControlService : IGameControlService
 {
+    public bool IsGameExists(Guid gameId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var isExists = dbContext.Games.Any(x => x.Id == gameId);
+
+        return isExists;
+    }
+
     public bool IsGameRunning(Guid gameId)
     {
         using var dbContext = new ApplicationContext();
@@ -161,6 +170,38 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return selectedSubTask;
+    }
+
+    public GameSubTask ScoreNextSubTask(Guid gameId, Guid userId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        ThrowIfIncorrectState(game.GameState, GameStateEnum.CardsOpenned);
+
+        dbContext.Attach(game);
+
+        var selectedSubTask = game.SubTasks.FirstOrDefault(x => x.IsSelected);
+
+        if (selectedSubTask == null)
+            throw new WorkflowException("Некорректное состояние. Должна быть выбрана предыдущая задача");
+
+        var nextSubTask = game.SubTasks.OrderBy(x => x.Order).Where(x => x.Order > selectedSubTask.Order).FirstOrDefault();
+
+        if (nextSubTask == null)
+            throw new WorkflowException("Не найдена следующая неоцененная задача");
+
+        selectedSubTask.IsSelected = false;
+        nextSubTask.IsSelected = true;
+
+        game.GameState = GameStateEnum.Scoring;
+
+        dbContext.SaveChanges();
+
+        return nextSubTask;
     }
 
     private static void ThrowIfNotAdmin(Guid adminId, Guid userId)

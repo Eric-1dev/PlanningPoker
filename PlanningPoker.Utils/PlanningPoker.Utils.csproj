@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PlanningPoker.DataModel\PlanningPoker.DataModel.csproj" />
     <ProjectReference Include="..\PlanningPoker.Entities\PlanningPoker.Entities.csproj" />
   </ItemGroup>
 

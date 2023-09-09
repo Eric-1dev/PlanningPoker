@@ -42,19 +42,19 @@ class HubConnector {
             gameProcessHelper.handleUserInfo(user);
         });
 
-        hubConnection.on("GameStateChanged", (gameState) => {
-            gameProcessHelper.gameStateChanged(gameState.gameState);
-            gameProcessHelper.handleSubTasksInfo(gameState.subTasks, gameState.availableScores);
+        hubConnection.on("GameStateChanged", (model) => {
+            gameProcessHelper.gameStateChanged(model.gameState);
+            gameProcessHelper.handleSubTasksInfo(model.subTasks);
         });
 
         hubConnection.on("ShowPlayerScores", (showPlayerScoresModel) => {
             gameProcessHelper.handleShowPlayerScores(showPlayerScoresModel);
         });
 
-        hubConnection.on("FlushPlayerScores", (model) => {
+        hubConnection.on("ReceiveScoreNextSubTask", (model) => {
             gameProcessHelper.handleFlushPlayerScores(model.playerScores);
             gameProcessHelper.gameStateChanged(model.gameState);
-            gameProcessHelper.handleSubTaskInfo(model.subTask);
+            gameProcessHelper.handleSubTaskInfo(model.subTasks);
         });
 
         this.#hubConnection = hubConnection;

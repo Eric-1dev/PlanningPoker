@@ -4,7 +4,7 @@ namespace PlanningPoker.Services.Interfaces;
 
 public interface IGameGroupCacheService
 {
-    UserInfoModel AddOrUpdateUserToGame(Guid gameId, UserInfoModel gamerConnection);
+    UserInfoModel AddOrUpdateUserToGame(Guid gameId, GamerConnectionModel gamerConnection);
 
     Guid? RemoveUserFromGame(string connectionId);
 

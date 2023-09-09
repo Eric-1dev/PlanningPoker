@@ -33,7 +33,7 @@ public class GameConnectHub : Hub
 
     public async Task UserConnected(Guid gameId)
     {
-        Context.Items.TryAdd("GameId", gameId);
+        Context.Items["GameId"] = gameId;
 
         var userName = Context.User.Identity.Name;
 
@@ -41,7 +41,7 @@ public class GameConnectHub : Hub
 
         var isPlayer = true;
 
-        var gamerInfoModel = new UserInfoModel(Context.ConnectionId, CurrentUserId, userName, isPlayer);
+        var gamerInfoModel = new GamerConnectionModel(Context.ConnectionId, CurrentUserId, userName, isPlayer);
 
         var myUserInfoModel = GameGroupCacheService.AddOrUpdateUserToGame(gameId, gamerInfoModel);
 
@@ -151,9 +151,22 @@ public class GameConnectHub : Hub
 
         var subTaskModel = new SubTaskModel(subTask);
 
-        var model = new RescoreCurrentSubTaskModel(playerScores, subTaskModel);
+        var model = new ScoreNextSubTaskModel(playerScores, subTaskModel);
 
-        await Clients.Group(GroupName).SendAsync("FlushPlayerScores", model);
+        await Clients.Group(GroupName).SendAsync("ReceiveScoreNextSubTask", model);
+    }
+
+    public async Task ScoreNextSubTask()
+    {
+        var subTask = GameControlService.ScoreNextSubTask(GameId, CurrentUserId);
+
+        var subTaskModel = new SubTaskModel(subTask);
+
+        var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
+
+        var model = new ScoreNextSubTaskModel(playerScores, subTaskModel);
+
+        await Clients.Group(GroupName).SendAsync("ReceiveScoreNextSubTask", model);
     }
 
     private async Task ChangeUserStatus(bool isPlayer)

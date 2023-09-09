@@ -9,6 +9,8 @@ public class ShowPlayerScoresModel
 
     public GameStateEnum GameState { get; set; }
 
+    public bool IsFinalTask { get; set; }
+
     public ShowPlayerScoresModel(UserScoreModel[] playerScores, GameStateEnum gameState)
     {
         PlayerScores = playerScores;

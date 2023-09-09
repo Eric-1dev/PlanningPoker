@@ -33,7 +33,6 @@ public class GameInfoModel
         OtherUsers = otherUsers;
         TaskName = game.TaskName;
         GameState = game.GameState;
-        //AvailableScores = CardSetConstants.GetAvailableScores(game.CardSetType);
         Cards = CardSetConstants.Cards(game.CardSetType);
         MyInfo = myInfo;
         AdminId = game.AdminId;

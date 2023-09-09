@@ -1,3 +1,5 @@
+using System.Data;
+using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Exceptions;
@@ -8,6 +10,8 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 {
+    private static object _locker = new();
+
     public GameGroupCacheInDataBaseService()
     {
         using var dbContext = new ApplicationContext();
@@ -17,40 +21,40 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         dbContext.SaveChanges();
     }
 
-    public UserInfoModel AddOrUpdateUserToGame(Guid gameId, UserInfoModel gamerConnection)
+    public UserInfoModel AddOrUpdateUserToGame(Guid gameId, GamerConnectionModel gamerConnection)
     {
-        using var dbContext = new ApplicationContext();
-
-        dbContext.Database.BeginTransaction();
-
-        var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.UserId);
-
-        if (userConnection != null)
+        // todo разобраться почему иногда пытаемся добавить одного пользователя 2 раза. Потом убрать локер
+        lock (_locker)
         {
-            userConnection.ConnectionId = gamerConnection.ConnectionId;
-            userConnection.IsActive = true;
-        }
-        else
-        {
-            userConnection = new GamerConnection
+            using var dbContext = new ApplicationContext();
+
+            var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.UserId);
+
+            if (userConnection != null)
             {
-                GameId = gameId,
-                ConnectionId = gamerConnection.ConnectionId,
-                UserId = gamerConnection.UserId,
-                Name = gamerConnection.Name,
-                Score = null,
-                IsPlayer = gamerConnection.IsPlayer,
-                IsActive = true,
-            };
+                userConnection.ConnectionId = gamerConnection.ConnectionId;
+                userConnection.IsActive = true;
+            }
+            else
+            {
+                userConnection = new GamerConnection
+                {
+                    GameId = gameId,
+                    ConnectionId = gamerConnection.ConnectionId,
+                    UserId = gamerConnection.UserId,
+                    Name = gamerConnection.Name,
+                    Score = null,
+                    IsPlayer = gamerConnection.IsPlayer,
+                    IsActive = true,
+                };
 
-            dbContext.GamerConnectionsCache.Add(userConnection);
+                dbContext.GamerConnectionsCache.Add(userConnection);
+            }
+
+            dbContext.SaveChanges();
+
+            return new UserInfoModel(userConnection);
         }
-
-        dbContext.SaveChanges();
-
-        dbContext.Database.CommitTransaction();
-
-        return new UserInfoModel(userConnection);
     }
 
     public Guid? RemoveUserFromGame(string connectionId)

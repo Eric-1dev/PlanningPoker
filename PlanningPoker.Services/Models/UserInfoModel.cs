@@ -14,14 +14,6 @@ public class UserInfoModel : UserScoreModel
 
     public bool IsActive { get; set; }
 
-    public UserInfoModel(string connectionId, Guid userId, string userName, bool isPlayer) : base(userId, null)
-    {
-        ConnectionId = connectionId;
-        UserId = userId;
-        Name = userName;
-        IsPlayer = isPlayer;
-    }
-
     public UserInfoModel(GamerConnection gamerConnection) : base(gamerConnection.UserId, gamerConnection.Score)
     {
         ConnectionId = gamerConnection.ConnectionId;

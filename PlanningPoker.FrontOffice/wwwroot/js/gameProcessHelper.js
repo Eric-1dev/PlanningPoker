@@ -234,9 +234,10 @@ let gameProcessHelper = {
         let isActive;
 
         if (subTask.isSelected) {
-            isActive = "true";
+            isActive = true;
+            $('.planning-poker-tasks-zone-task[active="true"]').attr('active', false);
         } else {
-            isActive = "false";
+            isActive = false;
         }
 
         const taskBlock = $(`<div class="planning-poker-tasks-zone-task" active="${isActive}" task-id="${subTask.id}">`);
@@ -296,6 +297,7 @@ let gameProcessHelper = {
             switch (gameProcessHelper._gameState) {
                 case 'Created':
                     subTaskScoreBlock.prop('disabled', true);
+                    $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();
@@ -303,6 +305,7 @@ let gameProcessHelper = {
                     break;
                 case 'Scoring':
                     subTaskScoreBlock.prop('disabled', true);
+                    $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').hide();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();
@@ -310,6 +313,7 @@ let gameProcessHelper = {
                     break;
                 case 'CardsOpenned':
                     subTaskScoreBlock.prop('disabled', false);
+                    $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').hide();
                     $('#planning-poker-score-next-button').show();
                     $('#planning-poker-rescore-button').show();
@@ -317,6 +321,7 @@ let gameProcessHelper = {
                     break;
                 case 'Finished':
                     subTaskScoreBlock.prop('disabled', true);
+                    $('#planning-poker-finish-game-button').hide();
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-score-next-button').hide();
                     $('#planning-poker-rescore-button').hide();

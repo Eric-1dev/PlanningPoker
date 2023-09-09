@@ -18,6 +18,11 @@ public class HomeController : BaseController
     [Route("/Game/{gameId:Guid}")]
     public IActionResult Game(Guid gameId)
     {
+        var isGameExists = GameControlService.IsGameExists(gameId);
+
+        if (!isGameExists)
+            return RedirectToAction("Index");
+
         var model = new GameProgressViewModel
         {
             GameId = gameId,
