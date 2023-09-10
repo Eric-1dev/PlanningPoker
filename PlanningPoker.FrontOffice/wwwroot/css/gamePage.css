@@ -221,6 +221,11 @@
     justify-content: space-between
 }
 
+.planning-poker-button-group {
+    display: flex;
+    flex-direction: row;
+}
+
 .planning-poker-d-none {
     display: none;
 }

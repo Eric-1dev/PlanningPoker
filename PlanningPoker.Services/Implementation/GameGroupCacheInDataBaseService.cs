@@ -9,7 +9,7 @@ namespace PlanningPoker.Services.Implementation;
 
 public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 {
-    private static object _locker = new();
+    private static readonly object _locker = new();
 
     public GameGroupCacheInDataBaseService()
     {
@@ -158,7 +158,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
 
         var allPlayers = dbContext.GamerConnectionsCache.Where(x => x.GameId == gameId);
 
-        foreach ( var player in allPlayers)
+        foreach (var player in allPlayers)
         {
             player.Score = null;
         }

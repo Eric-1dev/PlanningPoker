@@ -237,7 +237,6 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return game;
-
     }
 
     private static void ThrowIfNotAdmin(Guid adminId, Guid userId)
