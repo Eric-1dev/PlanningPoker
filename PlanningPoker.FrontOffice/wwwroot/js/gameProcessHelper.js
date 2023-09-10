@@ -304,6 +304,7 @@ let gameProcessHelper = {
         }
 
         const hasPlayers = gameProcessHelper._hasPlayersInGame();
+        const isPlayer = gameProcessHelper._isPlayer();
 
         $('.planning-poker-tasks-zone-task-score').prop('disabled', true);
 
@@ -325,7 +326,11 @@ let gameProcessHelper = {
                 $('#planning-poker-open-cards-button').hide();
                 break;
             case 'Scoring':
-                $('#planning-poker-gamer-card-zone').attr('active', 'true');
+                if (isPlayer) {
+                    $('#planning-poker-gamer-card-zone').attr('active', 'true');
+                } else {
+                    $('#planning-poker-gamer-card-zone').attr('active', 'false');
+                }
 
                 if (hasPlayers) {
                     $('#planning-poker-open-cards-button').show();
@@ -341,7 +346,11 @@ let gameProcessHelper = {
                 $('#planning-poker-rescore-button').hide();
                 break;
             case 'CardsOpenned':
-                $('#planning-poker-gamer-card-zone').attr('active', 'true');
+                if (isPlayer) {
+                    $('#planning-poker-gamer-card-zone').attr('active', 'true');
+                } else {
+                    $('#planning-poker-gamer-card-zone').attr('active', 'false');
+                }
 
                 $('#planning-poker-waiting-players-banner').hide();
 
@@ -424,13 +433,13 @@ let gameProcessHelper = {
             gameProcessHelper._cookieManager.setCookie("IsPlayerCookieValue", 'true');
             $('#planning-poker-spectate-button').show();
             $('#planning-poker-join-game-button').hide();
-            $('#planning-poker-gamer-card-zone').show();
+            $('#planning-poker-gamer-card-zone').attr('active', 'true');
             $('.planning-poker-gamer-score[my-card]').show();
         } else {
             gameProcessHelper._cookieManager.setCookie("IsPlayerCookieValue", 'false');
             $('#planning-poker-spectate-button').hide();
             $('#planning-poker-join-game-button').show();
-            $('#planning-poker-gamer-card-zone').hide();
+            $('#planning-poker-gamer-card-zone').attr('active', 'false');
             $('.planning-poker-gamer-score[my-card]').hide();
         }
 
@@ -585,6 +594,14 @@ let gameProcessHelper = {
         }
 
         gameProcessHelper._actualizeOpenCardsButtonState();
+    },
+
+    _isPlayer: () => {
+        const myId = gameProcessHelper._myUserId;
+
+        const myUser = gameProcessHelper._users.find((usr) => usr.userId === myId);
+
+        return myUser.isPlayer;
     },
 
     _isFinalSubTask: () => {
