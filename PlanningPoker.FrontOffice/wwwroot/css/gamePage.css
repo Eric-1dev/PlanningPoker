@@ -206,11 +206,11 @@
     display: flex;
     flex-direction: row;
     gap: 30px;
-    align-items: baseline;
+    align-items: center;
     height: 100%;
     justify-content: space-between
 }
 
-.planning-poker-button {
+.planning-poker-d-none {
     display: none;
 }
