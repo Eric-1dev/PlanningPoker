@@ -43,13 +43,13 @@
 }
 
     #planning-poker-gamer-card-zone[active="true"] {
-        animation-duration: 0.7s;
+        animation-duration: 0.5s;
         animation-name: slidein;
     }
 
     #planning-poker-gamer-card-zone[active="false"] {
         padding-top: 200px;
-        animation-duration: 0.7s;
+        animation-duration: 0.5s;
         animation-name: slideout;
     }
 

@@ -302,7 +302,9 @@ let gameProcessHelper = {
 
     actualizeButtons: () => {
         if (!gameProcessHelper._isAdmin) {
-            return;
+            $('#planning-poker-admin-buttons-group').hide();
+        } else {
+            $('#planning-poker-admin-buttons-group').show();
         }
 
         const hasPlayers = gameProcessHelper._hasPlayersInGame();
