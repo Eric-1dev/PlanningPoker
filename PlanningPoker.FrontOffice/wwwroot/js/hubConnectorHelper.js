@@ -6,6 +6,7 @@ class HubConnector {
     init() {
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/GameConnect")
+            .configureLogging(signalR.LogLevel.Information)
             .build();
 
         hubConnection.onclose(async () => {
@@ -40,9 +41,11 @@ class HubConnector {
 
         hubConnection.on("ChangeUserInfo", (user) => {
             gameProcessHelper.handleUserInfo(user);
+            gameProcessHelper.actualizeButtons();
         });
 
         hubConnection.on("GameStateChanged", (model) => {
+            gameProcessHelper.handleFlushPlayerScores(model.playerScores);
             gameProcessHelper.gameStateChanged(model.gameState);
             gameProcessHelper.handleSubTasksInfo(model.subTasks);
             gameProcessHelper.actualizeButtons();
@@ -111,11 +114,12 @@ class HubConnector {
             await this.#hubConnection.start()
                 .then(() => {
                     gameProcessHelper.onConnected();
-                    this.#hubConnection.invoke('UserConnected', gameProcessHelper.gameId);
+
+                    this.#hubConnection.invoke('UserConnected', gameProcessHelper.gameId, gameProcessHelper.isPlayerCookieValue);
                 });
             console.log("SignalR Connected.");
         } catch (e) {
-            console.log("SignalR Connection error.");
+            console.log("SignalR Connection error. " + e);
             setTimeout(async () => await this.#startConnection(), 3000);
         }
     }

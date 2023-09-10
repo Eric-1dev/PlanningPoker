@@ -17,6 +17,7 @@
 
 <input type="hidden" id="planning-poker-game-id" value="@Model.GameId" />
 <input type="hidden" id="planning-poker-user-id" value="@Model.UserId" />
+<input type="hidden" id="planning-poker-is-player-cookie-value" value="@Model.IsPlayerCookieValue.ToString()" />
 
 <div class="planning-poker-buttons-zone-wrapper">
     <div class="planning-poker-buttons-zone">
@@ -25,6 +26,7 @@
             <button class="btn btn-sm btn-success planning-poker-button" id="planning-poker-join-game-button">Вступить в игру</button>
         </div>
         <div class="planning-poker-button-group">
+            <span class="text-warning planning-poker-button" id="planning-poker-waiting-players-banner">Ожидание других игроков...</span>
             <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-finish-game-button">Завершить оценку</button>
             <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-start-game-button">Начать оценку</button>
             <button class="btn btn-sm btn-primary planning-poker-button" id="planning-poker-open-cards-button" disabled>Показать карты</button>

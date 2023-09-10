@@ -6,6 +6,7 @@ $(document).ready(() => {
 
 let gameProcessHelper = {
     _hubConnector: {},
+    _cookieManager: {},
     _subTaskZone: {},
 
     _myUserId: '',
@@ -17,14 +18,19 @@ let gameProcessHelper = {
     _availableScores: null,
 
     gameId: '',
+    isPlayerCookieValue: null,
 
     init: () => {
         const hubConnector = new HubConnector();
+        const cookieManager = new CookieManager();
 
         gameProcessHelper._hubConnector = hubConnector;
+        gameProcessHelper._cookieManager = cookieManager;
 
         gameProcessHelper.gameId = $('#planning-poker-game-id').val();
         gameProcessHelper._myUserId = $('#planning-poker-user-id').val();
+
+        gameProcessHelper.isPlayerCookieValue = $('#planning-poker-is-player-cookie-value').val().toLowerCase() === 'true';
 
         gameProcessHelper._addClickEventToCards();
 
@@ -199,6 +205,8 @@ let gameProcessHelper = {
 
         gameProcessHelper.handleUserInfo(gameInfo.myInfo);
 
+        gameProcessHelper.updateUserVote(gameInfo.myInfo);
+
         gameProcessHelper.handleTaskName(gameInfo.taskName);
 
         gameProcessHelper.handleSubTasksInfo(gameInfo.subTasks);
@@ -237,16 +245,11 @@ let gameProcessHelper = {
     },
 
     handleSubTaskInfo: (subTask) => {
-        let isActive;
-
         if (subTask.isSelected) {
-            isActive = true;
             $('.planning-poker-tasks-zone-task[active="true"]').attr('active', false);
-        } else {
-            isActive = false;
         }
 
-        const taskBlock = $(`<div class="planning-poker-tasks-zone-task" order="${subTask.order}" active="${isActive}" task-id="${subTask.id}">`);
+        const taskBlock = $(`<div class="planning-poker-tasks-zone-task" order="${subTask.order}" active="${subTask.isSelected}" task-id="${subTask.id}">`);
         const taskNameBlock = $(`<div class="planning-poker-tasks-zone-task-name">${subTask.text}</div>`);
 
         let scoreBlock;
@@ -267,13 +270,6 @@ let gameProcessHelper = {
 
                 scoreBlock.append(option);
             });
-
-            if (gameProcessHelper._gameState === 'CardsOpenned' && subTask.isSelected) {
-                scoreBlock.prop('disabled', false);
-            } else {
-                scoreBlock.prop('disabled', true);
-            }
-
         } else {
             scoreBlock = $('<div class="planning-poker-tasks-zone-task-score">');
             scoreBlock.html(subTask.score);
@@ -299,44 +295,65 @@ let gameProcessHelper = {
     },
 
     actualizeButtons: () => {
-        if (gameProcessHelper._isAdmin) {
-            switch (gameProcessHelper._gameState) {
-                case 'Created':
-                    $('#planning-poker-finish-game-button').hide();
-                    $('#planning-poker-start-game-button').show();
-                    $('#planning-poker-score-next-button').hide();
-                    $('#planning-poker-rescore-button').hide();
-                    $('#planning-poker-open-cards-button').hide();
-                    break;
-                case 'Scoring':
-                    $('#planning-poker-finish-game-button').hide();
-                    $('#planning-poker-start-game-button').hide();
-                    $('#planning-poker-score-next-button').hide();
-                    $('#planning-poker-rescore-button').hide();
-                    $('#planning-poker-open-cards-button').show();
-                    break;
-                case 'CardsOpenned':
-                    const isFinalSubTask = gameProcessHelper._isFinalSubTask();
-                    if (isFinalSubTask) {
-                        $('#planning-poker-finish-game-button').show();
-                    } else {
-                        $('#planning-poker-score-next-button').show();
-                    }
+        if (!gameProcessHelper._isAdmin) {
+            return;
+        }
 
-                    $('#planning-poker-start-game-button').hide();
-                    $('#planning-poker-rescore-button').show();
+        $('.planning-poker-tasks-zone-task-score').prop('disabled', true);
+
+        switch (gameProcessHelper._gameState) {
+            case 'Created':
+                $('#planning-poker-waiting-players-banner').hide();
+                $('#planning-poker-finish-game-button').hide();
+                $('#planning-poker-start-game-button').show();
+                $('#planning-poker-score-next-button').hide();
+                $('#planning-poker-rescore-button').hide();
+                $('#planning-poker-open-cards-button').hide();
+                break;
+            case 'Scoring':
+                const hasPlayers = gameProcessHelper._hasPlayersInGame();
+
+                if (hasPlayers) {
+                    $('#planning-poker-open-cards-button').show();
+                    $('#planning-poker-waiting-players-banner').hide();
+                } else {
                     $('#planning-poker-open-cards-button').hide();
-                    break;
-                case 'Finished':
-                    $('#planning-poker-finish-game-button').hide();
-                    $('#planning-poker-start-game-button').show();
-                    $('#planning-poker-score-next-button').hide();
-                    $('#planning-poker-rescore-button').hide();
-                    $('#planning-poker-open-cards-button').hide();
-                    break;
-                default:
-                    break;
-            }
+                    $('#planning-poker-waiting-players-banner').show();
+                }
+
+                $('#planning-poker-finish-game-button').hide();
+                $('#planning-poker-start-game-button').hide();
+                $('#planning-poker-score-next-button').hide();
+                $('#planning-poker-rescore-button').hide();
+                break;
+            case 'CardsOpenned':
+                $('#planning-poker-waiting-players-banner').hide();
+
+                const isFinalSubTask = gameProcessHelper._isFinalSubTask();
+
+                if (isFinalSubTask) {
+                    $('#planning-poker-finish-game-button').show();
+                } else {
+                    $('#planning-poker-score-next-button').show();
+                }
+
+                const subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
+                subTaskScoreBlock.prop('disabled', false);
+
+                $('#planning-poker-start-game-button').hide();
+                $('#planning-poker-rescore-button').show();
+                $('#planning-poker-open-cards-button').hide();
+                break;
+            case 'Finished':
+                $('#planning-poker-waiting-players-banner').hide();
+                $('#planning-poker-finish-game-button').hide();
+                $('#planning-poker-start-game-button').show();
+                $('#planning-poker-score-next-button').hide();
+                $('#planning-poker-rescore-button').hide();
+                $('#planning-poker-open-cards-button').hide();
+                break;
+            default:
+                break;
         }
     },
 
@@ -380,11 +397,13 @@ let gameProcessHelper = {
 
     changeMyStatus: (isPlayer) => {
         if (isPlayer) {
+            gameProcessHelper._cookieManager.setCookie("IsPlayerCookieValue", 'true');
             $('#planning-poker-spectate-button').show();
             $('#planning-poker-join-game-button').hide();
             $('#planning-poker-gamer-card-zone').show();
             $('.planning-poker-gamer-score[my-card]').show();
         } else {
+            gameProcessHelper._cookieManager.setCookie("IsPlayerCookieValue", 'false');
             $('#planning-poker-spectate-button').hide();
             $('#planning-poker-join-game-button').show();
             $('#planning-poker-gamer-card-zone').hide();
@@ -489,11 +508,28 @@ let gameProcessHelper = {
         }
     },
 
+    _hasPlayersInGame: () => {
+        
+        const player = gameProcessHelper._users.find((usr) => usr.isActive && usr.isPlayer);
+
+        if (player) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
     _addUserToLocalCache: (user) => {
         const existingUser = gameProcessHelper._users.find((usr) => usr.userId === user.userId);
 
         if (existingUser) {
-            gameProcessHelper._users.pop(existingUser);
+            for (var i = 0; i < gameProcessHelper._users.length; i++) {
+
+                if (gameProcessHelper._users[i].userId === existingUser.userId) {
+                    gameProcessHelper._users.splice(i, 1);
+                }
+
+            }
         }
 
         gameProcessHelper._users.push(user);
@@ -505,7 +541,13 @@ let gameProcessHelper = {
         const existingUser = gameProcessHelper._users.find((usr) => usr.userId === userId);
 
         if (existingUser) {
-            gameProcessHelper._users.pop(existingUser);
+            for (var i = 0; i < gameProcessHelper._users.length; i++) {
+
+                if (gameProcessHelper._users[i].userId === existingUser.userId) {
+                    gameProcessHelper._users.splice(i, 1);
+                }
+
+            }
         }
 
         gameProcessHelper._actualizeOpenCardsButtonState();

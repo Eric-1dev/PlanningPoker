@@ -31,7 +31,7 @@ public class GameConnectHub : Hub
     public IGameGroupCacheService GameGroupCacheService { get; set; }
     public IGameControlService GameControlService { get; set; }
 
-    public async Task UserConnected(Guid gameId)
+    public async Task UserConnected(Guid gameId, bool isPlayerCookieValue)
     {
         Context.Items["GameId"] = gameId;
 
@@ -39,7 +39,7 @@ public class GameConnectHub : Hub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, GroupName);
 
-        var isPlayer = true;
+        var isPlayer = isPlayerCookieValue;
 
         var gamerInfoModel = new GamerConnectionModel(Context.ConnectionId, CurrentUserId, userName, isPlayer);
 
@@ -75,13 +75,11 @@ public class GameConnectHub : Hub
     {
         var cardSetType = GameControlService.GetCardSetType(GameId);
 
-        string scoreText = null;
-
         if (score.HasValue)
         {
-            scoreText = CardSetConstants.GetScoreText(cardSetType, score.Value);
+            var isCardFromSet = CardSetConstants.HasCardInSet(cardSetType, score.Value);
 
-            if (scoreText == null)
+            if (!isCardFromSet)
             {
                 throw new WorkflowException("Выбранная карта не найдена в используемом наборе");
             }
@@ -94,7 +92,7 @@ public class GameConnectHub : Hub
         if (!isGameRunning || !isUserIsPlayer)
             return;
 
-        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score, scoreText);
+        var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score);
 
         UserInfoModel.ClearScore(user);
 
@@ -124,9 +122,11 @@ public class GameConnectHub : Hub
     {
         var game = GameControlService.StartGame(GameId, CurrentUserId);
 
-        var gameState = new GameStateChangedModel(game);
+        var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
 
-        await Clients.Group(GroupName).SendAsync("GameStateChanged", gameState);
+        var model = new GameStateChangedModel(game, playerScores);
+
+        await Clients.Group(GroupName).SendAsync("GameStateChanged", model);
     }
 
     public async Task TryOpenCards()
@@ -173,9 +173,11 @@ public class GameConnectHub : Hub
     {
         var game = GameControlService.FinishGame(GameId, CurrentUserId);
 
-        var gameState = new GameStateChangedModel(game);
+        var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
 
-        await Clients.Group(GroupName).SendAsync("GameStateChanged", gameState);
+        var model = new GameStateChangedModel(game, playerScores);
+
+        await Clients.Group(GroupName).SendAsync("GameStateChanged", model);
     }
 
     private async Task ChangeUserStatus(bool isPlayer)

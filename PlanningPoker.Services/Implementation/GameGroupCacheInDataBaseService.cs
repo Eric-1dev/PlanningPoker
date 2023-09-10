@@ -1,5 +1,4 @@
 using System.Data;
-using Microsoft.EntityFrameworkCore;
 using PlanningPoker.DataLayer;
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Exceptions;
@@ -28,11 +27,12 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         {
             using var dbContext = new ApplicationContext();
 
-            var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.UserId == gamerConnection.UserId);
+            var userConnection = dbContext.GamerConnectionsCache.FirstOrDefault(x => x.GameId == gameId && x.UserId == gamerConnection.UserId);
 
             if (userConnection != null)
             {
                 userConnection.ConnectionId = gamerConnection.ConnectionId;
+                userConnection.Name = gamerConnection.Name;
                 userConnection.IsActive = true;
             }
             else
@@ -93,7 +93,7 @@ public class GameGroupCacheInDataBaseService : IGameGroupCacheService
         return new UserInfoModel(myConnection);
     }
 
-    public UserInfoModel ChangeUserVote(string connectionId, double? score, string scoreText)
+    public UserInfoModel ChangeUserVote(string connectionId, double? score)
     {
         using var dbContext = new ApplicationContext();
 

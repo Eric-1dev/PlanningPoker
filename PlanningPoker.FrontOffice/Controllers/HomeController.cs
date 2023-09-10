@@ -23,10 +23,13 @@ public class HomeController : BaseController
         if (!isGameExists)
             return RedirectToAction("Index");
 
+        bool.TryParse(Request.Cookies["IsPlayerCookieValue"], out bool isPlayerCookieValue);
+
         var model = new GameProgressViewModel
         {
             GameId = gameId,
-            UserId = User.GetUserId()
+            UserId = User.GetUserId(),
+            IsPlayerCookieValue = isPlayerCookieValue
         };
 
         return View(model);

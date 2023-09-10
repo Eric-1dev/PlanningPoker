@@ -12,7 +12,7 @@ public interface IGameGroupCacheService
 
     UserInfoModel GetMyInfo(Guid gameId, string connectionId);
 
-    UserInfoModel ChangeUserVote(string connectionId, double? score, string scoreText);
+    UserInfoModel ChangeUserVote(string connectionId, double? score);
 
     void ChangeUserStatus(string connectionId, Guid gameId, bool isPlayer);
 

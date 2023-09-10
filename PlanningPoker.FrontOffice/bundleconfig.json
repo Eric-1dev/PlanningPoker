@@ -36,7 +36,8 @@
     {
         "outputFileName": "wwwroot/bundles/js/common.bundle.js",
         "inputFiles": [
-            "wwwroot/js/modalWindowHelper.js"
+            "wwwroot/js/modalWindowHelper.js",
+            "wwwroot/js/cookieManager.js"
         ],
         "minify": {
             "enabled": true

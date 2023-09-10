@@ -37,13 +37,8 @@ public static class CardSetConstants
         return _cardSets.First(x => x.CardSetType == cardSetType).Cards;
     }
 
-    //public static double[] GetAvailableScores(CardSetTypeEnum cardSetType)
-    //{
-    //    return Cards(cardSetType).Where(x => x.Score >= 0).Select(x => x.Score).ToArray();
-    //}
-
-    public static string GetScoreText(CardSetTypeEnum cardSetType, double score)
+    public static bool HasCardInSet(CardSetTypeEnum cardSetType, double score)
     {
-        return Cards(cardSetType).FirstOrDefault(x => x.Score == score)?.Text ?? null;
+        return Cards(cardSetType).FirstOrDefault(x => x.Score == score) != null;
     }
 }
