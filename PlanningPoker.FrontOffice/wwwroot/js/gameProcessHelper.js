@@ -143,7 +143,11 @@ let gameProcessHelper = {
             existingUserCard.after(scoreBlock);
             existingUserCard.remove();
         } else {
-            $('.planning-poker-gamers-zone').append(scoreBlock);
+            if (isMyCard) {
+                $('.planning-poker-gamers-zone').prepend(scoreBlock);
+            } else {
+                $('.planning-poker-gamers-zone').append(scoreBlock);
+            }
         }
     },
 
