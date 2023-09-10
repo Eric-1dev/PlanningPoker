@@ -560,7 +560,6 @@ let gameProcessHelper = {
     },
 
     _hasPlayersInGame: () => {
-
         const player = gameProcessHelper._users.find((usr) => usr.isActive && usr.isPlayer);
 
         if (player) {
@@ -585,6 +584,7 @@ let gameProcessHelper = {
 
         gameProcessHelper._users.push(user);
 
+        gameProcessHelper._syncVueUserList();
         gameProcessHelper._actualizeOpenCardsButtonState();
     },
 
@@ -600,7 +600,7 @@ let gameProcessHelper = {
 
             }
         }
-
+        gameProcessHelper._syncVueUserList();
         gameProcessHelper._actualizeOpenCardsButtonState();
     },
 
@@ -611,6 +611,7 @@ let gameProcessHelper = {
             existingUser.hasVoted = user.hasVoted;
         }
 
+        gameProcessHelper._syncVueUserList();
         gameProcessHelper._actualizeOpenCardsButtonState();
     },
 
@@ -638,6 +639,10 @@ let gameProcessHelper = {
         });
 
         return maxOrder === selectedOrder;
+    },
+
+    _syncVueUserList: () => {
+        vueUserList.users = gameProcessHelper._users;
     },
 
     _mapCardColorToClass: (color) => {

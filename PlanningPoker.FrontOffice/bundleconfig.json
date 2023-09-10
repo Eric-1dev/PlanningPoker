@@ -6,7 +6,8 @@
             "wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js",
             "wwwroot/lib/jquery-validation/dist/jquery.validate.min.js",
             "wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js",
-            "wwwroot/lib/signalr/dist/browser/signalr.min.js"
+            "wwwroot/lib/signalr/dist/browser/signalr.min.js",
+            "wwwroot/lib/vue.js/vue.js"
         ],
         "minify": {
             "enabled": false
@@ -46,7 +47,8 @@
     {
         "outputFileName": "wwwroot/bundles/css/gamePage.bundle.css",
         "inputFiles": [
-            "wwwroot/css/gamePage.css"
+            "wwwroot/css/gamePage.css",
+            "wwwroot/css/components/userList.css"
         ],
         "minify": {
             "enabled": true
@@ -56,7 +58,8 @@
         "outputFileName": "wwwroot/bundles/js/gameProcess.bundle.js",
         "inputFiles": [
             "wwwroot/js/gameProcessHelper.js",
-            "wwwroot/js/hubConnectorHelper.js"
+            "wwwroot/js/hubConnectorHelper.js",
+            "wwwroot/js/components/userList.js"
         ],
         "minify": {
             "enabled": true

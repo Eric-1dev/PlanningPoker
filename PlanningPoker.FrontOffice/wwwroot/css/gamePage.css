@@ -224,6 +224,7 @@
 .planning-poker-button-group {
     display: flex;
     flex-direction: row;
+    width: 30%;
 }
 
 .planning-poker-d-none {

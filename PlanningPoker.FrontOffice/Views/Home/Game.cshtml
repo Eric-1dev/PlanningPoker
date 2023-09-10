@@ -26,6 +26,21 @@
             <button class="btn btn-sm btn-success planning-poker-d-none" id="planning-poker-join-game-button">Вступить в игру</button>
         </div>
         <div class="planning-poker-button-group">
+            <div id="vue_user-list-element">
+                <button class="btn btn-sm btn-outline-success shadow-none" v-on:click="showList = !showList">Список пользователей</button>
+                <div class="vue_user-list_wrapper" v-bind:class="{'vue_d-none':!showList}">
+                    <div class="d-table">
+                        <div class="d-table-row" v-for="user in sortedUserList">
+                            <div class="d-table-cell w-100">{{user.name}}</div>
+                            <div class="d-table-cell">
+                                <div v-if="!user.isPlayer"><i class="bi-eye-fill"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="planning-poker-button-group justify-content-end">
             <h5><span class="badge bg-warning planning-poker-d-none" id="planning-poker-waiting-players-banner">Ожидание других игроков...</span></h5>
             <div id="planning-poker-admin-buttons-group">
                 <button class="btn btn-sm btn-primary planning-poker-d-none" id="planning-poker-finish-game-button">Завершить оценку</button>

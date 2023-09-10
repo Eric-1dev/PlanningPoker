@@ -1,0 +1,13 @@
+.vue_user-list_wrapper {
+    position: absolute;
+    background-color: whitesmoke;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 300px;
+    user-select: none;
+}
+
+.vue_d-none {
+    display: none;
+}
