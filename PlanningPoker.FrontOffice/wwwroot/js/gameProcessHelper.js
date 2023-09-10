@@ -309,7 +309,9 @@ let gameProcessHelper = {
 
         switch (gameProcessHelper._gameState) {
             case 'Created':
-                if (hasPlayers) {
+                $('#planning-poker-gamer-card-zone').attr('active', 'false');
+
+                if(hasPlayers) {
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-waiting-players-banner').hide();
                 } else {
@@ -323,6 +325,8 @@ let gameProcessHelper = {
                 $('#planning-poker-open-cards-button').hide();
                 break;
             case 'Scoring':
+                $('#planning-poker-gamer-card-zone').attr('active', 'true');
+
                 if (hasPlayers) {
                     $('#planning-poker-open-cards-button').show();
                     $('#planning-poker-waiting-players-banner').hide();
@@ -337,6 +341,8 @@ let gameProcessHelper = {
                 $('#planning-poker-rescore-button').hide();
                 break;
             case 'CardsOpenned':
+                $('#planning-poker-gamer-card-zone').attr('active', 'true');
+
                 $('#planning-poker-waiting-players-banner').hide();
 
                 const isFinalSubTask = gameProcessHelper._isFinalSubTask();
@@ -355,6 +361,8 @@ let gameProcessHelper = {
                 $('#planning-poker-open-cards-button').hide();
                 break;
             case 'Finished':
+                $('#planning-poker-gamer-card-zone').attr('active', 'false');
+
                 if (hasPlayers) {
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-waiting-players-banner').hide();
