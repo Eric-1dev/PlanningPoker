@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace PlanningPoker.DataModel;
 
 public class GamerConnection : BaseEntity

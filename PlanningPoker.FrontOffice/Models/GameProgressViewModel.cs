@@ -1,5 +1,3 @@
-using PlanningPoker.Entities.Models;
-
 namespace PlanningPoker.FrontOffice.Models;
 
 public class GameProgressViewModel
