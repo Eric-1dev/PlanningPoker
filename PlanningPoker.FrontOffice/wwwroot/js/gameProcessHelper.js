@@ -166,16 +166,18 @@ let gameProcessHelper = {
     updateUserVote: (user) => {
         gameProcessHelper._updateUserVoteInLocalCache(user);
 
-        let userCard = gameProcessHelper._findUserCardByUserId(user.userId);
+        const userCard = gameProcessHelper._findUserCardByUserId(user.userId);
 
         if (userCard.length === 0) {
             return;
         }
 
-        let cardInfo = gameProcessHelper._generateCardState(user);
+        const cardInfo = gameProcessHelper._generateCardState(user);
 
-        userCard.find('.planning-poker-card').attr('card-state', cardInfo.cardState);
-        userCard.find('.planning-poker-card').html(cardInfo.scoreText);
+        const userCardBlock = userCard.find('.planning-poker-card');
+        userCardBlock.attr('card-state', cardInfo.cardState);
+        userCardBlock.addClass(cardInfo.className);
+        userCardBlock.html(cardInfo.scoreText);
 
         if (userCard.attr('my-card')) {
             $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
@@ -395,11 +397,16 @@ let gameProcessHelper = {
             const userCard = gameProcessHelper._findUserCardByUserId(playerScore.userId);
 
             if (userCard) {
-                const scoreText = gameProcessHelper._getScoreTextByScore(playerScore.score);
+                const cardInfo = gameProcessHelper._getCardInfoByScore(playerScore.score);
+
+                const className = gameProcessHelper._mapCardColorToClass(cardInfo.color);
 
                 const cardContentBlock = userCard.find('.planning-poker-card');
                 cardContentBlock.attr('card-state', 'openned');
-                cardContentBlock.html(scoreText);
+                cardContentBlock.removeClass();
+                cardContentBlock.addClass('planning-poker-card');
+                cardContentBlock.addClass(className);
+                cardContentBlock.html(cardInfo.text);
             }
         });
 
@@ -448,10 +455,14 @@ let gameProcessHelper = {
 
     _generateCardState: (userInfo) => {
         let cardState;
-        let scoreText;
+        let cardInfo;
+        let className = '';
 
         if (userInfo.score !== null && gameProcessHelper._gameState === 'CardsOpenned') {
-            scoreText = gameProcessHelper._getScoreTextByScore(userInfo.score);
+            cardInfo = gameProcessHelper._getCardInfoByScore(userInfo.score);
+
+            scoreText = cardInfo.text;
+            className = gameProcessHelper._mapCardColorToClass(cardInfo.color);
             cardState = 'openned';
         } else {
             scoreText = '';
@@ -462,12 +473,13 @@ let gameProcessHelper = {
             }
         }
 
-        let cardInfo = {
+        const result = {
             cardState: cardState,
-            scoreText: scoreText
+            scoreText: scoreText,
+            className: className
         };
 
-        return cardInfo;
+        return result;
     },
 
     _findUserCardByUserId: (userId) => {
@@ -525,10 +537,10 @@ let gameProcessHelper = {
             });
     },
 
-    _getScoreTextByScore: (score) => {
+    _getCardInfoByScore: (score) => {
         let card = gameProcessHelper._cards.find((card) => card.score === score);
 
-        return card.text;
+        return card;
     },
 
     _actualizeOpenCardsButtonState: () => {
