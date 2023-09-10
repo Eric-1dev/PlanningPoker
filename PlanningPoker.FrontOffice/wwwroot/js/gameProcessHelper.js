@@ -263,7 +263,10 @@ let gameProcessHelper = {
         if (gameProcessHelper._isAdmin) {
             scoreBlock = $('<select class="form-select shadow-none planning-poker-tasks-zone-task-score">');
 
-            scoreBlock.append($('<option value="">'));
+            const emptyOption = $('<option value="">');
+            emptyOption.html('-');
+
+            scoreBlock.append(emptyOption);
 
             gameProcessHelper._availableScores.forEach((scoreValue) => {
                 let selectedAttr = '';
@@ -278,7 +281,15 @@ let gameProcessHelper = {
             });
         } else {
             scoreBlock = $('<div class="planning-poker-tasks-zone-task-score">');
-            scoreBlock.html(subTask.score);
+
+            let scoreText;
+            if (subTask.score === null) {
+                scoreText = '-';
+            } else {
+                scoreText = subTask.score;
+            }
+
+            scoreBlock.html(scoreText);
         }
 
         scoreBlock.change((event) => gameProcessHelper.onSubTaskScoreChanged(event.target));
@@ -316,7 +327,7 @@ let gameProcessHelper = {
             case 'Created':
                 $('#planning-poker-gamer-card-zone').attr('active', 'false');
 
-                if(hasPlayers) {
+                if (hasPlayers) {
                     $('#planning-poker-start-game-button').show();
                     $('#planning-poker-waiting-players-banner').hide();
                 } else {
@@ -453,6 +464,7 @@ let gameProcessHelper = {
     _generateCardState: (userInfo) => {
         let cardState;
         let cardInfo;
+        let scoreText;
 
         if (userInfo.score !== null && gameProcessHelper._gameState === 'CardsOpenned') {
             cardInfo = gameProcessHelper._getCardInfoByScore(userInfo.score);
@@ -548,7 +560,7 @@ let gameProcessHelper = {
     },
 
     _hasPlayersInGame: () => {
-        
+
         const player = gameProcessHelper._users.find((usr) => usr.isActive && usr.isPlayer);
 
         if (player) {
