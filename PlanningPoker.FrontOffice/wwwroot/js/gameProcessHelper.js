@@ -399,13 +399,8 @@ let gameProcessHelper = {
             if (userCard) {
                 const cardInfo = gameProcessHelper._getCardInfoByScore(playerScore.score);
 
-                const className = gameProcessHelper._mapCardColorToClass(cardInfo.color);
-
                 const cardContentBlock = userCard.find('.planning-poker-card');
                 cardContentBlock.attr('card-state', 'openned');
-                cardContentBlock.removeClass();
-                cardContentBlock.addClass('planning-poker-card');
-                cardContentBlock.addClass(className);
                 cardContentBlock.html(cardInfo.text);
             }
         });
@@ -456,13 +451,11 @@ let gameProcessHelper = {
     _generateCardState: (userInfo) => {
         let cardState;
         let cardInfo;
-        let className = '';
 
         if (userInfo.score !== null && gameProcessHelper._gameState === 'CardsOpenned') {
             cardInfo = gameProcessHelper._getCardInfoByScore(userInfo.score);
 
             scoreText = cardInfo.text;
-            className = gameProcessHelper._mapCardColorToClass(cardInfo.color);
             cardState = 'openned';
         } else {
             scoreText = '';
@@ -476,7 +469,6 @@ let gameProcessHelper = {
         const result = {
             cardState: cardState,
             scoreText: scoreText,
-            className: className
         };
 
         return result;

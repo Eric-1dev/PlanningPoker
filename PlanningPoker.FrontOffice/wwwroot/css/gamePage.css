@@ -91,7 +91,7 @@
     height: 150px;
     border: 1px solid lightgray;
     border-radius: 7px;
-    font-size: 70px;
+    font-size: 60px;
     align-items: center;
     justify-content: center;
     user-select: none;
@@ -115,7 +115,6 @@
 .planning-poker-card-color-gray {
     background-color: gray;
     color: white;
-    font-size: 50px;
 }
 
 .planning-poker-card[card-state='voted'] {

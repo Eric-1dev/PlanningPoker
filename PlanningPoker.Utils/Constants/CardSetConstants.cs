@@ -5,7 +5,7 @@ namespace PlanningPoker.Utils.Constants;
 
 public static class CardSetConstants
 {
-    private static CardSet[] _cardSets;
+    private static readonly CardSet[] _cardSets;
 
     static CardSetConstants()
     {
@@ -23,10 +23,10 @@ public static class CardSetConstants
                     new Card(5,     CardColorEnum.Yellow),
                     new Card(8,     CardColorEnum.Yellow),
                     new Card(13,    CardColorEnum.Yellow),
-                    new Card(21,    CardColorEnum.Red),
-                    new Card(34,    CardColorEnum.Red),
-                    new Card(55,    CardColorEnum.Red),
-                    new Card(-1,  CardColorEnum.Gray, "Pass")
+                    new Card(20,    CardColorEnum.Red),
+                    new Card(40,    CardColorEnum.Red),
+                    new Card(100,   CardColorEnum.Red),
+                    new Card(-1,    CardColorEnum.Gray, "Pass")
                 }
             }
         };
