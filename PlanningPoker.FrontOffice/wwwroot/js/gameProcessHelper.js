@@ -89,6 +89,10 @@ let gameProcessHelper = {
             gameProcessHelper._editTask();
         });
 
+        $('.planning-poker-tasks-zone-task-name').click((event) => {
+            //todo добавить возможность оценить выбранную задачу
+        });
+
         gameProcessHelper._hubConnector.init();
     },
 
@@ -383,7 +387,6 @@ let gameProcessHelper = {
                 $('#planning-poker-waiting-players-banner').hide();
 
                 let isFinalSubTask = gameProcessHelper._isFinalSubTask();
-                debugger
 
                 if (isFinalSubTask) {
                     $('#planning-poker-finish-game-button').show();
