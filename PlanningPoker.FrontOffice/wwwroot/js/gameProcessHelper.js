@@ -16,6 +16,7 @@ let gameProcessHelper = {
     _lastClickedCard: null,
     _cards: null,
     _availableScores: null,
+    _editTaskMode: false,
 
     gameId: '',
     isPlayerCookieValue: null,
@@ -82,6 +83,10 @@ let gameProcessHelper = {
             }
 
             gameProcessHelper._hubConnector.invokeFinishGame();
+        });
+
+        $('#planning-poker-edit-task-button').click(() => {
+            gameProcessHelper._editTask();
         });
 
         gameProcessHelper._hubConnector.init();
@@ -197,6 +202,8 @@ let gameProcessHelper = {
     },
 
     handleGameInfoMessage: (gameInfo) => {
+        vueApp.setGameInfo(gameInfo);
+
         gameProcessHelper._isAdmin = gameInfo.myInfo.userId === gameInfo.adminId;
 
         gameProcessHelper._cards = gameInfo.cards;
@@ -245,9 +252,13 @@ let gameProcessHelper = {
     },
 
     handleSubTasksInfo: (subTasks) => {
+        $('#planning-poker-tasks-zone').html('');
+
         subTasks.sort((a, b) => a.order - b.order).forEach((subTask) => {
             gameProcessHelper.handleSubTaskInfo(subTask);
         });
+
+        vueApp.updateSubTasks(subTasks);
     },
 
     handleSubTaskInfo: (subTask) => {
@@ -312,10 +323,12 @@ let gameProcessHelper = {
     },
 
     actualizeButtons: () => {
-        if (!gameProcessHelper._isAdmin) {
-            $('#planning-poker-admin-buttons-group').hide();
-        } else {
+        if (gameProcessHelper._isAdmin) {
             $('#planning-poker-admin-buttons-group').show();
+            $('#planning-poker-edit-task-button').show();
+        } else {
+            $('#planning-poker-admin-buttons-group').hide();
+            $('#planning-poker-edit-task-button').hide();
         }
 
         const hasPlayers = gameProcessHelper._hasPlayersInGame();
@@ -369,15 +382,18 @@ let gameProcessHelper = {
 
                 $('#planning-poker-waiting-players-banner').hide();
 
-                const isFinalSubTask = gameProcessHelper._isFinalSubTask();
+                let isFinalSubTask = gameProcessHelper._isFinalSubTask();
+                debugger
 
                 if (isFinalSubTask) {
                     $('#planning-poker-finish-game-button').show();
+                    $('#planning-poker-score-next-button').hide();
                 } else {
                     $('#planning-poker-score-next-button').show();
+                    $('#planning-poker-finish-game-button').hide();
                 }
 
-                const subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
+                let subTaskScoreBlock = gameProcessHelper._findSelectedSubTaskScoreBlock();
                 subTaskScoreBlock.prop('disabled', false);
 
                 $('#planning-poker-start-game-button').hide();
@@ -459,6 +475,10 @@ let gameProcessHelper = {
         }
 
         $('.planning-poker-card-selected').removeClass('planning-poker-card-selected');
+    },
+
+    updateSubTasks: (subTasks) => {
+        gameProcessHelper._hubConnector.invokeUpdateSubTasks(subTasks);
     },
 
     _generateCardState: (userInfo) => {
@@ -642,7 +662,7 @@ let gameProcessHelper = {
     },
 
     _syncVueUserList: () => {
-        vueUserList.users = gameProcessHelper._users;
+        vueApp.setUsers(gameProcessHelper._users);
     },
 
     _mapCardColorToClass: (color) => {

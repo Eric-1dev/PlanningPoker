@@ -64,6 +64,11 @@ class HubConnector {
             gameProcessHelper.actualizeButtons();
         });
 
+        hubConnection.on("SubTasksUpdated", (subTasks) => {
+            gameProcessHelper.handleSubTasksInfo(subTasks);
+            gameProcessHelper.actualizeButtons();
+        });
+
         this.#hubConnection = hubConnection;
 
         this.#startConnection();
@@ -107,6 +112,10 @@ class HubConnector {
 
     invokeFinishGame() {
         this.#hubConnection.invoke('FinishGame');
+    }
+
+    invokeUpdateSubTasks(subTasks) {
+        this.#hubConnection.invoke('UpdateSubTasks', subTasks);
     }
 
     async #startConnection() {

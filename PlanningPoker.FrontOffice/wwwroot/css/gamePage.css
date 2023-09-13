@@ -1,4 +1,8 @@
 #planning-poker-connection-lost-locker {
+    display: none;
+}
+
+.planning-poker-locker {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -6,7 +10,7 @@
     right: 0;
     background-color: rgba(0,0,0, 0.4);
     backdrop-filter: blur(10px);
-    display: none;
+    z-index: 20000;
 }
 
 #planning-poker-connection-lost-banner-wrapper {
@@ -221,6 +225,11 @@
     justify-content: space-between
 }
 
+#planning-poker-admin-buttons-group {
+    display: flex;
+    gap: 10px;
+}
+
 .planning-poker-button-group {
     display: flex;
     flex-direction: row;
@@ -229,6 +238,35 @@
 
 .planning-poker-d-none {
     display: none;
+}
+
+#vue_edit-sub-tasks-element {
+    position: absolute;
+
+}
+
+.vue_user-list_wrapper {
+    position: absolute;
+    background-color: whitesmoke;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 300px;
+    user-select: none;
+}
+
+.vue_d-none {
+    display: none;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
 @keyframes slidein {

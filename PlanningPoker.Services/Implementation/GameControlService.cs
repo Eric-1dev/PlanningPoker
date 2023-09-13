@@ -4,6 +4,7 @@ using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
 using PlanningPoker.Entities.Exceptions;
 using PlanningPoker.Services.Interfaces;
+using PlanningPoker.Services.Models;
 
 namespace PlanningPoker.Services.Implementation;
 
@@ -237,6 +238,53 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return game;
+    }
+
+    public GameSubTask[] UpdateSubTasks(Guid gameId, Guid userId, List<UpdateSubTaskModel> subTasks)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        dbContext.Attach(game);
+
+        int order = 0;
+
+        var tasksToAddOrUpdate = subTasks.Where(x => !string.IsNullOrWhiteSpace(x.Text)).ToArray();
+
+        if (!tasksToAddOrUpdate.Any())
+            throw new WorkflowException("Должна остаться хотя бы одна подзадача для оценки");
+
+        // удаляем таски, id который не попали в обновленный список
+        game.SubTasks.RemoveAll(x => !subTasks.Select(ut => ut.Id).Contains(x.Id));
+
+        foreach (var updatedSubTask in tasksToAddOrUpdate)
+        {
+            var existingTask = game.SubTasks.FirstOrDefault(x => x.Id == updatedSubTask.Id);
+
+            if (existingTask != null)
+            {
+                existingTask.Order = order;
+                existingTask.Text = updatedSubTask.Text;
+            }
+            else
+            {
+                game.SubTasks.Insert(0, new GameSubTask
+                {
+                    GameId = gameId,
+                    IsSelected = false,
+                    Order = order,
+                    Text = updatedSubTask.Text,
+                    Score = null
+                });
+            }
+
+            order++;
+        }
+
+        dbContext.SaveChanges();
+
+        return game.SubTasks.ToArray();
     }
 
     private static void ThrowIfNotAdmin(Guid adminId, Guid userId)

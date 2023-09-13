@@ -1,5 +1,6 @@
 using PlanningPoker.DataModel;
 using PlanningPoker.Entities.Enums;
+using PlanningPoker.Services.Models;
 
 namespace PlanningPoker.Services.Interfaces;
 
@@ -26,4 +27,6 @@ public interface IGameControlService
     GameSubTask ScoreNextSubTask(Guid gameId, Guid userId);
 
     Game FinishGame(Guid gameId, Guid userId);
+
+    GameSubTask[] UpdateSubTasks(Guid gameId, Guid userId, List<UpdateSubTaskModel> subTasks);
 }

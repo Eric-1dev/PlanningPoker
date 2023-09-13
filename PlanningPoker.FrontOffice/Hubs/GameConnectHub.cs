@@ -180,6 +180,15 @@ public class GameConnectHub : Hub
         await Clients.Group(GroupName).SendAsync("GameStateChanged", model);
     }
 
+    public async Task UpdateSubTasks(List<UpdateSubTaskModel> subTasks)
+    {
+        var resultSubTasks = GameControlService.UpdateSubTasks(GameId, CurrentUserId, subTasks);
+
+        var model = resultSubTasks.Select(x => new SubTaskModel(x)).ToArray();
+
+        await Clients.Group(GroupName).SendAsync("SubTasksUpdated", model);
+    }
+
     private async Task ChangeUserStatus(bool isPlayer)
     {
         GameGroupCacheService.ChangeUserStatus(Context.ConnectionId, GameId, isPlayer);
