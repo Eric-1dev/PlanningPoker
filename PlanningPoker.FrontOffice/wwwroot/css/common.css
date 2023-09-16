@@ -31,12 +31,6 @@ header {
     padding: 5px 20px;
 }
 
-a.navbar-brand {
-    white-space: normal;
-    text-align: center;
-    word-break: break-all;
-}
-
 a {
     color: #0077cc;
 }
