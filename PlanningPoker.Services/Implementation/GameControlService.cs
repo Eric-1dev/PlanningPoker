@@ -246,6 +246,8 @@ public class GameControlService : IGameControlService
 
         var game = GetGameById(gameId);
 
+        ThrowIfNotAdmin(game.AdminId, userId);
+
         dbContext.Attach(game);
 
         int order = 0;
@@ -285,6 +287,28 @@ public class GameControlService : IGameControlService
         dbContext.SaveChanges();
 
         return game.SubTasks.ToArray();
+    }
+
+    public Game ChangeSelectedSubTask(Guid gameId, Guid userId, Guid subTaskId)
+    {
+        using var dbContext = new ApplicationContext();
+
+        var game = GetGameById(gameId);
+
+        ThrowIfNotAdmin(game.AdminId, userId);
+
+        dbContext.Attach(game);
+
+        foreach (var subTask in game.SubTasks)
+        {
+            subTask.IsSelected = subTask.Id == subTaskId;
+        }
+
+        game.GameState = GameStateEnum.Scoring;
+
+        dbContext.SaveChanges();
+
+        return game;
     }
 
     private static void ThrowIfNotAdmin(Guid adminId, Guid userId)

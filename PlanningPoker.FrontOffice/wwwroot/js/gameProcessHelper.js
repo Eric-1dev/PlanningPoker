@@ -89,10 +89,6 @@ let gameProcessHelper = {
             gameProcessHelper._editTask();
         });
 
-        $('.planning-poker-tasks-zone-task-name').click((event) => {
-            //todo добавить возможность оценить выбранную задачу
-        });
-
         gameProcessHelper._hubConnector.init();
     },
 
@@ -311,6 +307,19 @@ let gameProcessHelper = {
 
         taskBlock.append(taskNameBlock);
         taskBlock.append(scoreBlock);
+
+        taskNameBlock.off('click');
+
+        if(!subTask.isSelected) {
+            taskNameBlock.click((event) => {
+                modalWindowHelper.showConfirmDialog('Перейти к оценке этой задачи?', () => {
+                    const subTaskId = $(event.target).closest('.planning-poker-tasks-zone-task').attr('task-id');
+                    gameProcessHelper._hubConnector.invokeScoreSubTaskById(subTaskId);
+
+                    return true;
+                });
+            })
+        }
 
         let existingTask = gameProcessHelper._findSubTaskById(subTask.id);
 

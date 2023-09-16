@@ -29,4 +29,6 @@ public interface IGameControlService
     Game FinishGame(Guid gameId, Guid userId);
 
     GameSubTask[] UpdateSubTasks(Guid gameId, Guid userId, List<UpdateSubTaskModel> subTasks);
+
+    Game ChangeSelectedSubTask(Guid gameId, Guid userId, Guid subTaskId);
 }

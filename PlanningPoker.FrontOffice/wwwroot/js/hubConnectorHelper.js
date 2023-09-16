@@ -118,6 +118,10 @@ class HubConnector {
         this.#hubConnection.invoke('UpdateSubTasks', subTasks);
     }
 
+    invokeScoreSubTaskById(subTaskId) {
+        this.#hubConnection.invoke('ScoreSubTaskById', subTaskId);
+    }
+
     async #startConnection() {
         try {
             await this.#hubConnection.start()

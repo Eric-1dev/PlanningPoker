@@ -184,13 +184,19 @@
     font-size: 18px;
     border-bottom: 1px solid lightgray;
     padding: 5px;
-    cursor: pointer;
 }
 
     .planning-poker-tasks-zone-task[active="true"] {
         font-weight: bold;
         color: blue;
-        cursor: default;
+    }
+
+        .planning-poker-tasks-zone-task[active="true"] .planning-poker-tasks-zone-task-name {
+            cursor: default;
+        }
+
+    .planning-poker-tasks-zone-task[active="false"] .planning-poker-tasks-zone-task-name {
+        cursor: pointer;
     }
 
 #planning-poker-tasks-zone-task-header {
@@ -242,7 +248,6 @@
 
 #vue_edit-sub-tasks-element {
     position: absolute;
-
 }
 
 .vue_user-list_wrapper {
