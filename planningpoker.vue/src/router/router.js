@@ -14,6 +14,7 @@ const routes = [
         component: GameProcess
     },
     {
+        name: "Login",
         path: "/Login",
         component: Login
     }
@@ -23,5 +24,18 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes: routes
 });
+
+router.beforeEach(
+    (to, from, next) => {
+        if (to.name === 'Login') {
+            next({
+                query: {redirectUrl: from.path}
+            });
+            return;
+        }
+
+        next();
+    }
+);
 
 export default router;

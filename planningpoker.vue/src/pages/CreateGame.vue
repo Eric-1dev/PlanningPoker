@@ -1,6 +1,6 @@
 <template>
     <div>
-        sdfsdf
+        CreateGame Page
     </div>
 </template>
 

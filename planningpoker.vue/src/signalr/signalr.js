@@ -1,18 +1,18 @@
-import { HttpTransportType, HubConnectionBuilder } from "@microsoft/signalr";
-
-const connection = new HubConnectionBuilder()
-    .withUrl('https://localhost:44353/GameConnect', {
-        skipNegotiation: true,
-        transport: HttpTransportType.WebSockets
-      })
-    .build();
-
-    connection.on
-
-    connection.start();
+import { HttpTransportType, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const signalr = {
-    connection
-};
+    start(url, token) {
+        const connection = new HubConnectionBuilder()
+            .withUrl(url, {
+                skipNegotiation: true,
+                transport: HttpTransportType.WebSockets,
+                accessTokenFactory: () => token
+            })
+            .configureLogging(LogLevel.Information)
+            .build();
+        
+        connection.start();
+    }
+}
 
 export default signalr;

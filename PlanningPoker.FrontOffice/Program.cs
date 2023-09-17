@@ -66,10 +66,12 @@ builder.Services
     })
     .AddJsonProtocol(options => options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-//builder.Services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
-//{
-//    builder.AllowAnyOrigin();
-//}));
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
+{
+    builder.AllowAnyOrigin();
+    builder.AllowAnyHeader();
+    builder.AllowAnyMethod();
+}));
 
 var app = builder.Build();
 
@@ -85,7 +87,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseCors("CorsPolicy");
+app.UseCors("CorsPolicy");
 
 app.MapControllerRoute(
     name: "default",

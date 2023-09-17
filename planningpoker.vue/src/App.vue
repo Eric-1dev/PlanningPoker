@@ -12,11 +12,11 @@
                     <a asp-action="Logout" asp-controller="Authorization" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Выход</a>
                 }
                 } -->
-                <div v-if="$store.state.userName">
-                    <span>{{ $store.state.userName }}</span>
+                <div v-if="userName">
+                    <span>{{ userName }}</span>
                     <pp-button
                         class="pp-exit-button" 
-                        v-if="$store.state.userName"
+                        v-if="userName"
                         @click="logOut"
                      >
                         Выход
@@ -35,15 +35,31 @@
 </template>
 
 <script>
+import signalr from '@/signalr/signalr'
+
 export default {
-    beforeMount() {
-        //this.$store.commit('setUserId', '123');
-        this.$store.commit('setUserName', 'fg');
+    async beforeMount() {
+
+        //signalr.start(this.HUB_CONNECT_URL, token);
+    },
+
+    computed: {
+        userName() {
+            return this.$store.state.userName;
+        }
     },
 
     methods: {
         logOut() {
-            this.$store.commit('setUserName', null);
+            this.$store.commit('clearUserName');
+        }
+    },
+
+    watch: {
+        userName(newName) {
+            if (!newName) {
+                this.$router.push({name: 'Login'});
+            }
         }
     }
 }

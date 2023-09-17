@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{$route.params.id}}
+        GameProcess Page, Id = {{$route.params.id}}
     </div>
 </template>
 
