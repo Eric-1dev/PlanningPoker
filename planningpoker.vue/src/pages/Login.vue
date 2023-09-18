@@ -4,13 +4,16 @@
             <form @submit.prevent="login">
                 <div class="pp-login-header">Представьтесь, пожалуйста</div>
                 <pp-input-text v-model="userName" placeholder="Имя пользователя" />
-                <pp-button color="blue" type="submit">Войти</pp-button>
+                <pp-button color="green" type="submit">Войти</pp-button>
             </form>
         </div>
     </div>
 </template>
 
 <script>
+import signalr from '@/signalr/signalr';
+import mainStore from '@/store/modules/mainStore';
+
 
 export default {
     data() {
@@ -21,7 +24,13 @@ export default {
 
     methods: {
         login() {
-            this.$store.commit('setUserName', this.userName);
+            if (!this.userName) {
+                return;
+            }
+
+            this.$store.commit('mainStore/setUserName', this.userName);
+
+            signalr.generateAndSetToken(this.$store.state.mainStore.userId, this.$store.state,mainStore.userName)
 
             const redirectPath = this.$route.query.redirectUrl ?? '/';
 

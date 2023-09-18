@@ -20,7 +20,7 @@ public class PokerAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     {
         var userData = GetUserDataFromQuery();
 
-        userData ??= GetUserDataFromCookies();
+        userData ??= GetUserDataFromCookies(); //todo выпилить после перехода на vue
 
         if (string.IsNullOrEmpty(userData.UserName))
             return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));

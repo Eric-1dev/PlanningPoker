@@ -1,70 +1,70 @@
 <template>
     <div class="app">
+        <div class="pp-backgroud-cell">
+            <header>
+                <div class="pp-username-area">
+                    <div v-if="userName">
+                        <span>{{ userName }}</span>
+                        <pp-button class="pp-exit-button" @click="logOut">
+                            Выход
+                        </pp-button>
+                    </div>
 
-        <header>
-            <div class="pp-username-area">
-                <div v-if="userName">
-                    <span>{{ userName }}</span>
-                    <pp-button class="pp-exit-button" v-if="userName" @click="logOut">
-                        Выход
-                    </pp-button>
+                    <div v-else>
+                        <span>Гость</span>
+                    </div>
                 </div>
-                <div v-else>
-                    <span>Гость</span>
-                </div>
+            </header>
+
+            <div class="pp-body-wrapper">
+                <router-view></router-view>
             </div>
-        </header>
-
-        <div class="pp-body-wrapper pp-backgroud-cell">
-            <router-view></router-view>
         </div>
     </div>
 </template>
 
 <script>
 import signalr from '@/signalr/signalr'
+import { mapState } from 'vuex';
 
 export default {
     async beforeMount() {
+        this.$store.commit('mainStore/initUserData');
+
         this.$router.beforeEach(
             (to, from, next) => {
-                if (!this.$store.getters.getUserName && to.name != 'Login') {
-                    console.log(to);
+                if (!this.$store.state.mainStore.userName && to.name != 'Login') {
                     next({ name: 'Login', query: { redirectUrl: to.path } });
                 } else {
                     next();
                 }
             });
 
-        let userId = this.$store.state.userId
-        if (!userId) {
-            this.$store.commit('setupUserId');
-        }
-
-        const encodedToken = btoa(encodeURIComponent(`${this.$store.state.userId}:${this.$store.getters.getUserName}`));
-
-        signalr.start(this.HUB_CONNECT_URL, encodedToken);
-    },
-
-    mounted() {
-
-    },
-
-    computed: {
-        userName() {
-            return this.$store.state.userName;
-        }
+        signalr.setUrl(this.HUB_CONNECT_URL);
+        signalr.onStart = () => this.$store.commit('mainStore/setHubConnectionState', true);
+        signalr.onStop = () => this.$store.commit('mainStore/setHubConnectionState', false);
     },
 
     methods: {
         logOut() {
-            this.$store.commit('clearUserName');
+            this.$store.commit('mainStore/clearUserName');
             this.redirectToLogin();
         },
 
         redirectToLogin() {
-            console.log(this.$route.fullPath);
             this.$router.go();
+        }
+    },
+
+    computed: {
+        userName() {
+            return this.$store.state.mainStore.userName;
+        }
+    },
+
+    watch: {
+        userName() {
+            signalr.generateAndSetToken(this.$store.state.mainStore.userId, this.$store.state.mainStore.userName);
         }
     }
 }
@@ -89,17 +89,12 @@ html {
     }
 }
 
-body {
-    margin-top: 40px;
-    margin-bottom: 200px;
-}
-
 header {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 40px;
+    height: 50px;
     padding: 5px 20px;
 }
 
@@ -113,16 +108,21 @@ header {
 
 .pp-body-wrapper {
     position: absolute;
-    top: 40px;
+    top: 50px;
     right: 0;
     left: 0;
     bottom: 0;
 }
 
 .pp-backgroud-cell {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: linear-gradient(#ccc, transparent 1px), linear-gradient(90deg, #ccc, transparent 1px);
     background-size: 15px 15px;
-    background-position: center center;
+    background-position: top center;
 }
 
 .pp-exit-button {
