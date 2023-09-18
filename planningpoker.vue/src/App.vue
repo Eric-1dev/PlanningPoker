@@ -14,11 +14,7 @@
                 } -->
                 <div v-if="userName">
                     <span>{{ userName }}</span>
-                    <pp-button
-                        class="pp-exit-button" 
-                        v-if="userName"
-                        @click="logOut"
-                     >
+                    <pp-button class="pp-exit-button" v-if="userName" @click="logOut">
                         Выход
                     </pp-button>
                 </div>
@@ -39,8 +35,21 @@ import signalr from '@/signalr/signalr'
 
 export default {
     async beforeMount() {
+        this.$router.beforeEach(
+            (to, from, next) => {
+                if (!this.$store.getters.getUserName && to.name != 'Login') {
+                    console.log(to);
+                    next({ name: 'Login', query: { redirectUrl: to.path } });
+                } else {
+                    next();
+                }
+            });
 
         //signalr.start(this.HUB_CONNECT_URL, token);
+    },
+
+    mounted() {
+
     },
 
     computed: {
@@ -52,14 +61,12 @@ export default {
     methods: {
         logOut() {
             this.$store.commit('clearUserName');
-        }
-    },
+            this.redirectToLogin();
+        },
 
-    watch: {
-        userName(newName) {
-            if (!newName) {
-                this.$router.push({name: 'Login'});
-            }
+        redirectToLogin() {
+            console.log(this.$route.fullPath);
+            this.$router.go();
         }
     }
 }
@@ -115,7 +122,7 @@ header {
 }
 
 .pp-backgroud-cell {
-    background: linear-gradient( #ccc, transparent 1px), linear-gradient( 90deg, #ccc, transparent 1px);
+    background: linear-gradient(#ccc, transparent 1px), linear-gradient(90deg, #ccc, transparent 1px);
     background-size: 15px 15px;
     background-position: center center;
 }

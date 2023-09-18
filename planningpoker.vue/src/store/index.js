@@ -10,12 +10,22 @@ export default createStore({
     },
 
     getters: {
-        getUserId: ({state, commit}) => {
+        getUserId(state, commit) {
             if (!state.userId) {
                 commit('setupUserId');
             }
 
             return state.userId;
+        },
+
+        getUserName(state) {
+            if (state.userName){
+                return state.userName;
+            }
+
+            state.userName = cookies.get('UserName');
+
+            return state.userName;
         }
     },
 

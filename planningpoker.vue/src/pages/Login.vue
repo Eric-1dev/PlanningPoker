@@ -22,7 +22,10 @@ export default {
     methods: {
         login() {
             this.$store.commit('setUserName', this.userName);
-            this.$router.push(this.$route.query.redirectUrl);
+
+            const redirectPath = this.$route.query.redirectUrl ?? '/';
+
+            this.$router.push(redirectPath);
         }
     }
 }

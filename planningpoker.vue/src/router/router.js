@@ -6,10 +6,12 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
     {
+        name: "CreateGame",
         path: "/",
         component: CreateGame
     },
     {
+        name: "Game",
         path: "/Game/:id",
         component: GameProcess
     },
@@ -24,18 +26,5 @@ const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes: routes
 });
-
-router.beforeEach(
-    (to, from, next) => {
-        if (to.name === 'Login') {
-            next({
-                query: {redirectUrl: from.path}
-            });
-            return;
-        }
-
-        next();
-    }
-);
 
 export default router;
