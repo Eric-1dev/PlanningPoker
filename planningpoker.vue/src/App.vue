@@ -25,7 +25,6 @@
 
 <script>
 import signalr from '@/signalr/signalr'
-import { mapState } from 'vuex';
 
 export default {
     async beforeMount() {
@@ -81,6 +80,7 @@ html {
     font-size: 14px;
     position: relative;
     min-height: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @media (min-width: 768px) {
@@ -107,6 +107,7 @@ header {
 }
 
 .pp-body-wrapper {
+    padding: 10px 20px;
     position: absolute;
     top: 50px;
     right: 0;
@@ -127,5 +128,13 @@ header {
 
 .pp-exit-button {
     margin-left: 10px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .4s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

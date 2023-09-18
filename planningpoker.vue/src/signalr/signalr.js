@@ -1,6 +1,13 @@
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
 const signalr = {
+    _config: {
+        url: null,
+        token: null
+    },
+
+    _connection: {},
+
     setUrl(url) {
         this._config.url = url;
     },
@@ -39,12 +46,15 @@ const signalr = {
 
         });
 
+        connection.on('ReceiveGameInfo', (gameInfo) => {
+            this.onReceiveGameInfo(gameInfo);
+        });
+
         await connection.start();
         await this.onStart();
     },
 
     async stop() {
-        debugger;
         await this._connection.stop();
         await this.onStop();
     },
@@ -52,12 +62,11 @@ const signalr = {
     onStart: async () => { },
     onStop: async () => { },
 
-    _config: {
-        url: null,
-        token: null
-    },
+    onReceiveGameInfo: () => { },
 
-    _connection: {}
+    invokeUserConnected(gameId, isPlayer) {
+        this._connection.invoke('UserConnected', gameId, isPlayer);
+    }
 
     // async _startConnection() {
     //     try {
