@@ -2,9 +2,9 @@
     <div class="pp-login-container">
         <div class="pp-login-form-wrapper">
             <form @submit.prevent="login">
-                <div>Представьтесь, пожалуйста</div>
+                <div class="pp-login-header">Представьтесь, пожалуйста</div>
                 <pp-input-text v-model="userName" placeholder="Имя пользователя" />
-                <pp-button type="submit">Войти</pp-button>
+                <pp-button color="blue" type="submit">Войти</pp-button>
             </form>
         </div>
     </div>
@@ -51,5 +51,11 @@ export default {
     border-color: lightgray;
     text-align: center;
     background-color: whitesmoke;
+}
+
+.pp-login-header {
+    margin: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
 }
 </style>

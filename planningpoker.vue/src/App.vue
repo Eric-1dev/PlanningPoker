@@ -3,15 +3,6 @@
 
         <header>
             <div class="pp-username-area">
-                <!-- @{
-                var userName = User.Identity.Name;
-
-                if (userName != null)
-                {
-                    <div>@userName</div>
-                    <a asp-action="Logout" asp-controller="Authorization" asp-route-redirectUrl="@HttpContextAccessor.HttpContext.Request.Path" id="planning-poker-logout-button" class="btn btn-sm btn-secondary shadow-none">Выход</a>
-                }
-                } -->
                 <div v-if="userName">
                     <span>{{ userName }}</span>
                     <pp-button class="pp-exit-button" v-if="userName" @click="logOut">
@@ -45,7 +36,14 @@ export default {
                 }
             });
 
-        //signalr.start(this.HUB_CONNECT_URL, token);
+        let userId = this.$store.state.userId
+        if (!userId) {
+            this.$store.commit('setupUserId');
+        }
+
+        const encodedToken = btoa(encodeURIComponent(`${this.$store.state.userId}:${this.$store.getters.getUserName}`));
+
+        signalr.start(this.HUB_CONNECT_URL, encodedToken);
     },
 
     mounted() {

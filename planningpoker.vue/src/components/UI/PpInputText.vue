@@ -20,6 +20,14 @@ export default {
 
 <style scoped>
 .text-input {
+    height: max-content;
     padding: 5px;
+    border-radius: 5px;
+    border: 1px solid gray;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: blue;
 }
 </style>

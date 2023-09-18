@@ -12,6 +12,7 @@ export default createStore({
     getters: {
         getUserId(state, commit) {
             if (!state.userId) {
+                console.log(commit)
                 commit('setupUserId');
             }
 
