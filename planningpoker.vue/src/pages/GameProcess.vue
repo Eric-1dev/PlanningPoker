@@ -3,6 +3,11 @@
         GameProcess Page, Id = {{ $route.params.id }}
     </div>
 
+    <div class="pp-gamer-card-zone">
+        <pp-card v-for="card in cards" :key="card.text" :text="card.text" :score="card.score" :color="card.color" @selectCard="selectCard"
+            :isSelectable="true"></pp-card>
+    </div>
+
     <transition name="fade">
         <div v-if="!isHubConnected" class="pp-locker" id="planning-poker-connection-lost-locker">
             <div class="pp-connection-lost-banner-wrapper">
@@ -16,6 +21,7 @@
 </template>
 
 <script>
+
 import signalr from '@/signalr/signalr';
 import { mapState } from 'vuex';
 
@@ -31,7 +37,8 @@ export default {
     computed: {
         ...mapState({
             isHubConnected: state => state.mainStore.isHubConnected,
-            isPlayer: state => state.gameStore.isPlayer
+            isPlayer: state => state.gameStore.isPlayer,
+            cards: state => state.gameStore.gameInfo.cards
         })
     },
 
@@ -63,6 +70,10 @@ export default {
                 console.log("SignalR Connection error. " + e);
                 setTimeout(async () => await this.reconnect(), 3000);
             }
+        },
+
+        selectCard(score) {
+            console.log(score);
         }
     }
 }
@@ -104,5 +115,16 @@ export default {
 
 .pp-connection-lost-banner-text {
     margin-bottom: 50px;
+}
+
+.pp-gamer-card-zone {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    display: flex;
+    gap: 20px;
+    padding: 10px;
 }
 </style>
