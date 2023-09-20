@@ -1,46 +1,55 @@
 <template>
-<div class="pp-buttons-zone-wrapper">
-    <div class="pp-buttons-zone">
-        <div class="planning-poker-button-group">
-            <pp-button v-if="this.isPlayer">Стать набдюдателем</pp-button>
-            <pp-button v-else>Вступить в игру</pp-button>
-        </div>
-        <!-- <div class="planning-poker-button-group">
-            <vue-user-list :user-list="this.users"></vue-user-list>
-        </div> -->
-        <div class="pp-button-group pp-justify-content-end">
-            <h5 v-if="!hasPlayers"><span class="pp-badge-warning">Ожидание других игроков...</span></h5>
-            <div class="pp-admin-buttons-group">
-                <pp-button v-if="needShowFinishButton">Завершить оценку</pp-button>
-                <pp-button v-if="needShowStartButton">Начать оценку</pp-button>
-                <pp-button v-if="needShowShowCardsButton" :disabled="!canShowCards">Показать карты</pp-button>
-                <pp-button v-if="needShowNextSubtaskButton">Перейти к следующей</pp-button>
-                <pp-button v-if="needShowRescoreButton">Оценить заново</pp-button>
+    <div class="pp-buttons-zone-wrapper">
+        <div class="pp-buttons-zone">
+            <div class="pp-button-group">
+                <pp-button v-if="isPlayer">Стать набдюдателем</pp-button>
+                <pp-button v-else>Вступить в игру</pp-button>
+            </div>
+            <div class="pp-button-group">
+                <user-list></user-list>
+            </div>
+            <div class="pp-button-group pp-justify-content-end">
+                <h5 v-if="!hasPlayers"><span class="pp-badge-warning">Ожидание других игроков...</span></h5>
+                <div class="pp-admin-buttons-group" v-if="isAdmin">
+                    <pp-button v-if="needShowFinishButton">Завершить оценку</pp-button>
+                    <pp-button v-if="needShowStartButton">Начать оценку</pp-button>
+                    <pp-button v-if="needShowShowCardsButton" :disabled="!canShowCards">Показать карты</pp-button>
+                    <pp-button v-if="needShowNextSubtaskButton">Перейти к следующей</pp-button>
+                    <pp-button v-if="needShowRescoreButton">Оценить заново</pp-button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <div class="pp-gamers-zone-wrapper">
         <div class="pp-gamers-zone">
 
             <!-- Карта текущего игрока -->
-            <div class="pp-gamer-score">
-                <pp-card v-if="this.isPlayer" state="openned"></pp-card>
-                <div class="pp-gamer-name">{{ this.gameInfo.myInfo?.name }}</div>
+            <div class="pp-gamer-score" v-if="isPlayer">
+                <pp-card v-if="isPlayer" state="openned"></pp-card>
+                <div class="pp-gamer-name">{{ gameInfo.myInfo?.name }}</div>
             </div>
 
             <!-- Карты других игроков -->
-            <div v-for="otherUser in this.otherPlayers" class="pp-gamer-score">
+            <div v-for="otherUser in otherPlayers" class="pp-gamer-score">
                 <pp-card state="openned"></pp-card>
                 <div class="pp-gamer-name">{{ otherUser.name }}</div>
             </div>
         </div>
     </div>
 
-    <div class="pp-gamer-card-zone">
+    <div class="pp-tasks-zone-wrapper">
+        <div class="pp-tasks-zone-task-header">
+            <span>{{ gameInfo.taskName }}</span>
+        </div>
+
+        <sub-task-list></sub-task-list>
+    </div>
+
+    <div class="pp-gamer-card-zone" :active="isPlayer">
         <pp-card v-for="card in gameInfo.cards" :key="card.text" :text="card.text" :score="card.score" :color="card.color"
-            state="default" :isSelected="this.gameInfo.myInfo.score === card.score" :isSelectable="this.gameInfo.gameState === 'Scoring'" @selectCard="selectCard">
+            state="default" :isSelected="gameInfo.myInfo.score === card.score && isPlayer"
+            :isSelectable="gameInfo.gameState === 'Scoring'" @selectCard="selectCard">
         </pp-card>
     </div>
 
@@ -60,11 +69,16 @@
 
 import signalr from '@/signalr/signalr';
 import { mapState } from 'vuex';
-import TaskEditor from '@/components/TaskEditor.vue';
+import SubTaskList from '@/components/SubTaskList.vue';
+import UserList from '@/components/UserList.vue';
 
 export default {
     async beforeMount() {
         this.$store.commit('gameStore/setIsPlayer');
+
+        signalr.setUrl(this.HUB_CONNECT_URL);
+        signalr.onStart = () => this.$store.commit('mainStore/setHubConnectionState', true);
+        signalr.onStop = () => this.$store.commit('mainStore/setHubConnectionState', false);
 
         signalr.onReceiveGameInfo = (gameInfo) => this.$store.commit('gameStore/setGameInfo', gameInfo);
 
@@ -79,20 +93,28 @@ export default {
         ...mapState({
             isHubConnected: state => state.mainStore.isHubConnected,
             isPlayer: state => state.gameStore.isPlayer,
+            isAdmin: state => state.gameStore.gameInfo.myInfo?.userId === state.gameStore.gameInfo.adminId,
             gameInfo: state => state.gameStore.gameInfo
         }),
 
         otherPlayers() {
-            return this.gameInfo.otherUsers?.filter(user => user.isActive && user.isPlayer);
+            if (!this.gameInfo.otherUsers) {
+                return false;
+            }
+
+            return this.gameInfo.otherUsers.filter(user => user.isActive && user.isPlayer);
         },
 
         canShowCards() {
-            console.log(this.gameInfo.otherUsers.filter(user => !user.HasVoted))
-            return this.gameInfo.otherUsers.filter(user => !user.HasVoted).length === 0;
+            if (!this.gameInfo.otherUsers) {
+                return false;
+            }
+
+            return this.gameInfo.otherUsers.filter(user => !user.HasVoted)?.length === 0;
         },
 
         hasPlayers() {
-            return this.otherPlayers.length === 0 || this.isPlayer;
+            return this.otherPlayers?.length !== 0 || this.isPlayer;
         },
 
         needShowStartButton() {
@@ -104,7 +126,14 @@ export default {
         },
 
         needShowNextSubtaskButton() {
-            return this.hasPlayers && this.gameInfo.gameState === 'CardsOpenned';
+            if (!this.gameInfo.subTasks) {
+                return false;
+            }
+
+            const orders = this.gameInfo.subTasks.map(task => task.order);
+            const maxOrder = Math.max(...orders);
+
+            return this.hasPlayers && this.gameInfo.gameState === 'CardsOpenned' && this.gameInfo.subTasks.find(task => task.isSelected).order !== maxOrder;
         },
 
         needShowRescoreButton() {
@@ -152,7 +181,8 @@ export default {
     },
 
     components: {
-        TaskEditor
+        SubTaskList,
+        UserList
     }
 }
 </script>
@@ -195,6 +225,16 @@ export default {
     margin-bottom: 50px;
 }
 
+.pp-gamers-zone-wrapper {
+    position: absolute;
+    top: 40px;
+    left: 0px;
+    right: 570px;
+    bottom: 210px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
 .pp-gamer-card-zone {
     position: fixed;
     bottom: 0;
@@ -206,14 +246,15 @@ export default {
     padding: 10px;
 }
 
-.pp-gamers-zone-wrapper {
-    position: absolute;
-    top: 40px;
-    left: 0px;
-    right: 570px;
-    bottom: 210px;
-    overflow-y: auto;
-    padding: 10px;
+.pp-gamer-card-zone[active="true"] {
+    animation-duration: 0.5s;
+    animation-name: slidein;
+}
+
+.pp-gamer-card-zone[active="false"] {
+    padding-top: 200px;
+    animation-duration: 0.5s;
+    animation-name: slideout;
 }
 
 .pp-gamers-zone {
@@ -262,6 +303,7 @@ export default {
     display: flex;
     flex-direction: row;
     width: 30%;
+    align-items: baseline;
 }
 
 .pp-justify-content-end {
@@ -279,5 +321,40 @@ export default {
     color: white;
     border: 1px solid rgb(255, 165, 47);
     border-radius: 10px;
+}
+
+.pp-tasks-zone-wrapper {
+    position: absolute;
+    width: 550px;
+    top: 40px;
+    right: 0;
+    bottom: 200px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.pp-tasks-zone-task-header {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+@keyframes slidein {
+    from {
+        padding-top: 200px;
+    }
+
+    to {
+        padding-top: 10px;
+    }
+}
+
+@keyframes slideout {
+    from {
+        padding-top: 10px;
+    }
+
+    to {
+        padding-top: 200px;
+    }
 }
 </style>

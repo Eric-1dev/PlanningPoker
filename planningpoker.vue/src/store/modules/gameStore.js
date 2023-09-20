@@ -7,7 +7,8 @@ const gameStore = {
 
     state: {
         isPlayer: false,
-        gameInfo: {}
+        gameInfo: {},
+        availableScores: []
     },
 
     mutations: {
@@ -22,6 +23,8 @@ const gameStore = {
 
         setGameInfo(state, gameInfo) {
             state.gameInfo = gameInfo;
+            state.gameInfo.subTasks.sort((a, b) => a.order - b.order);
+            state.availableScores = gameInfo.cards.map(card => card.score).filter(score => score >= 0);
         },
 
         addUser(state, user) {

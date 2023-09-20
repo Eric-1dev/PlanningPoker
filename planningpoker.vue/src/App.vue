@@ -38,10 +38,6 @@ export default {
                     next();
                 }
             });
-
-        signalr.setUrl(this.HUB_CONNECT_URL);
-        signalr.onStart = () => this.$store.commit('mainStore/setHubConnectionState', true);
-        signalr.onStop = () => this.$store.commit('mainStore/setHubConnectionState', false);
     },
 
     methods: {
@@ -121,7 +117,7 @@ header {
     right: 0;
     bottom: 0;
     left: 0;
-    background: linear-gradient(#ccc, transparent 1px), linear-gradient(90deg, #ccc, transparent 1px);
+    background: linear-gradient(#eee, transparent 1px), linear-gradient(90deg, #eee, transparent 1px);
     background-size: 15px 15px;
     background-position: top center;
 }
