@@ -1,6 +1,6 @@
 <template>
     <div class="pp-card" :class="this.classes" @click="this.cardClick">
-        {{ this.text }}
+        {{ this.cardText }}
     </div>
 </template>
 
@@ -14,14 +14,19 @@ export default {
         score: Number,
         color: String,
         isSelectable: Boolean,
-        isSelected: Boolean
+        isSelected: Boolean,
+        state: String
     },
 
     computed: {
         classes() {
             let classes = [];
 
-            classes.push(this.mapColorToClass(this.color));
+            if (this.state === 'openned') {
+                classes.push(this.mapColorToClass('Blue'))
+            } else {
+                classes.push(this.mapColorToClass(this.color));
+            }
 
             if (this.isSelectable) {
                 classes.push('pp-card-clickable');
@@ -32,12 +37,20 @@ export default {
             }
 
             return classes.join(' ');
+        },
+
+        cardText() {
+            if (this.state === 'default' || this.state === 'openned') {
+                return this.text;
+            }
+
+            return '';
         }
     },
 
     methods: {
-        mapColorToClass() {
-            switch (this.color) {
+        mapColorToClass(color) {
+            switch (color) {
                 case 'Green':
                     return 'pp-card-color-green';
                 case 'Yellow':
@@ -48,13 +61,17 @@ export default {
                     return 'pp-card-color-gray';
                 case 'Blue':
                     return 'pp-card-color-blue';
+                case 'White':
+                    return 'pp-card-color-white';
                 default:
                     return '';
             }
         },
 
         cardClick() {
-            this.$emit('selectCard', this.score);
+            if (this.isSelectable) {
+                this.$emit('selectCard', this.score);
+            }
         }
     }
 }
@@ -91,6 +108,16 @@ export default {
 .pp-card-color-gray {
     background-color: gray;
     color: white;
+}
+
+.pp-card-color-blue {
+    background-color: cadetblue;
+    color: white;
+}
+
+.pp-card-color-white {
+    background-color: white;
+    color: black;
 }
 
 .pp-gamer-card-zone {

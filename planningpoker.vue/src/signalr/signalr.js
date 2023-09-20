@@ -50,6 +50,14 @@ const signalr = {
             this.onReceiveGameInfo(gameInfo);
         });
 
+        connection.on('UserJoin', (user) => {
+            this.onUserJoin(user);
+        });
+        
+        connection.on('UserQuit', (userId) => {
+            this.onUserQuit(userId);
+        });
+
         await connection.start();
         await this.onStart();
     },
@@ -63,6 +71,8 @@ const signalr = {
     onStop: async () => { },
 
     onReceiveGameInfo: () => { },
+    onUserJoin: () => { },
+    onUserQuit: () => { },
 
     invokeUserConnected(gameId, isPlayer) {
         this._connection.invoke('UserConnected', gameId, isPlayer);
