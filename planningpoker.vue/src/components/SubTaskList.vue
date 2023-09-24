@@ -22,7 +22,7 @@
         <div v-else v-for="subTask in subTasks">
             <div class="pp-task">
                 <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask)">{{ subTask.text }}</span>
-                <div>
+                <div class="pp-task-score-select-container">
                     <v-select
                         v-if="isAdmin"
                         @update:modelValue="scoreChanged($event, subTask.id)"
@@ -105,6 +105,8 @@ export default {
 
         saveSubTasks() {
             const subTasks = this.subTasksToEdit.filter(task => task.text);
+
+            subTasks.forEach(task => task.text = task.text.trim());
 
             for (let i = 0; i < subTasks.length; i++) {
                 subTasks[i].order = i;
@@ -202,5 +204,9 @@ export default {
 
 .pp-subtask-controlls span {
     cursor: pointer;
+}
+
+.pp-task-score-select-container {
+    min-width: fit-content;
 }
 </style>
