@@ -150,6 +150,10 @@ const signalr = {
 
     invokeScoreSubTaskById(subTaskId) {
         this._connection.invoke('ScoreSubTaskById', subTaskId);
+    },
+
+    invokeUpdateSubTasks(subTasks) {
+        this._connection.invoke('UpdateSubTasks', subTasks);
     }
 }
 

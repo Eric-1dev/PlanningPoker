@@ -44,7 +44,7 @@
             <span>{{ gameInfo.taskName }}</span>
         </div>
 
-        <sub-task-list @scoreChanged="updateSubTaskScore" @scoreSubTaskById="scoreSubTaskById"></sub-task-list>
+        <sub-task-list @scoreChanged="updateSubTaskScore" @scoreSubTaskById="scoreSubTaskById" @updateSubTasks="updateSubTasks"></sub-task-list>
     </div>
 
     <div class="pp-gamer-card-zone" :active="isPlayer && gameInfo.gameState === 'Scoring'">
@@ -54,7 +54,7 @@
         </pp-card>
     </div>
 
-    <transition name="fade">
+    <transition name="fade-transition">
         <div v-if="!isHubConnected" class="pp-locker" id="planning-poker-connection-lost-locker">
             <div class="pp-connection-lost-banner-wrapper">
                 <div class="pp-connection-lost-banner">
@@ -254,6 +254,10 @@ export default {
 
         scoreSubTaskById(subTaskId) {
             signalr.invokeScoreSubTaskById(subTaskId);
+        },
+
+        updateSubTasks(subTasks) {
+            signalr.invokeUpdateSubTasks(subTasks);
         }
     },
 

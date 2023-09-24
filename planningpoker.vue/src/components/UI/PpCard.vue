@@ -96,10 +96,11 @@ export default {
     height: 150px;
     border: 1px solid lightgray;
     border-radius: 7px;
-    font-size: 50px;
+    font-size: 60px;
     align-items: center;
     justify-content: center;
     user-select: none;
+    line-height: 90px;
 }
 
 .pp-card-color-green {
