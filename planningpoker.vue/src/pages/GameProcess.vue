@@ -120,7 +120,7 @@ export default {
 
         canShowCards() {
             const otherPlayerVoted = this.gameInfo.otherUsers
-                ? this.gameInfo.otherUsers.filter(user => !user.hasVoted)?.length === 0
+                ? this.gameInfo.otherUsers.filter(user => user.isPlayer && !user.hasVoted)?.length === 0
                 : true;
 
             const currentPlayerIsVoted = this.isPlayer
