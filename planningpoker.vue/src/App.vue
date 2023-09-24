@@ -5,9 +5,9 @@
                 <div class="pp-username-area">
                     <div v-if="userName">
                         <span>{{ userName }}</span>
-                        <pp-button class="pp-exit-button" @click="logOut">
+                        <v-btn color="grey" class="pp-exit-button" @click="logOut" size="small">
                             Выход
-                        </pp-button>
+                        </v-btn>
                     </div>
 
                     <div v-else>
@@ -132,5 +132,10 @@ header {
 
 .fade-enter, .fade-leave-to {
   opacity: 0;
+}
+
+@font-face {
+    font-family: "bootstrap-icons";
+    src: local("bootstrap-icons"), url("./fonts/bootstrap-icons.woff2") format("woff2"), url("./fonts/bootstrap-icons.woff") format("woff");
 }
 </style>

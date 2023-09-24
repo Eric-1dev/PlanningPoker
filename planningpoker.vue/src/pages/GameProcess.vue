@@ -1,21 +1,21 @@
 <template>
-    <div class="pp-buttons-zone-wrapper">
-        <div class="pp-buttons-zone">
-            <div class="pp-button-group">
-                <pp-button v-if="isPlayer" @click="spectate">Стать набдюдателем</pp-button>
-                <pp-button v-else @click="joinGame">Вступить в игру</pp-button>
+    <div class="v-btns-zone-wrapper">
+        <div class="v-btns-zone">
+            <div class="v-btn-group">
+                <v-btn v-if="isPlayer" @click="spectate" color="primary" size="small">Стать набдюдателем</v-btn>
+                <v-btn v-else @click="joinGame" color="primary" size="small">Вступить в игру</v-btn>
             </div>
-            <div class="pp-button-group">
+            <div class="v-btn-group">
                 <user-list></user-list>
             </div>
-            <div class="pp-button-group pp-justify-content-end">
+            <div class="v-btn-group pp-justify-content-end">
                 <h5 v-if="!hasPlayers"><span class="pp-badge-warning">Ожидание других игроков...</span></h5>
                 <div class="pp-admin-buttons-group" v-if="isAdmin">
-                    <pp-button v-if="needShowFinishButton" @click="finishGame">Завершить оценку</pp-button>
-                    <pp-button v-if="needShowStartButton" @click="startGame">Начать оценку</pp-button>
-                    <pp-button v-if="needShowShowCardsButton" @click="tryOpenCards" :disabled="!canShowCards">Показать карты</pp-button>
-                    <pp-button v-if="needShowNextSubtaskButton" @click="scoreNextSubTask">Перейти к следующей</pp-button>
-                    <pp-button v-if="needShowRescoreButton" @click="rescoreSubTask">Оценить заново</pp-button>
+                    <v-btn v-if="needShowFinishButton" @click="finishGame" size="small">Завершить оценку</v-btn>
+                    <v-btn v-if="needShowStartButton" @click="startGame" size="small">Начать оценку</v-btn>
+                    <v-btn v-if="needShowShowCardsButton" @click="tryOpenCards" :disabled="!canShowCards" size="small">Показать карты</v-btn>
+                    <v-btn v-if="needShowNextSubtaskButton" @click="scoreNextSubTask" :disabled="!canGoNextTask" color="warning" size="small">Перейти к следующей</v-btn>
+                    <v-btn v-if="needShowRescoreButton" @click="rescoreSubTask" color="warning" size="small">Оценить заново</v-btn>
                 </div>
             </div>
         </div>
@@ -35,6 +35,7 @@
                 <pp-card :text="String(otherUser.score)" :state="cardState(otherUser)"></pp-card>
                 <div class="pp-gamer-name">{{ otherUser.name }}</div>
             </div>
+            
         </div>
     </div>
 
@@ -129,6 +130,12 @@ export default {
             return otherPlayerVoted && currentPlayerIsVoted;
         },
 
+        canGoNextTask() {
+            const selectedSubTask = this.gameInfo.subTasks.find(task => task.isSelected === true);
+
+            return selectedSubTask.score;
+        },
+
         hasPlayers() {
             return this.otherPlayers?.length !== 0 || this.isPlayer;
         },
@@ -157,7 +164,15 @@ export default {
         },
 
         needShowFinishButton() {
-            return this.gameInfo.gameState === 'CardsOpenned';
+            if (this.gameInfo.gameState !== 'CardsOpenned') {
+                return false;
+            }
+
+            const unvotedTask = this.gameInfo.subTasks.find(subTask => subTask.score === null);
+
+            console.log(unvotedTask)
+
+            return !unvotedTask;
         }
     },
 
@@ -228,9 +243,7 @@ export default {
         },
 
         tryOpenCards() {
-            if (this.canShowCards) {
-                signalr.invokeTryOpenCards();
-            }
+            signalr.invokeTryOpenCards();
         },
 
         scoreNextSubTask() {
@@ -343,7 +356,7 @@ export default {
     text-align: center;
 }
 
-.pp-buttons-zone-wrapper {
+.v-btns-zone-wrapper {
     position: absolute;
     top: 3px;
     left: 0;
@@ -352,7 +365,7 @@ export default {
     padding: 2px 10px;
 }
 
-.pp-buttons-zone {
+.v-btns-zone {
     display: flex;
     flex-direction: row;
     gap: 30px;
@@ -361,7 +374,7 @@ export default {
     justify-content: space-between
 }
 
-.pp-button-group {
+.v-btn-group {
     display: flex;
     flex-direction: row;
     width: 30%;

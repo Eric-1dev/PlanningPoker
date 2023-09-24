@@ -2,14 +2,20 @@
     <div class="pp-tasks-zone">
         <div v-for="subTask in subTasks">
             <div v-if="editMode">
-                <pp-input-text :value="subTask.text"></pp-input-text>
+                <v-text-field :value="subTask.text" :rules="[required]"></v-text-field>
             </div>
             <div v-else class="pp-task">
                 <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask.id)">{{ subTask.text }}</span>
-                <select v-if="isAdmin" @change="scoreChanged($event, subTask.id)" class="pp-tasks-zone-task-score" :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'">
-                    <option value="">-</option>
-                    <option v-for="item in availableScores" :value="item" :selected="subTask.score === item">{{ item }}</option>
-                </select>
+                <v-select
+                    v-if="isAdmin"
+                    @change="scoreChanged($event, subTask.id)"
+                    class="pp-tasks-zone-task-score"
+                    :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
+                    :items="availableScores"
+                    clearable
+                    density="compact"
+                    variant="outlined"
+                ></v-select>
                 <span v-else>{{ subTask.score ?? '-' }}</span>
             </div>
         </div>
@@ -73,8 +79,7 @@ export default {
 }
 
 .pp-tasks-zone-task-score {
-    width: auto;
-    padding: 0.375rem 0.5rem 0.375rem 0.5rem;
+    width: 3em;
 }
 
 .pp-tasks-zone {

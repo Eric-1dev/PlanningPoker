@@ -3,6 +3,7 @@ import App from '@/App'
 import router from '@/router/router';
 import store from '@/store';
 import components from '@/components/UI';
+import vuetify from '@/vuetify';
 
 const app = createApp(App);
 
@@ -18,5 +19,6 @@ components.forEach(component => {
 
 app.use(router)
 app.use(store)
+app.use(vuetify)
 
 app.mount('#app')

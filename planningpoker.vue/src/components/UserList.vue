@@ -1,6 +1,6 @@
 <template>
     <div>
-        <pp-button v-on:click="this.showList = !this.showList">Список пользователей</pp-button>
+        <v-btn v-on:click="this.showList = !this.showList" color="success" size="small">Список пользователей</v-btn>
         <div class="user-list_wrapper" v-if="this.showList">
             <div class="pp-d-table">
                 <div class="pp-d-table-row" v-for="user in sortedUserList">

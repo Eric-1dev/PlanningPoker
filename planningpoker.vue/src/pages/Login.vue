@@ -1,11 +1,11 @@
 <template>
     <div class="pp-login-container">
         <div class="pp-login-form-wrapper">
-            <form @submit.prevent="login">
+            <v-form @submit.prevent="login">
                 <div class="pp-login-header">Представьтесь, пожалуйста</div>
-                <pp-input-text v-model="userName" placeholder="Имя пользователя" />
-                <pp-button color="green" type="submit">Войти</pp-button>
-            </form>
+                <v-text-field v-model="userName" :rules="[required]" clearable placeholder="Имя пользователя" />
+                <v-btn color="success" size="small" type="submit">Войти</v-btn>
+            </v-form>
         </div>
     </div>
 </template>

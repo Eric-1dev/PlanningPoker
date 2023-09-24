@@ -22,10 +22,14 @@ export default {
         classes() {
             let classes = [];
 
-            if (this.state === 'openned' || this.state === 'voted') {
+            if (this.state === 'openned') {
                 classes.push(this.mapColorToClass('Blue'))
+            } else if (this.state === 'voted') {
+                classes.push(this.mapColorToClass('Blue'))
+                classes.push('pp-card-voted');
             } else if (this.state === 'unvoted') {
                 classes.push(this.mapColorToClass('White'))
+                classes.push('pp-card-unvoted');
             } else{
                 classes.push(this.mapColorToClass(this.color));
             }
@@ -126,6 +130,17 @@ export default {
 .pp-card-color-white {
     background-color: white;
     color: black;
+}
+
+.pp-card-voted::after {
+    font-family: "bootstrap-icons";
+    content: "\f26e";
+}
+
+.pp-card-unvoted::after {
+    content: "\f293";
+    font-family: "bootstrap-icons";
+    color: gray;
 }
 
 .pp-gamer-card-zone {
