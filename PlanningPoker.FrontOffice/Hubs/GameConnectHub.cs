@@ -53,7 +53,8 @@ public class GameConnectHub : Hub
 
         await Clients.Caller.SendAsync("ReceiveGameInfo", gameInfo);
 
-        UserInfoModel.ClearScore(myUserInfoModel);
+        if (game.GameState != Entities.Enums.GameStateEnum.CardsOpenned)
+            UserInfoModel.ClearScore(myUserInfoModel);
 
         if (otherUsers.Length > 0)
         {
@@ -94,9 +95,11 @@ public class GameConnectHub : Hub
 
         var user = GameGroupCacheService.ChangeUserVote(Context.ConnectionId, score);
 
+        await Clients.Caller.SendAsync("UserVoted", user);
+
         UserInfoModel.ClearScore(user);
 
-        await Clients.Group(GroupName).SendAsync("UserVoted", user);
+        await Clients.OthersInGroup(GroupName).SendAsync("UserVoted", user);
     }
 
     public async Task SendChangeSubTaskScore(Guid subTaskId, double? score)
@@ -145,26 +148,22 @@ public class GameConnectHub : Hub
 
     public async Task RescoreSubTask()
     {
-        var subTask = GameControlService.RescoreCurrentSubTask(GameId, CurrentUserId);
+        var game = GameControlService.RescoreCurrentSubTask(GameId, CurrentUserId);
 
         var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
 
-        var subTaskModel = new SubTaskModel(subTask);
-
-        var model = new ScoreNextSubTaskModel(playerScores, subTaskModel);
+        var model = new GameStateChangedModel(game, playerScores);
 
         await Clients.Group(GroupName).SendAsync("ReceiveScoreNextSubTask", model);
     }
 
     public async Task ScoreNextSubTask()
     {
-        var subTask = GameControlService.ScoreNextSubTask(GameId, CurrentUserId);
-
-        var subTaskModel = new SubTaskModel(subTask);
+        var game = GameControlService.ScoreNextSubTask(GameId, CurrentUserId);
 
         var playerScores = GameGroupCacheService.FlushPlayerScores(GameId);
 
-        var model = new ScoreNextSubTaskModel(playerScores, subTaskModel);
+        var model = new GameStateChangedModel(game, playerScores);
 
         await Clients.Group(GroupName).SendAsync("ReceiveScoreNextSubTask", model);
     }
@@ -206,9 +205,11 @@ public class GameConnectHub : Hub
 
         var myInfo = GameGroupCacheService.GetMyInfo(GameId, Context.ConnectionId);
 
+        await Clients.Caller.SendAsync("ChangeUserInfo", myInfo);
+
         UserInfoModel.ClearScore(myInfo);
 
-        await Clients.Group(GroupName).SendAsync("ChangeUserInfo", myInfo);
+        await Clients.OthersInGroup(GroupName).SendAsync("ChangeUserInfo", myInfo);
     }
 
     private static string GetGroupName(Guid groupId) => groupId.ToString();

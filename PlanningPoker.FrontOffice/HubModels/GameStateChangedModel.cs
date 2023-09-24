@@ -1,21 +1,14 @@
 using PlanningPoker.DataModel;
-using PlanningPoker.Entities.Enums;
 using PlanningPoker.Services.Models;
 
 namespace PlanningPoker.FrontOffice.HubModels;
 
-public class GameStateChangedModel
+public class GameStateChangedModel : ShowPlayerScoresModel
 {
-    public GameStateEnum GameState { get; set; }
-
     public SubTaskModel[] SubTasks { get; set; }
 
-    public UserScoreModel[] PlayerScores { get; set; }
-
-    public GameStateChangedModel(Game game, UserScoreModel[] playerScores)
+    public GameStateChangedModel(Game game, UserScoreModel[] playerScores) : base(playerScores, game.GameState)
     {
-        GameState = game.GameState;
         SubTasks = game.SubTasks.Select(x => new SubTaskModel(x)).ToArray();
-        PlayerScores = playerScores;
     }
 }

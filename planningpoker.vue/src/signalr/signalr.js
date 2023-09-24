@@ -58,6 +58,34 @@ const signalr = {
             this.onUserQuit(userId);
         });
 
+        connection.on("UserVoted", (user) => {
+            this.onUpdateUser(user);
+        });
+
+        connection.on("ReceiveChangeSubTaskScore", (subTask) => {
+            this.onReceiveChangeSubTaskScore(subTask);
+        });
+
+        connection.on("ChangeUserInfo", (user) => {
+            this.onUpdateUser(user);
+        });
+
+        connection.on("GameStateChanged", (model) => {
+            this.onGameStateChanged(model);
+        });
+
+        connection.on("ShowPlayerScores", (model) => {
+            this.onShowPlayerScores(model);
+        });
+
+        connection.on("ReceiveScoreNextSubTask", (model) => {
+            this.onReceiveScoreNextSubTask(model);
+        });
+
+        connection.on("SubTasksUpdated", (subTasks) => {
+            this.onSubTasksUpdated(subTasks);
+        });
+
         await connection.start();
         await this.onStart();
     },
@@ -73,25 +101,56 @@ const signalr = {
     onReceiveGameInfo: () => { },
     onUserJoin: () => { },
     onUserQuit: () => { },
+    onUpdateUser: () => { },
+    onReceiveChangeSubTaskScore: () => { },
+    onGameStateChanged: () => { },
+    onShowPlayerScores: () => { },
+    onReceiveScoreNextSubTask: () => { },
+    onSubTasksUpdated: () => { },
 
     invokeUserConnected(gameId, isPlayer) {
         this._connection.invoke('UserConnected', gameId, isPlayer);
+    },
+
+    invokeTryChangeVote(score) {
+        this._connection.invoke('TryChangeVote', score);
+    },
+
+    invokeChangeSubTaskScore(subTaskId, score) {
+        this._connection.invoke('SendChangeSubTaskScore', subTaskId, score);
+    },
+
+    invokeSpectate() {
+        this._connection.invoke('MakeMeSpectator');
+    },
+
+    invokeJoinGame() {
+        this._connection.invoke('MakeMePlayer');
+    },
+
+    invokeStartGame() {
+        this._connection.invoke('StartGame');
+    },
+
+    invokeFinishGame() {
+        this._connection.invoke('FinishGame');
+    },
+
+    invokeRescoreSubTask() {
+        this._connection.invoke('RescoreSubTask');
+    },
+
+    invokeTryOpenCards() {
+        this._connection.invoke('TryOpenCards');
+    },
+
+    invokeScoreNextSubTask() {
+        this._connection.invoke('ScoreNextSubTask');
+    },
+
+    invokeScoreSubTaskById(subTaskId) {
+        this._connection.invoke('ScoreSubTaskById', subTaskId);
     }
-
-    // async _startConnection() {
-    //     try {
-    //         await this.connection.start()
-    //             .then(() => {
-    //                 this.isConnected = true;
-
-    //                 this.connection.invoke('UserConnected', gameProcessHelper.gameId, gameProcessHelper.isPlayerCookieValue);
-    //             });
-    //         console.log("SignalR Connected.");
-    //     } catch (e) {
-    //         console.log("SignalR Connection error. " + e);
-    //         setTimeout(async () => await this._startConnection(), 3000);
-    //     }
-    // }
 }
 
 export default signalr;

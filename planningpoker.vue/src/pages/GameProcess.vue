@@ -2,8 +2,8 @@
     <div class="pp-buttons-zone-wrapper">
         <div class="pp-buttons-zone">
             <div class="pp-button-group">
-                <pp-button v-if="isPlayer">Стать набдюдателем</pp-button>
-                <pp-button v-else>Вступить в игру</pp-button>
+                <pp-button v-if="isPlayer" @click="spectate">Стать набдюдателем</pp-button>
+                <pp-button v-else @click="joinGame">Вступить в игру</pp-button>
             </div>
             <div class="pp-button-group">
                 <user-list></user-list>
@@ -11,11 +11,11 @@
             <div class="pp-button-group pp-justify-content-end">
                 <h5 v-if="!hasPlayers"><span class="pp-badge-warning">Ожидание других игроков...</span></h5>
                 <div class="pp-admin-buttons-group" v-if="isAdmin">
-                    <pp-button v-if="needShowFinishButton">Завершить оценку</pp-button>
-                    <pp-button v-if="needShowStartButton">Начать оценку</pp-button>
-                    <pp-button v-if="needShowShowCardsButton" :disabled="!canShowCards">Показать карты</pp-button>
-                    <pp-button v-if="needShowNextSubtaskButton">Перейти к следующей</pp-button>
-                    <pp-button v-if="needShowRescoreButton">Оценить заново</pp-button>
+                    <pp-button v-if="needShowFinishButton" @click="finishGame">Завершить оценку</pp-button>
+                    <pp-button v-if="needShowStartButton" @click="startGame">Начать оценку</pp-button>
+                    <pp-button v-if="needShowShowCardsButton" @click="tryOpenCards" :disabled="!canShowCards">Показать карты</pp-button>
+                    <pp-button v-if="needShowNextSubtaskButton" @click="scoreNextSubTask">Перейти к следующей</pp-button>
+                    <pp-button v-if="needShowRescoreButton" @click="rescoreSubTask">Оценить заново</pp-button>
                 </div>
             </div>
         </div>
@@ -26,13 +26,13 @@
 
             <!-- Карта текущего игрока -->
             <div class="pp-gamer-score" v-if="isPlayer">
-                <pp-card v-if="isPlayer" state="openned"></pp-card>
+                <pp-card v-if="isPlayer" :text="String(gameInfo.myInfo?.score)" :state="cardState(gameInfo.myInfo)"></pp-card>
                 <div class="pp-gamer-name">{{ gameInfo.myInfo?.name }}</div>
             </div>
 
             <!-- Карты других игроков -->
             <div v-for="otherUser in otherPlayers" class="pp-gamer-score">
-                <pp-card state="openned"></pp-card>
+                <pp-card :text="String(otherUser.score)" :state="cardState(otherUser)"></pp-card>
                 <div class="pp-gamer-name">{{ otherUser.name }}</div>
             </div>
         </div>
@@ -43,10 +43,10 @@
             <span>{{ gameInfo.taskName }}</span>
         </div>
 
-        <sub-task-list></sub-task-list>
+        <sub-task-list @scoreChanged="updateSubTaskScore" @scoreSubTaskById="scoreSubTaskById"></sub-task-list>
     </div>
 
-    <div class="pp-gamer-card-zone" :active="isPlayer">
+    <div class="pp-gamer-card-zone" :active="isPlayer && gameInfo.gameState === 'Scoring'">
         <pp-card v-for="card in gameInfo.cards" :key="card.text" :text="card.text" :score="card.score" :color="card.color"
             state="default" :isSelected="gameInfo.myInfo.score === card.score && isPlayer"
             :isSelectable="gameInfo.gameState === 'Scoring'" @selectCard="selectCard">
@@ -86,6 +86,18 @@ export default {
 
         signalr.onUserQuit = (userId) => this.$store.commit('gameStore/removeUser', userId);
 
+        signalr.onUpdateUser = (user) => this.$store.commit('gameStore/updateUser', user);
+
+        signalr.onReceiveChangeSubTaskScore = (subTask) => this.$store.commit('gameStore/updateSubTask', subTask);
+
+        signalr.onGameStateChanged = (model) => this.$store.commit('gameStore/updateGameState', model);
+
+        signalr.onShowPlayerScores = (model) => this.$store.commit('gameStore/updatePlayersScore', model);
+
+        signalr.onReceiveScoreNextSubTask = (model) => this.$store.commit('gameStore/updatePlayersScore', model);
+
+        signalr.onSubTasksUpdated = (subTasks) => this.$store.commit('gameStore/updateSubTasks', subTasks);
+        
         await this.reconnect();
     },
 
@@ -106,11 +118,15 @@ export default {
         },
 
         canShowCards() {
-            if (!this.gameInfo.otherUsers) {
-                return false;
-            }
+            const otherPlayerVoted = this.gameInfo.otherUsers
+                ? this.gameInfo.otherUsers.filter(user => !user.hasVoted)?.length === 0
+                : true;
 
-            return this.gameInfo.otherUsers.filter(user => !user.HasVoted)?.length === 0;
+            const currentPlayerIsVoted = this.isPlayer
+                ? this.gameInfo.myInfo.hasVoted
+                : true;
+
+            return otherPlayerVoted && currentPlayerIsVoted;
         },
 
         hasPlayers() {
@@ -145,7 +161,7 @@ export default {
         }
     },
 
-    beforeUnmount() {
+    unmounted() {
         signalr.stop();
     },
 
@@ -176,7 +192,53 @@ export default {
         },
 
         selectCard(score) {
-            console.log(score);
+            signalr.invokeTryChangeVote(score);
+        },
+
+        cardState(user) {
+            if (this.gameInfo.gameState === 'CardsOpenned' && user?.hasVoted) {
+                return 'openned';
+            }
+
+            return user?.hasVoted ? 'voted' : 'unvoted';
+        },
+
+        updateSubTaskScore(subTaskId, score) {
+            signalr.invokeChangeSubTaskScore(subTaskId, score);
+        },
+
+        spectate() {
+            signalr.invokeSpectate();
+        },
+
+        joinGame() {
+            signalr.invokeJoinGame();
+        },
+
+        startGame() {
+            signalr.invokeStartGame();
+        },
+
+        finishGame() {
+            signalr.invokeFinishGame();
+        },
+
+        rescoreSubTask() {
+            signalr.invokeRescoreSubTask();
+        },
+
+        tryOpenCards() {
+            if (this.canShowCards) {
+                signalr.invokeTryOpenCards();
+            }
+        },
+
+        scoreNextSubTask() {
+            signalr.invokeScoreNextSubTask();
+        },
+
+        scoreSubTaskById(subTaskId) {
+            signalr.invokeScoreSubTaskById(subTaskId);
         }
     },
 

@@ -22,18 +22,20 @@ export default {
         classes() {
             let classes = [];
 
-            if (this.state === 'openned') {
+            if (this.state === 'openned' || this.state === 'voted') {
                 classes.push(this.mapColorToClass('Blue'))
-            } else {
+            } else if (this.state === 'unvoted') {
+                classes.push(this.mapColorToClass('White'))
+            } else{
                 classes.push(this.mapColorToClass(this.color));
             }
 
             if (this.isSelectable) {
                 classes.push('pp-card-clickable');
-            }
 
-            if (this.isSelected) {
-                classes.push('pp-card-selected');
+                if (this.isSelected) {
+                    classes.push('pp-card-selected');
+                }
             }
 
             return classes.join(' ');
@@ -69,7 +71,13 @@ export default {
         },
 
         cardClick() {
-            if (this.isSelectable) {
+            if (!this.isSelectable) {
+                return;
+            }
+
+            if (this.isSelected) {
+                this.$emit('selectCard', null);
+            } else {
                 this.$emit('selectCard', this.score);
             }
         }

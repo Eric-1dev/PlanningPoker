@@ -22,9 +22,9 @@ public interface IGameControlService
 
     CardSetTypeEnum GetCardSetType(Guid gameId);
 
-    GameSubTask RescoreCurrentSubTask(Guid gameId, Guid userId);
+    Game RescoreCurrentSubTask(Guid gameId, Guid userId);
 
-    GameSubTask ScoreNextSubTask(Guid gameId, Guid userId);
+    Game ScoreNextSubTask(Guid gameId, Guid userId);
 
     Game FinishGame(Guid gameId, Guid userId);
 

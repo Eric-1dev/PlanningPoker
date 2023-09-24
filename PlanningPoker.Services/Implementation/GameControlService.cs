@@ -147,7 +147,7 @@ public class GameControlService : IGameControlService
         return game.CardSetType;
     }
 
-    public GameSubTask RescoreCurrentSubTask(Guid gameId, Guid userId)
+    public Game RescoreCurrentSubTask(Guid gameId, Guid userId)
     {
         using var dbContext = new ApplicationContext();
 
@@ -170,10 +170,10 @@ public class GameControlService : IGameControlService
 
         dbContext.SaveChanges();
 
-        return selectedSubTask;
+        return game;
     }
 
-    public GameSubTask ScoreNextSubTask(Guid gameId, Guid userId)
+    public Game ScoreNextSubTask(Guid gameId, Guid userId)
     {
         using var dbContext = new ApplicationContext();
 
@@ -205,7 +205,7 @@ public class GameControlService : IGameControlService
 
         dbContext.SaveChanges();
 
-        return nextSubTask;
+        return game;
     }
 
     public Game FinishGame(Guid gameId, Guid userId)
