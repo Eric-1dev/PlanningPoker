@@ -6,7 +6,7 @@
                 <div class="pp-d-table-row" v-for="user in sortedUserList">
                     <div class="pp-d-table-cell pp-w-100">{{ user.name }}</div>
                     <div class="pp-d-table-cell">
-                        <div v-if="!user.isPlayer"><i class="bi-eye-fill"></i></div>
+                        <div v-if="!user.isPlayer"><span class="mdi mdi-eye-outline"></span></div>
                     </div>
                 </div>
             </div>
