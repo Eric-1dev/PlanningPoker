@@ -4,6 +4,7 @@ import router from '@/router/router';
 import store from '@/store';
 import components from '@/components/UI';
 import vuetify from '@/vuetify';
+import '@mdi/font/css/materialdesignicons.min.css'
 
 const app = createApp(App);
 

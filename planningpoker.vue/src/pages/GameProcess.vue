@@ -11,10 +11,10 @@
             <div class="v-btn-group pp-justify-content-end">
                 <h5 v-if="!hasPlayers"><span class="pp-badge-warning">Ожидание других игроков...</span></h5>
                 <div class="pp-admin-buttons-group" v-if="isAdmin">
-                    <v-btn v-if="needShowFinishButton" @click="finishGame" size="small">Завершить оценку</v-btn>
-                    <v-btn v-if="needShowStartButton" @click="startGame" size="small">Начать оценку</v-btn>
-                    <v-btn v-if="needShowShowCardsButton" @click="tryOpenCards" :disabled="!canShowCards" size="small">Показать карты</v-btn>
-                    <v-btn v-if="needShowNextSubtaskButton" @click="scoreNextSubTask" :disabled="!canGoNextTask" color="warning" size="small">Перейти к следующей</v-btn>
+                    <v-btn v-if="needShowFinishButton" @click="finishGame" size="small" color="success">Завершить оценку</v-btn>
+                    <v-btn v-if="needShowStartButton" @click="startGame" size="small" color="success">Начать оценку</v-btn>
+                    <v-btn v-if="needShowShowCardsButton" @click="tryOpenCards" :disabled="!canShowCards" size="small" color="success">Показать карты</v-btn>
+                    <v-btn v-if="needShowNextSubtaskButton" @click="scoreNextSubTask" :disabled="!canGoNextTask" color="success" size="small">Перейти к следующей</v-btn>
                     <v-btn v-if="needShowRescoreButton" @click="rescoreSubTask" color="warning" size="small">Оценить заново</v-btn>
                 </div>
             </div>
@@ -26,16 +26,16 @@
 
             <!-- Карта текущего игрока -->
             <div class="pp-gamer-score" v-if="isPlayer">
-                <pp-card v-if="isPlayer" :text="String(gameInfo.myInfo?.score)" :state="cardState(gameInfo.myInfo)"></pp-card>
+                <pp-card v-if="isPlayer" :text="getCardTextByScore(gameInfo.myInfo?.score)" :state="cardState(gameInfo.myInfo)"></pp-card>
                 <div class="pp-gamer-name">{{ gameInfo.myInfo?.name }}</div>
             </div>
 
             <!-- Карты других игроков -->
             <div v-for="otherUser in otherPlayers" class="pp-gamer-score">
-                <pp-card :text="String(otherUser.score)" :state="cardState(otherUser)"></pp-card>
+                <pp-card :text="getCardTextByScore(otherUser.score)" :state="cardState(otherUser)"></pp-card>
                 <div class="pp-gamer-name">{{ otherUser.name }}</div>
             </div>
-            
+
         </div>
     </div>
 
@@ -95,7 +95,7 @@ export default {
 
         signalr.onShowPlayerScores = (model) => this.$store.commit('gameStore/updatePlayersScore', model);
 
-        signalr.onReceiveScoreNextSubTask = (model) => this.$store.commit('gameStore/updatePlayersScore', model);
+        signalr.onReceiveScoreNextSubTask = (model) => this.$store.commit('gameStore/updateGameState', model);
 
         signalr.onSubTasksUpdated = (subTasks) => this.$store.commit('gameStore/updateSubTasks', subTasks);
         
@@ -170,8 +170,6 @@ export default {
 
             const unvotedTask = this.gameInfo.subTasks.find(subTask => subTask.score === null);
 
-            console.log(unvotedTask)
-
             return !unvotedTask;
         }
     },
@@ -216,6 +214,10 @@ export default {
             }
 
             return user?.hasVoted ? 'voted' : 'unvoted';
+        },
+
+        getCardTextByScore(score) {
+            return this.gameInfo.cards?.find(card => card.score === score)?.text;
         },
 
         updateSubTaskScore(subTaskId, score) {

@@ -3,7 +3,7 @@
         <div class="pp-login-form-wrapper">
             <v-form @submit.prevent="login">
                 <div class="pp-login-header">Представьтесь, пожалуйста</div>
-                <v-text-field v-model="userName" :rules="[required]" clearable placeholder="Имя пользователя" />
+                <v-text-field v-model="userName" :clearable="true" placeholder="Имя пользователя" />
                 <v-btn color="success" size="small" type="submit">Войти</v-btn>
             </v-form>
         </div>

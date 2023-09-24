@@ -6,17 +6,19 @@
             </div>
             <div v-else class="pp-task">
                 <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask.id)">{{ subTask.text }}</span>
-                <v-select
-                    v-if="isAdmin"
-                    @change="scoreChanged($event, subTask.id)"
-                    class="pp-tasks-zone-task-score"
-                    :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
-                    :items="availableScores"
-                    clearable
-                    density="compact"
-                    variant="outlined"
-                ></v-select>
-                <span v-else>{{ subTask.score ?? '-' }}</span>
+                <div>
+                    <v-select
+                        v-if="isAdmin"
+                        @update:modelValue="scoreChanged($event, subTask.id)"
+                        :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
+                        :items="availableScores"
+                        :hide-details="true"
+                        v-model="subTask.score"
+                        density="compact"
+                        variant="outlined"
+                    ></v-select>
+                    <span v-else>{{ subTask.score ?? '-' }}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -42,8 +44,8 @@ export default {
     },
 
     methods: {
-        scoreChanged(event, subTaskId) {
-            const score = parseFloat(event.target.value);
+        scoreChanged(item, subTaskId) {
+            const score = parseFloat(item);
             this.$emit('scoreChanged', subTaskId, score);
         },
 
@@ -76,10 +78,6 @@ export default {
 .pp-task-name {
     word-wrap: anywhere;
     margin-right: 10px;
-}
-
-.pp-tasks-zone-task-score {
-    width: 3em;
 }
 
 .pp-tasks-zone {

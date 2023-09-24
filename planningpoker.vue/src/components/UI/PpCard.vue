@@ -96,7 +96,7 @@ export default {
     height: 150px;
     border: 1px solid lightgray;
     border-radius: 7px;
-    font-size: 60px;
+    font-size: 50px;
     align-items: center;
     justify-content: center;
     user-select: none;
@@ -133,13 +133,15 @@ export default {
 }
 
 .pp-card-voted::after {
-    font-family: "bootstrap-icons";
-    content: "\f26e";
+    font-size: 80px;
+    font-family: "Material Design Icons";
+    content: "\F012C";
 }
 
 .pp-card-unvoted::after {
-    content: "\f293";
-    font-family: "bootstrap-icons";
+    font-size: 80px;
+    font-family: 'Material Design Icons';
+    content: "\F0150";
     color: gray;
 }
 
