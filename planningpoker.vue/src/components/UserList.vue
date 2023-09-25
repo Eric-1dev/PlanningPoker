@@ -1,7 +1,7 @@
 <template>
     <div>
-        <v-btn v-on:click="this.showList = !this.showList" color="success" size="small">Список пользователей</v-btn>
-        <div class="user-list_wrapper" v-if="this.showList">
+        <v-btn v-on:click="showList = !showList" color="success" size="small">Список пользователей</v-btn>
+        <div class="user-list_wrapper" v-if="showList">
             <div class="pp-d-table">
                 <div class="pp-d-table-row" v-for="user in sortedUserList">
                     <div class="pp-d-table-cell pp-w-100">{{ user.name }}</div>

@@ -1,42 +1,35 @@
 <template>
     <div class="pp-tasks-zone">
         <v-btn v-if="!editMode" size="small" color="teal" @click="editSubTasks">Редактировать подзадачи</v-btn>
-        <v-btn v-else size="small" color="teal" @click="saveSubTasks">Сохранить изменения</v-btn>
-        <div v-if="editMode" v-for="subTaskToEdit in subTasksToEdit" :key="subTaskToEdit.uniqueId" class="pp-task-edit-container">
-            <div class="pp-subtask-controlls">
-                <span class="mdi mdi-arrow-up-thick" @click="moveUp(subTaskToEdit.uniqueId)"></span>
-                <span class="mdi mdi-arrow-down-thick" @click="moveDown(subTaskToEdit.uniqueId)"></span>
-            </div>
-            <v-textarea
-                rows="2"
-                v-model="subTaskToEdit.text"
-                :hide-details="true"
-                density="compact"
-                :no-resize="true"
-            ></v-textarea>
-            <div class="pp-subtask-controlls">
-                <span class="mdi mdi-trash-can-outline" @click="removeTask(subTaskToEdit.uniqueId)"></span>
-                <span class="mdi mdi-plus" @click="addNewTask(subTaskToEdit.uniqueId)"></span>
-            </div>
+        <div v-else class="pp-editor-buttons">
+            <v-btn size="small" color="teal" @click="saveSubTasks">Сохранить изменения</v-btn>
+            <v-btn size="small" color="warning" @click="editMode = false">Отмена</v-btn>    
         </div>
-        <div v-else v-for="subTask in subTasks">
-            <div class="pp-task">
-                <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask)">{{ subTask.text }}</span>
-                <div class="pp-task-score-select-container">
-                    <v-select
-                        v-if="isAdmin"
-                        @update:modelValue="scoreChanged($event, subTask.id)"
-                        :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
-                        :items="availableScores"
-                        :hide-details="true"
-                        v-model="subTask.score"
-                        density="compact"
-                        variant="outlined"
-                    ></v-select>
-                    <span v-else>{{ subTask.score ?? '-' }}</span>
+
+        <v-scale-transition>
+            <pp-sub-tasks-editor v-if="editMode" v-model:subTasks="subTasksToEdit" :canRemoveLast="false"></pp-sub-tasks-editor>
+            
+            <div v-else class="pp-tasks-wrapper">
+                <div v-for="subTask in subTasks">
+                    <div class="pp-task">
+                        <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask)">{{ subTask.text }}</span>
+                        <div class="pp-task-score-select-container">
+                            <v-select
+                                v-if="isAdmin"
+                                @update:modelValue="scoreChanged($event, subTask.id)"
+                                :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
+                                :items="availableScores"
+                                :hide-details="true"
+                                v-model="subTask.score"
+                                density="compact"
+                                variant="outlined"
+                            ></v-select>
+                            <span v-else>{{ subTask.score ?? '-' }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </v-scale-transition>
     </div>
     <pp-confirmation-dialog
         title="Вы уверены?"
@@ -48,7 +41,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import PpConfirmationDialog from './UI/PpConfirmationDialog.vue';
 
 export default {
     data() {
@@ -115,50 +107,17 @@ export default {
             this.$emit('updateSubTasks', subTasks);
             this.editMode = false;
         },
-
-        moveUp(id) {
-            const index = this.subTasksToEdit.map(x => x.uniqueId).indexOf(id);
-
-            if (index < 1) {
-                return;
-            }
-
-            const swap = this.subTasksToEdit[index];
-            this.subTasksToEdit[index] = this.subTasksToEdit[index - 1];
-            this.subTasksToEdit[index - 1] = swap;
-        },
-
-        moveDown(id) {
-            const index = this.subTasksToEdit.map(x => x.uniqueId).indexOf(id);
-
-            if (index >= this.subTasksToEdit.length - 1) {
-                return;
-            }
-
-            const swap = this.subTasksToEdit[index];
-            this.subTasksToEdit[index] = this.subTasksToEdit[index + 1];
-            this.subTasksToEdit[index + 1] = swap;
-        },
-
-        removeTask(id) {
-            this.subTasksToEdit = this.subTasksToEdit.filter(task => task.uniqueId !== id)
-        },
-
-        addNewTask(id) {
-            const index = this.subTasksToEdit.map(x => x.uniqueId).indexOf(id);
-
-            const newTask = {
-                uniqueId: new Date().valueOf(),
-                text: null
-            };
-
-            this.subTasksToEdit = [...this.subTasksToEdit.slice(0, index + 1), newTask, ...this.subTasksToEdit.slice(index + 1)];
-        }
     }
 }
 </script>
 
 <style scoped>
+.pp-tasks-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .pp-cursor-pointer {
     cursor: pointer;
 }
@@ -190,23 +149,13 @@ export default {
     gap: 30px;
 }
 
-.pp-task-edit-container {
-    display: flex;
-    flex-direction: row;
-}
-
-.pp-subtask-controlls {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    font-size: 1.2em;
-}
-
-.pp-subtask-controlls span {
-    cursor: pointer;
-}
-
 .pp-task-score-select-container {
     min-width: fit-content;
+}
+
+.pp-editor-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 </style>
