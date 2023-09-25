@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App'
 import router from '@/router/router';
 import store from '@/store';
-import components from '@/components/UI';
+import uiComponents from '@/components/UI';
 import vuetify from '@/vuetify';
 import '@mdi/font/css/materialdesignicons.min.css'
 
@@ -14,12 +14,12 @@ app.config.globalProperties.HUB_CONNECT_URL = app.config.globalProperties.APPLIC
 app.config.globalProperties.API_BASE_URL = app.config.globalProperties.APPLICATION_BASE_URL + "/api";
 app.config.globalProperties.API_CREATE_GAME_URL = app.config.globalProperties.API_BASE_URL + "/Game/Create";
 
-components.forEach(component => {
+uiComponents.forEach(component => {
     app.component(component.name, component);
 });
 
-app.use(router)
-app.use(store)
-app.use(vuetify)
+app.use(router);
+app.use(store);
+app.use(vuetify);
 
-app.mount('#app')
+app.mount('#app');
