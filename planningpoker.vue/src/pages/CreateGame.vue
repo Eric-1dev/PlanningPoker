@@ -8,7 +8,7 @@
 
                     <pp-sub-tasks-editor v-model:subTasks="subTasks" :canRemoveLast="true"></pp-sub-tasks-editor>
 
-                    <v-btn size="small" color="primary" @click="createGame">Создать игру</v-btn>
+                    <v-btn color="primary" @click="createGame">Создать игру</v-btn>
                 </div>
             </v-form>
         </div>
@@ -53,19 +53,12 @@ export default {
 
 <style scoped>
 .pp-create-game-container {
-    position: fixed;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 50px;
-    z-index: 20000;
-    width: 500px;
-    top: 50px;
-    left: calc(50% - 250px);
 }
 
 .pp-create-game-form-wrapper {
-    width: fit-content;
     border: 1px dotted lightgray;
     border-radius: 20px;
     padding: 40px;
@@ -75,7 +68,7 @@ export default {
 .pp-create-game-form-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
     width: 600px;
 }
 </style>
