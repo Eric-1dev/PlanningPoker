@@ -25,6 +25,7 @@
 
 <script>
 import signalr from '@/signalr/signalr'
+import axios from 'axios'
 
 export default {
     async beforeMount() {
@@ -58,8 +59,13 @@ export default {
     },
 
     watch: {
-        userName() {
-            signalr.generateAndSetToken(this.$store.state.mainStore.userId, this.$store.state.mainStore.userName);
+        userName(newValue) {
+            const token = newValue
+                ? btoa(encodeURIComponent(`${this.$store.state.mainStore.userId}:${this.$store.state.mainStore.userName}`))
+                : null;
+
+            signalr.setToken(token);
+            axios.defaults.headers.common['Authorization'] = token;
         }
     }
 }
@@ -77,7 +83,7 @@ html {
     position: relative;
     min-height: 100%;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-    overflow-y: hidden !important;
+    overflow-y: auto !important;
 }
 
 @media (min-width: 768px) {
@@ -127,11 +133,23 @@ header {
     margin-left: 10px;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .4s;
+.list-item {
+    display: inline-block;
+    margin-right: 10px;
 }
 
-.fade-enter, .fade-leave-to {
-  opacity: 0;
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.4s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.list-move {
+    transition: transform 0.4s ease;
 }
 </style>

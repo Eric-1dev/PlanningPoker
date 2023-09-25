@@ -12,12 +12,7 @@ const signalr = {
         this._config.url = url;
     },
 
-    generateAndSetToken(userId, userName) {
-        if (!userName || !userId) {
-            this._config.token = null;
-        }
-
-        const token = btoa(encodeURIComponent(`${userId}:${userName}`));
+    setToken(token) {
         this._config.token = token;
     },
 
@@ -43,7 +38,6 @@ const signalr = {
 
         connection.onclose(async () => {
             await this.onStop();
-
         });
 
         connection.on('ReceiveGameInfo', (gameInfo) => {

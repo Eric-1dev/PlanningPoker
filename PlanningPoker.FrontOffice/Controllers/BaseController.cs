@@ -3,20 +3,20 @@ using PlanningPoker.Entities.Models;
 
 namespace PlanningPoker.FrontOffice.Controllers;
 
-public abstract class BaseController : Controller
+public abstract class BaseController : ControllerBase
 {
-    protected JsonResult Fail(string message)
+    protected IActionResult Fail(string message)
     {
-        return Json(OperationResult.Fail(message));
+        return Ok(OperationResult.Fail(message));
     }
 
-    protected JsonResult Success(string message = null)
+    protected IActionResult Success(string message = null)
     {
-        return Json(OperationResult.Success(message));
+        return Ok(OperationResult.Success(message));
     }
 
-    protected JsonResult Success<T>(T entity)
+    protected IActionResult Success<T>(T entity)
     {
-        return Json(OperationResult<T>.Success(entity));
+        return Ok(OperationResult<T>.Success(entity));
     }
 }

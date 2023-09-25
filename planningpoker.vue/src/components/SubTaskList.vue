@@ -1,33 +1,38 @@
 <template>
     <div class="pp-tasks-zone">
-        <v-btn v-if="!editMode" size="small" color="teal" @click="editSubTasks">Редактировать подзадачи</v-btn>
-        <div v-else class="pp-editor-buttons">
-            <v-btn size="small" color="teal" @click="saveSubTasks">Сохранить изменения</v-btn>
-            <v-btn size="small" color="warning" @click="editMode = false">Отмена</v-btn>    
+        <div class="pp-edit-sub-tasks-buttons" v-if="isAdmin">
+            <v-btn v-if="!editMode" size="small" color="teal" block @click="editSubTasks">Редактировать подзадачи</v-btn>
+
+            <div v-else class="pp-editor-buttons">
+                <v-btn size="small" color="teal" @click="saveSubTasks">Сохранить изменения</v-btn>
+                <v-btn size="small" color="warning" @click="editMode = false">Отмена</v-btn>    
+            </div>
         </div>
 
         <v-scale-transition>
             <pp-sub-tasks-editor v-if="editMode" v-model:subTasks="subTasksToEdit" :canRemoveLast="false"></pp-sub-tasks-editor>
             
             <div v-else class="pp-tasks-wrapper">
-                <div v-for="subTask in subTasks">
-                    <div class="pp-task">
-                        <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask)">{{ subTask.text }}</span>
-                        <div class="pp-task-score-select-container">
-                            <v-select
-                                v-if="isAdmin"
-                                @update:modelValue="scoreChanged($event, subTask.id)"
-                                :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
-                                :items="availableScores"
-                                :hide-details="true"
-                                v-model="subTask.score"
-                                density="compact"
-                                variant="outlined"
-                            ></v-select>
-                            <span v-else>{{ subTask.score ?? '-' }}</span>
+                <transition-group name="list">
+                    <div v-for="subTask in subTasks" :key="subTask.id">
+                        <div class="pp-task">
+                            <span class="pp-cursor-pointer" :class="subTask.isSelected ? 'pp-task-selected' : ''" @click="scoreSubTask(subTask)">{{ subTask.text }}</span>
+                            <div class="pp-task-score-select-container">
+                                <v-select
+                                    v-if="isAdmin"
+                                    @update:modelValue="scoreChanged($event, subTask.id)"
+                                    :disabled="!subTask.isSelected || gameState !== 'CardsOpenned'"
+                                    :items="availableScores"
+                                    hide-details="auto"
+                                    v-model="subTask.score"
+                                    density="compact"
+                                    variant="outlined"
+                                ></v-select>
+                                <span v-else>{{ subTask.score ?? '-' }}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </transition-group>
             </div>
         </v-scale-transition>
     </div>

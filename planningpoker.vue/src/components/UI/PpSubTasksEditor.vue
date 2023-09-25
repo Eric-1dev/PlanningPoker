@@ -1,7 +1,11 @@
 <template>
     <div>
-        <v-btn block v-if="subTaskList.length === 0" size="small" color="success" @click="addNewTask">Добавить
-            подзадачу</v-btn>
+        <transition name="fade-transition">
+            <div class="pp-add-sub-task-button">
+                <v-btn v-if="subTaskList.length === 0" size="small" color="success" @click="addNewTask">Добавить
+                    подзадачу</v-btn>
+            </div>
+        </transition>
 
         <div class="pp-task-edit-wrapper">
             <transition-group name="list">
@@ -11,8 +15,8 @@
                         <span class="mdi mdi-arrow-down-thick" @click="moveDown(subTask.uniqueId)"></span>
                     </div>
 
-                    <v-textarea rows="2" v-model="subTask.text" :hide-details="true" density="compact"
-                        :no-resize="true"></v-textarea>
+                    <v-textarea rows="2" v-model="subTask.text" hide-details="auto" placeholder="Название подзадачи"
+                        density="compact" :no-resize="true"></v-textarea>
 
                     <div class="pp-subtask-controlls">
                         <span class="mdi mdi-trash-can-outline" @click="removeTask(subTask.uniqueId)"></span>
@@ -35,7 +39,11 @@ export default {
     },
 
     props: {
-        subTasks: Array,
+        subTasks: {
+            type: Array,
+            default: []
+        },
+
         canRemoveLast: {
             type: Boolean,
             default: true
@@ -127,23 +135,8 @@ export default {
     cursor: pointer;
 }
 
-.list-item {
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.list-enter-active,
-.list-leave-active {
-    transition: all 0.4s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-    opacity: 0;
-    transform: translateY(30px);
-}
-
-.list-move {
-    transition: transform 0.4s ease;
+.pp-add-sub-task-button {
+    display: flex;
+    justify-content: center;
 }
 </style>

@@ -12,7 +12,7 @@ app.config.globalProperties.APPLICATION_BASE_URL = "https://localhost:44353";
 
 app.config.globalProperties.HUB_CONNECT_URL = app.config.globalProperties.APPLICATION_BASE_URL + "/GameConnect";
 app.config.globalProperties.API_BASE_URL = app.config.globalProperties.APPLICATION_BASE_URL + "/api";
-app.config.globalProperties.API_AUTHORIZATION_URL = app.config.globalProperties.API_BASE_URL + "/ApiLogin/Authorization";
+app.config.globalProperties.API_CREATE_GAME_URL = app.config.globalProperties.API_BASE_URL + "/Game/Create";
 
 components.forEach(component => {
     app.component(component.name, component);

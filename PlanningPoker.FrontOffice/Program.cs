@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using BundlerMinifier.TagHelpers;
 using ElectroPrognizer.Utils.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -35,24 +34,12 @@ var connectionString = builder.Configuration.GetConnectionString("PlanningPoker"
 ConfigurationHelper.SetConnectionString(connectionString);
 
 builder.Services
-    .AddMvc()
-    .AddControllersAsServices();
-
-builder.Services
-    .AddControllersWithViews()
+    .AddControllers()
+    .AddControllersAsServices()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddBundles(options =>
-{
-    options.AppendVersion = true;
-    options.UseMinifiedFiles = false;
-    options.UseBundles = false;
-});
 
 builder.Services.AddAuthentication(PokerAuthenticationHandler.AuthSchemeName)
     .AddScheme<AuthenticationSchemeOptions, PokerAuthenticationHandler>(PokerAuthenticationHandler.AuthSchemeName, null, options => { });
@@ -75,23 +62,14 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
 
 var app = builder.Build();
 
-app.UseDeveloperExceptionPage();
-
 app.UseHsts();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors("CorsPolicy");
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllers().RequireAuthorization();
 

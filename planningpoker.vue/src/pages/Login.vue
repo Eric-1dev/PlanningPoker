@@ -29,8 +29,6 @@ export default {
 
             this.$store.commit('mainStore/setUserName', this.userName);
 
-            signalr.generateAndSetToken(this.$store.state.mainStore.userId, this.$store.state,mainStore.userName)
-
             const redirectPath = this.$route.query.redirectUrl ?? '/';
 
             this.$router.push(redirectPath);
