@@ -387,10 +387,6 @@ export default {
     align-items: baseline;
 }
 
-.pp-justify-content-end {
-    justify-content: end;
-}
-
 .pp-admin-buttons-group {
     display: flex;
     gap: 10px;

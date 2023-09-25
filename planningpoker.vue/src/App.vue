@@ -126,6 +126,10 @@ header {
     margin-left: 10px;
 }
 
+.pp-justify-content-end {
+    justify-content: end;
+}
+
 .list-item {
     display: inline-block;
     margin-right: 10px;

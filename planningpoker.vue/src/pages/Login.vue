@@ -3,7 +3,7 @@
         <div class="pp-login-form-wrapper">
             <v-form @submit.prevent="login">
                 <div class="pp-login-header">Представьтесь, пожалуйста</div>
-                <v-text-field v-model="userName" :clearable="true" placeholder="Имя пользователя" />
+                <v-text-field v-model="userName" :clearable="true" label="Имя пользователя" />
                 <v-btn color="success" size="small" type="submit">Войти</v-btn>
             </v-form>
         </div>
@@ -18,6 +18,12 @@ export default {
         }
     },
 
+    beforeMount() {
+        if (this.$store.state.mainStore.userName) {
+            this.redirect();
+        }
+    },
+
     methods: {
         login() {
             if (!this.userName) {
@@ -26,6 +32,10 @@ export default {
 
             this.$store.commit('mainStore/setUserName', this.userName);
 
+            this.redirect();
+        },
+
+        redirect() {
             const redirectPath = this.$route.query.redirectUrl ?? '/';
 
             this.$router.push(redirectPath);

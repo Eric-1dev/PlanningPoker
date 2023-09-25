@@ -1,7 +1,9 @@
 <template>
     <div class="pp-tasks-zone">
-        <div class="pp-edit-sub-tasks-buttons" v-if="isAdmin">
-            <v-btn v-if="!editMode" size="small" color="teal" block @click="editSubTasks">Редактировать подзадачи</v-btn>
+        <div v-if="isAdmin">
+            <div v-if="!editMode" class="pp-edit-sub-tasks-button">
+                <v-btn size="small" color="teal" @click="editSubTasks">Редактировать подзадачи</v-btn>
+            </div>
 
             <div v-else class="pp-editor-buttons">
                 <v-btn size="small" color="teal" @click="saveSubTasks">Сохранить изменения</v-btn>
@@ -156,6 +158,11 @@ export default {
 
 .pp-task-score-select-container {
     min-width: fit-content;
+}
+
+.pp-edit-sub-tasks-button {
+    display: flex;
+    justify-content: end;
 }
 
 .pp-editor-buttons {
