@@ -1,25 +1,17 @@
 <template>
-    <div class="app">
-        <div class="pp-backgroud-cell">
-            <header>
-                <div class="pp-username-area">
-                    <div v-if="userName">
-                        <span>{{ userName }}</span>
-                        <v-btn color="grey" class="pp-exit-button" @click="logOut" size="small">
-                            Выход
-                        </v-btn>
-                    </div>
-
-                    <div v-else>
-                        <span>Гость</span>
-                    </div>
-                </div>
-            </header>
-
-            <div class="pp-body-wrapper">
-                <router-view></router-view>
+    <header>
+        <div class="pp-username-area">
+            <div v-if="userName">
+                <span>{{ userName }}</span>
+                <v-btn color="grey" class="pp-exit-button" @click="logOut" size="small">
+                    Выход
+                </v-btn>
             </div>
         </div>
+    </header>
+
+    <div class="pp-body-wrapper">
+        <router-view></router-view>
     </div>
 </template>
 

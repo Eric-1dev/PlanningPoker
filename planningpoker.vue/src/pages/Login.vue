@@ -11,9 +11,6 @@
 </template>
 
 <script>
-import signalr from '@/signalr/signalr';
-import mainStore from '@/store/modules/mainStore';
-
 export default {
     data() {
         return {
