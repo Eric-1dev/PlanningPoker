@@ -31,10 +31,12 @@
             </div>
 
             <!-- Карты других игроков -->
-            <div v-for="otherUser in otherPlayers" class="pp-gamer-score">
-                <pp-card :text="getCardTextByScore(otherUser.score)" :state="cardState(otherUser)"></pp-card>
-                <div class="pp-gamer-name">{{ otherUser.name }}</div>
-            </div>
+            <transition-group name="list">
+                <div v-for="otherUser in otherPlayers" :key="otherUser.userId" class="pp-gamer-score">
+                    <pp-card :text="getCardTextByScore(otherUser.score)" :state="cardState(otherUser)"></pp-card>
+                    <div class="pp-gamer-name">{{ otherUser.name }}</div>
+                </div>
+            </transition-group>
 
         </div>
     </div>

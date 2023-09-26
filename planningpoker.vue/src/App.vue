@@ -26,7 +26,7 @@ import AlertGroup from './components/AlertGroup.vue';
 export default {
     async beforeMount() {
         this.$store.commit('mainStore/initUserData');
-        
+
         this.$router.beforeEach((to, from, next) => {
             if (!this.$store.state.mainStore.userName && to.name != 'Login') {
                 next({ name: 'Login', query: { redirectUrl: to.path } });
