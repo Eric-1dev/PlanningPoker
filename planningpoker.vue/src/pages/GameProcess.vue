@@ -81,6 +81,8 @@ export default {
         signalr.onStart = () => this.$store.commit('mainStore/setHubConnectionState', true);
         signalr.onStop = () => this.$store.commit('mainStore/setHubConnectionState', false);
 
+        signalr.onSystemMessageReceived = (messageInfo) => this.$store.dispatch('mainStore/addAlert', { level: messageInfo.messageType, message: messageInfo.message });
+
         signalr.onReceiveGameInfo = (gameInfo) => this.$store.commit('gameStore/setGameInfo', gameInfo);
 
         signalr.onUserJoin = (user) => this.$store.commit('gameStore/addUser', user);
@@ -265,7 +267,7 @@ export default {
         SubTaskList,
         UserList
     }
-}
+};
 </script>
 
 <style scoped>

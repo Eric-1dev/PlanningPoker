@@ -8,7 +8,8 @@ const mainStore = {
     state: {
         userId: null,
         userName: '',
-        isHubConnected: false
+        isHubConnected: false,
+        alerts: []
     },
 
     mutations: {
@@ -39,11 +40,29 @@ const mainStore = {
 
         setHubConnectionState(state, isConnected) {
             state.isHubConnected = isConnected;
+        },
+
+        pushAlert(state, alert) {
+            state.alerts.unshift(alert);
+        },
+
+        popAlert(state, uniqueId) {
+            state.alerts = state.alerts.filter(alert => alert.uniqueId !== uniqueId);
         }
     },
 
     actions: {
+        addAlert({ commit }, alertData) {
+            const alert = {
+                level: alertData.level,
+                message: alertData.message,
+                uniqueId: new Date().valueOf()
+            };
+            
+            commit('pushAlert', alert);
 
+            setTimeout(() => commit('popAlert', alert.uniqueId), 5000);
+        }
     }
 };
 

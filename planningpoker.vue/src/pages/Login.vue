@@ -41,8 +41,7 @@ export default {
             this.$router.push(redirectPath);
         }
     }
-}
-
+};
 </script>
 
 <style scoped>

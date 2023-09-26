@@ -115,7 +115,7 @@ export default {
             this.editMode = false;
         },
     }
-}
+};
 </script>
 
 <style scoped>

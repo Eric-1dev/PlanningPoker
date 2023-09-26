@@ -13,24 +13,28 @@
     <div class="pp-body-wrapper">
         <router-view></router-view>
     </div>
+
+    <alert-group></alert-group>
+
 </template>
 
 <script>
-import signalr from '@/signalr/signalr'
-import axios from 'axios'
+import signalr from '@/signalr/signalr';
+import axios from 'axios';
+import AlertGroup from './components/AlertGroup.vue';
 
 export default {
     async beforeMount() {
         this.$store.commit('mainStore/initUserData');
-
-        this.$router.beforeEach(
-            (to, from, next) => {
-                if (!this.$store.state.mainStore.userName && to.name != 'Login') {
-                    next({ name: 'Login', query: { redirectUrl: to.path } });
-                } else {
-                    next();
-                }
-            });
+        
+        this.$router.beforeEach((to, from, next) => {
+            if (!this.$store.state.mainStore.userName && to.name != 'Login') {
+                next({ name: 'Login', query: { redirectUrl: to.path } });
+            }
+            else {
+                next();
+            }
+        });
     },
 
     methods: {
@@ -47,7 +51,7 @@ export default {
     computed: {
         userName() {
             return this.$store.state.mainStore.userName;
-        }
+        },
     },
 
     watch: {
@@ -55,12 +59,15 @@ export default {
             const token = newValue
                 ? btoa(encodeURIComponent(`${this.$store.state.mainStore.userId}:${this.$store.state.mainStore.userName}`))
                 : null;
-
             signalr.setToken(token);
             axios.defaults.headers.common['Authorization'] = token;
         }
+    },
+
+    components: { 
+        AlertGroup
     }
-}
+};
 </script>
 
 <style>

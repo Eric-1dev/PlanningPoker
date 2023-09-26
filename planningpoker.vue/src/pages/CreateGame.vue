@@ -38,17 +38,23 @@ export default {
 
             await axios.post(this.API_CREATE_GAME_URL, {
                 taskName: this.taskName,
-                subTasks: this.subTasks.map(task => task.text.trim()).filter(text => !!text)
+                subTasks: this.subTasks.map(task => task.text?.trim()).filter(text => !!text)
             }).then((response) => {
                 if (response.data.isSuccess) {
                     this.$router.push({ name: 'Game', params: { id: response.data.entity } });
+                } else {
+                    this.showError(response.data.message);
                 }
             }, (error) => {
-                console.log(error);
+                this.showError(error);
             });
+        },
+
+        showError(message) {
+            this.$store.dispatch('mainStore/addAlert', { level: 'Error', message: message });
         }
     }
-}
+};
 </script>
 
 <style scoped>

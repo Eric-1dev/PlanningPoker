@@ -109,7 +109,7 @@ export default {
             this.$emit('update:subTasks', this.subTaskList);
         }
     }
-}
+};
 </script>
 
 <style scoped>
@@ -129,6 +129,7 @@ export default {
     flex-direction: column;
     justify-content: space-around;
     font-size: 1.2em;
+    color: rgb(83, 83, 83);
 }
 
 .pp-subtask-controlls span {

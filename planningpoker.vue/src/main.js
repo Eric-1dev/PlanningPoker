@@ -1,10 +1,10 @@
-import { createApp } from 'vue'
-import App from '@/App'
+import { createApp } from 'vue';
+import App from '@/App';
 import router from '@/router/router';
 import store from '@/store';
 import uiComponents from '@/components/UI';
 import vuetify from '@/vuetify';
-import '@mdi/font/css/materialdesignicons.min.css'
+import '@mdi/font/css/materialdesignicons.min.css';
 
 const app = createApp(App);
 

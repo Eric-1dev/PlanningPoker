@@ -40,6 +40,10 @@ const signalr = {
             await this.onStop();
         });
 
+        connection.on('SystemMessageReceived', (messageInfo) => {
+            this.onSystemMessageReceived(messageInfo);
+        });
+
         connection.on('ReceiveGameInfo', (gameInfo) => {
             this.onReceiveGameInfo(gameInfo);
         });
@@ -101,6 +105,7 @@ const signalr = {
     onShowPlayerScores: () => { },
     onReceiveScoreNextSubTask: () => { },
     onSubTasksUpdated: () => { },
+    onSystemMessageReceived: () => { },
 
     invokeUserConnected(gameId, isPlayer) {
         this._connection.invoke('UserConnected', gameId, isPlayer);

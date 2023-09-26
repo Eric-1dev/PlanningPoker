@@ -15,7 +15,7 @@ public class ErrorHandleHubFilter : IHubFilter
         }
         catch (WorkflowException ex)
         {
-            await invocationContext.Hub.Clients.Caller.SendAsync("OnSystemMessageReceived", new MessageInfoModel
+            await invocationContext.Hub.Clients.Caller.SendAsync("SystemMessageReceived", new MessageInfoModel
             {
                 MessageType = MessageTypeEnum.Error,
                 Message = ex.Message
