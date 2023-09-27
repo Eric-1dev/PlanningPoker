@@ -14,13 +14,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-
 export default {
-    computed: {
-        ...mapState({
-            alerts: state => state.mainStore.alerts
-        })
+    props: {
+        alerts: Array
     }
 };
 </script>

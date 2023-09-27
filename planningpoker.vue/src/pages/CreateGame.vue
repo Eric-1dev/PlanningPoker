@@ -30,6 +30,8 @@ export default {
         };
     },
 
+    inject: ['addAlert'],
+
     methods: {
         async createGame() {
             if (!this.$refs.form.validate()) {
@@ -51,7 +53,7 @@ export default {
         },
 
         showError(message) {
-            this.$store.dispatch('mainStore/addAlert', { level: 'Error', message: message });
+            this.addAlert('Error', message);
         }
     }
 };

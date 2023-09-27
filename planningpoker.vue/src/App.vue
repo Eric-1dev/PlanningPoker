@@ -14,7 +14,7 @@
         <router-view></router-view>
     </div>
 
-    <alert-group></alert-group>
+    <alert-group :alerts="alerts"></alert-group>
 
 </template>
 
@@ -24,6 +24,12 @@ import axios from 'axios';
 import AlertGroup from './components/AlertGroup.vue';
 
 export default {
+    data() {
+        return {
+            alerts: []
+        };
+    },
+
     async beforeMount() {
         this.$store.commit('mainStore/initUserData');
 
@@ -45,7 +51,25 @@ export default {
 
         redirectToLogin() {
             this.$router.go();
+        },
+
+        addAlert(level, message) {
+            const alert = {
+                level: level,
+                message: message,
+                uniqueId: new Date().valueOf()
+            };
+
+            this.alerts.unshift(alert);
+
+            setTimeout(() => this.alerts = this.alerts.filter(item => item.uniqueId !== alert.uniqueId), 5000);
         }
+    },
+
+    provide: function () {
+        return {
+            addAlert: this.addAlert
+        };
     },
 
     computed: {

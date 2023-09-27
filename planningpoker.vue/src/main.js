@@ -8,11 +8,11 @@ import '@mdi/font/css/materialdesignicons.min.css';
 
 const app = createApp(App);
 
-app.config.globalProperties.APPLICATION_BASE_URL = "https://localhost:44353";
+app.config.globalProperties.APPLICATION_BASE_URL = process.env.VUE_APP_BASE_URL;
 
-app.config.globalProperties.HUB_CONNECT_URL = app.config.globalProperties.APPLICATION_BASE_URL + "/GameConnect";
-app.config.globalProperties.API_BASE_URL = app.config.globalProperties.APPLICATION_BASE_URL + "/api";
-app.config.globalProperties.API_CREATE_GAME_URL = app.config.globalProperties.API_BASE_URL + "/Game/Create";
+app.config.globalProperties.HUB_CONNECT_URL = app.config.globalProperties.APPLICATION_BASE_URL + process.env.VUE_APP_HUB_CONNECT_URL;
+app.config.globalProperties.API_BASE_URL = app.config.globalProperties.APPLICATION_BASE_URL + process.env.VUE_APP_API_BASE_URL;
+app.config.globalProperties.API_CREATE_GAME_URL = app.config.globalProperties.API_BASE_URL + process.env.VUE_APP_API_CREATE_GAME_URL;
 
 uiComponents.forEach(component => {
     app.component(component.name, component);

@@ -76,6 +76,8 @@ import SubTaskList from '@/components/SubTaskList.vue';
 import UserList from '@/components/UserList.vue';
 
 export default {
+    inject: ['addAlert'],
+
     async beforeMount() {
         this.$store.commit('gameStore/setIsPlayer');
 
@@ -83,7 +85,7 @@ export default {
         signalr.onStart = () => this.$store.commit('mainStore/setHubConnectionState', true);
         signalr.onStop = () => this.$store.commit('mainStore/setHubConnectionState', false);
 
-        signalr.onSystemMessageReceived = (messageInfo) => this.$store.dispatch('mainStore/addAlert', { level: messageInfo.messageType, message: messageInfo.message });
+        signalr.onSystemMessageReceived = (messageInfo) => this.addAlert(messageInfo.messageType, messageInfo.message);
 
         signalr.onReceiveGameInfo = (gameInfo) => this.$store.commit('gameStore/setGameInfo', gameInfo);
 
